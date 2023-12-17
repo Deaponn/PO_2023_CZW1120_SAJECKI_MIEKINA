@@ -13,7 +13,7 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
         return lowerLeftMix.equals(this.lowerLeft) && upperRightMix.equals(this.upperRight);
     }
 
-    public <T> Stream<T> map(BiFunction<Integer, Integer, T> mapper) {
+    public <T> Stream<T> mapAllPositions(BiFunction<Integer, Integer, T> mapper) {
         int startX = this.lowerLeft.getX();
         int endX = this.upperRight.getX();
         int startY = this.lowerLeft.getY();
@@ -24,7 +24,7 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
         );
     }
 
-    public <T> Stream<T> map(Function<Vector2D, T> mapper) {
-        return this.map((x, y) -> mapper.apply(new Vector2D(x, y)));
+    public <T> Stream<T> mapAllPositions(Function<Vector2D, T> mapper) {
+        return this.mapAllPositions((x, y) -> mapper.apply(new Vector2D(x, y)));
     }
 }

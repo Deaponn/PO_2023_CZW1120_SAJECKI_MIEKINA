@@ -23,9 +23,9 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      *
      * @param worldEntity entity to move.
      * @param direction move direction to apply before move.
-     * @throws OutOfMapBoundaryException on entity being moved to outside the map.
+     * @throws OutOfMapBoundsException on entity being moved to outside the map.
      */
-    void moveEntity(WorldEntity worldEntity, MoveDirection direction) throws OutOfMapBoundaryException;
+    void moveEntity(WorldEntity worldEntity, MoveDirection direction) throws OutOfMapBoundsException;
 
     /**
      * Return true if given position on the map is occupied. Should not be
