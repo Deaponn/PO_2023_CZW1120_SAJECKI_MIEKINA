@@ -7,5 +7,5 @@ public interface MoveValidator {
      * @param position position checked for the movement possibility.
      * @return true if the object can move to that position.
      */
-    boolean canMoveTo(Vector2D position);
+    NextMoveType moveType(Vector2D position);
 }
