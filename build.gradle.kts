@@ -24,9 +24,15 @@ javafx {
 }
 
 dependencies {
-    implementation("junit:junit:4.13.1")
+    testCompileOnly("junit:junit:4.13.1")
+}
+
+sourceSets.test {
+    java {
+        srcDirs("test")
+    }
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnit()
 }
