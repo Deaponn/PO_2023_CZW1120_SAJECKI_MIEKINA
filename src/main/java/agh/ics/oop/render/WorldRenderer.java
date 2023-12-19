@@ -17,28 +17,27 @@ public class WorldRenderer {
         this.imageResourceAtlas = imageResourceAtlas;
     }
 
-    private Class<? extends WorldElementRenderer<?>> getAssignedRenderer(Class<?> elementClass) {
-        AssignRenderer assignRenderer = elementClass.getAnnotation(AssignRenderer.class);
-        return assignRenderer.renderer();
+    private Class<? extends WorldElementRenderer<?>> getAssignedRenderer(Class<?> elementClass)
+            throws IllegalRendererAssignment {
+        try {
+            AssignRenderer assignRenderer = elementClass.getAnnotation(AssignRenderer.class);
+            return assignRenderer.renderer();
+        } catch (NullPointerException e) {
+            // assign a renderer to the element class (@AssignRenderer)
+            throw new IllegalRendererAssignment("no assigned renderer found", elementClass);
+        }
     }
 
-
-    @SuppressWarnings("unchecked")
-    private <T extends WorldElement> WorldElementRenderer<T> tryRegisterElementRenderer(T element)
+    private <T extends WorldElement> void tryRegisterElementRenderer(T element)
             throws IllegalRendererAssignment {
         Class<?> elementClass = element.getClass();
         Class<? extends WorldElementRenderer<?>> elementRendererClass = this.getAssignedRenderer(elementClass);
+        System.out.println(element.getClass());
+        System.out.println(elementRendererClass.getCanonicalName());
         try {
-
-            WorldElementRenderer<T> elementRenderer =
-                    ((Class<WorldElementRenderer<T>>) elementRendererClass)
-                            .getConstructor()
-                            .newInstance();
-            this.registeredElementRendererMap.put(element.getClass(), elementRenderer);
-            return elementRenderer;
-        } catch (ClassCastException e) {
-            throw new IllegalRendererAssignment("illegal element class supplied",
-                    elementClass, elementRendererClass);
+            this.registeredElementRendererMap.put(element.getClass(), elementRendererClass
+                    .getConstructor()
+                    .newInstance());
         } catch (NoSuchMethodException e) {
             // you need to implement 0-parameter renderer constructor.
             throw new IllegalRendererAssignment("renderer constructor not found",
@@ -58,15 +57,27 @@ public class WorldRenderer {
         }
     }
 
+    
     @SuppressWarnings("unchecked")
     public <T extends WorldElement> WorldElementRenderer<T> getElementRenderer(T element)
             throws IllegalRendererAssignment {
         WorldElementRenderer<?> elementRenderer = this.registeredElementRendererMap.get(element.getClass());
         if (elementRenderer == null) {
-            elementRenderer = this.tryRegisterElementRenderer(element);
+            this.tryRegisterElementRenderer(element);
+            elementRenderer = this.getElementRenderer(element);
         }
         try {
             return (WorldElementRenderer<T>) elementRenderer;
+        } catch (ClassCastException e) {
+            throw new IllegalRendererAssignment("illegal element class supplied",
+                    element, elementRenderer);
+        }
+    }
+
+    public <T extends WorldElement> void renderElement(T element) throws IllegalRendererAssignment {
+        WorldElementRenderer<T> elementRenderer = this.getElementRenderer(element);
+        try {
+            elementRenderer.render(this, element);
         } catch (ClassCastException e) {
             throw new IllegalRendererAssignment("illegal element class supplied",
                     element, elementRenderer);
