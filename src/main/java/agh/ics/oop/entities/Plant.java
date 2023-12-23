@@ -16,4 +16,17 @@ public class Plant implements WorldElement {
 
     @Override
     public boolean isAtPosition(Vector2D other) { return Objects.equals(position, other); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Plant plant = (Plant) o;
+        return Objects.equals(getPosition(), plant.getPosition());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPosition());
+    }
 }
