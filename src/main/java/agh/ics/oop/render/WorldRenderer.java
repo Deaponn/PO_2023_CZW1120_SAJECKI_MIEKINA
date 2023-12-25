@@ -1,8 +1,6 @@
 package agh.ics.oop.render;
 
-import agh.ics.oop.model.Boundary;
-import agh.ics.oop.model.WorldElement;
-import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.model.*;
 import agh.ics.oop.window.WorldView;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +27,16 @@ public class WorldRenderer {
 
     public void renderElement(WorldElement element) throws IllegalRendererAssignment {
         this.assignmentMap.renderElement(this, element);
+    }
+
+    public void putImage(Vector2D position, String imageKey) {
+        try {
+            this.worldView.put(position, this.imageMap.getImage(imageKey));
+        } catch (OutOfMapBoundsException e) {
+            System.out.println("Attempted to write outside of bounds: " + e.getMessage());
+        } catch (NullPointerException e) {
+            System.out.println("Image resource " + imageKey + " not found");
+        }
     }
 
     private void tryRenderElement(WorldElement element) {

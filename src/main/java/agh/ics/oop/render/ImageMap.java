@@ -34,7 +34,7 @@ public class ImageMap {
 
         if (imageFiles != null) {
             Map<String, String> imagePathMap = Arrays.stream(imageFiles)
-                    .collect(Collectors.toMap(ImageMap::getImageID, File::getName));
+                    .collect(Collectors.toMap(ImageMap::getImageKey, File::getName));
             this.loadImages(imagePathMap, searchPath);
         }
     }
@@ -60,7 +60,7 @@ public class ImageMap {
         return this.imageMap.get(imageKey);
     }
 
-    private static String getImageID(File file) {
+    private static String getImageKey(File file) {
         if (!file.isFile())
             return null;
         return file.getName().replaceFirst("\\.[^.]+$", "");
