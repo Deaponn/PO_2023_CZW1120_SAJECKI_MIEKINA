@@ -1,5 +1,7 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.entities.Animal;
+
 import java.util.UUID;
 
 /**
@@ -18,14 +20,11 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
     void placeElement(WorldElement worldElement);
 
     /**
-     * Moves an animal (if it is present on the map) according to specified direction.
-     * If the move is not possible, this method throws an exception.
+     * Moves an animal (if it is present on the map).
      *
-     * @param worldEntity entity to move.
-     * @param direction move direction to apply before move.
-     * @throws OutOfMapBoundsException on entity being moved to outside the map.
+     * @param animal entity to move.
      */
-    void moveEntity(WorldEntity worldEntity, MoveDirection direction) throws OutOfMapBoundsException;
+    void moveAnimal(Animal animal);
 
     /**
      * Return true if given position on the map is occupied. Should not be
