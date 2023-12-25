@@ -18,6 +18,6 @@ public class App extends Application {
                 LayoutPath.LAUCHER.path
         );
 
-        launcherWindow.show();
+        launcherWindow.start();
     }
 }

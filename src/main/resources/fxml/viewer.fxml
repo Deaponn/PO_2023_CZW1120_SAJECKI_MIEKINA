@@ -7,6 +7,6 @@
             fx:controller="agh.ics.oop.window.controller.Viewer"
             minHeight="400.0" minWidth="600.0">
     <center>
-        <Canvas width="600.0" height="400.0"/>
+        <Canvas fx:id="canvas" width="600.0" height="400.0"/>
     </center>
 </BorderPane>

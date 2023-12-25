@@ -5,16 +5,12 @@ import agh.ics.oop.model.EquatorialWorldMap;
 import agh.ics.oop.model.MapType;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.ImageMap;
+import agh.ics.oop.window.Bundle;
 import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class Launcher extends WindowController {
-    private final List<Window<Viewer>> viewerWindowList = new LinkedList<>();
-
     public void launchViewer() {
         Window<Viewer> viewerWindow = new Window<>(
                 "Viewer",
@@ -24,9 +20,9 @@ public class Launcher extends WindowController {
         WorldMap worldMap = new EquatorialWorldMap(configuration);
         ImageMap imageMap = new ImageMap("resources/gfx", "png");
 
-        viewerWindow.send("world_map", worldMap);
-        viewerWindow.send("image_map", imageMap);
-        this.viewerWindowList.add(viewerWindow);
-        viewerWindow.show();
+        Bundle viewerBundle = new Bundle()
+                .send("world_map", worldMap)
+                .send("image_map", imageMap);
+        viewerWindow.start(viewerBundle);
     }
 }

@@ -14,16 +14,18 @@ public class Viewer extends WindowController {
     private WorldRenderer worldRenderer;
     private CanvasWorldView worldView;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void start() {
+        super.start();
+
         this.worldView = new CanvasWorldView(this.canvas);
         this.worldRenderer = new WorldRenderer(
-                (ImageMap) this.getState("image_map").orElseThrow(),
+                (ImageMap) this.getParam("image_map").orElseThrow(),
                 this.worldView
         );
     }
 
     public void render() {
-        this.worldRenderer.renderView((WorldMap) this.getState("world_map").orElseThrow());
+        this.worldRenderer.renderView((WorldMap) this.getParam("world_map").orElseThrow());
     }
 }
