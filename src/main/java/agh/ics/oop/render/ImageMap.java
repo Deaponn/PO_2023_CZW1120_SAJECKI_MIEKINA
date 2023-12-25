@@ -2,11 +2,14 @@ package agh.ics.oop.render;
 
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ImageMap {
     private final Map<String, Image> imageMap;
@@ -20,8 +23,20 @@ public class ImageMap {
         this.loadImages(imagePathMap, parentPath);
     }
 
-    public ImageMap(Map<String, String> imagePathMap) {
-        this(imagePathMap, "");
+    public ImageMap(String searchPath, String extension) {
+        this();
+
+        File searchFile = new File(searchPath);
+        String extensionPattern = "." + extension;
+        File[] imageFiles = searchFile.listFiles(
+                pathname -> pathname.isFile() && pathname.getName().contains(extensionPattern)
+        );
+
+        if (imageFiles != null) {
+            Map<String, String> imagePathMap = Arrays.stream(imageFiles)
+                    .collect(Collectors.toMap(ImageMap::getImageID, File::getName));
+            this.loadImages(imagePathMap, searchPath);
+        }
     }
 
     public void loadImage(String imageKey, Image image) {
@@ -43,5 +58,11 @@ public class ImageMap {
 
     public Image getImage(String imageKey) {
         return this.imageMap.get(imageKey);
+    }
+
+    private static String getImageID(File file) {
+        if (!file.isFile())
+            return null;
+        return file.getName().replaceFirst("\\.[^.]+$", "");
     }
 }
