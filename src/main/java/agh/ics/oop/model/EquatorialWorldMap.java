@@ -90,7 +90,7 @@ public class EquatorialWorldMap implements WorldMap {
         Vector2D position = animal.getPosition();
         MapDirection direction = animal.getDirection();
         switch (moveType(position, direction)) {
-            case REGULAR -> animal.setPosition(position.add(direction.getMoveOffset()));
+            case REGULAR -> animal.setPosition(position.add(direction.moveOffset));
             case POLAR -> animal.rotateBy(MoveDirection.ROTATE_180);
             case LEAP_TO_OTHER_SIDE -> {
                 if (position.getX() > 0) {
@@ -154,14 +154,15 @@ public class EquatorialWorldMap implements WorldMap {
     @Override
     public NextMoveType moveType(Vector2D position, MapDirection direction) {
         // move would cause Y to go out of bounds
-        if ((position.getY() == configuration.mapHeight() && direction.getMoveOffset().getY() == 1) ||
-                (position.getY() == 0 && direction.getMoveOffset().getY() == -1)
+        Vector2D offset = direction.moveOffset;
+        if ((position.getY() == configuration.mapHeight() && offset.getY() == 1) ||
+                (position.getY() == 0 && offset.getY() == -1)
             ) {
             return NextMoveType.POLAR;
         }
         // move would cause X to go out of bounds
-        if ((position.getX() == configuration.mapWidth() && direction.getMoveOffset().getX() == 1) ||
-                (position.getX() == 0 && direction.getMoveOffset().getX() == -1)) {
+        if ((position.getX() == configuration.mapWidth() && offset.getX() == 1) ||
+                (position.getX() == 0 && offset.getX() == -1)) {
             return NextMoveType.LEAP_TO_OTHER_SIDE;
         }
         return NextMoveType.REGULAR;
