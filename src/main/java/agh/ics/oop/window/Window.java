@@ -7,14 +7,15 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 
-public class Window<T> {
+public class Window<T extends WindowController> {
     private final Stage stage;
     private final String title;
     private final String layoutPath;
 
-    private Pane viewRoot;
-    private T viewController;
+    private Pane root;
+    private T controller;
 
     public Window(Stage stage, String title, String layoutPath) {
         this.stage = stage;
@@ -33,7 +34,7 @@ public class Window<T> {
 
         try {
             this.loadView();
-            this.setView(this.viewRoot);
+            this.setView(this.root);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -43,8 +44,8 @@ public class Window<T> {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(this.getFXMLResourceURL());
 
-        this.viewRoot = loader.load();
-        this.viewController = loader.getController();
+        this.root = loader.load();
+        this.controller = loader.getController();
     }
 
     private void setView(Pane viewRoot) {
@@ -54,8 +55,16 @@ public class Window<T> {
         this.stage.minHeightProperty().bind(viewRoot.minHeightProperty());
     }
 
-    public T getViewController() {
-        return this.viewController;
+    public T getController() {
+        return this.controller;
+    }
+
+    public void send(String key, Object object) {
+        this.controller.send(key, object);
+    }
+
+    public Optional<Object> getState(String key) {
+        return this.controller.getState(key);
     }
 
     private URL getFXMLResourceURL() {
