@@ -7,12 +7,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 
 public class Window<T extends WindowController> {
     private final Stage stage;
     private final String title;
     private final String layoutPath;
+    private boolean isInit;
 
     private Pane root;
     private T controller;
@@ -21,22 +21,35 @@ public class Window<T extends WindowController> {
         this.stage = stage;
         this.title = title;
         this.layoutPath = layoutPath;
-
-        this.init();
+        this.isInit = false;
     }
 
     public Window(String title, String layoutPath) {
         this(new Stage(), title, layoutPath);
     }
 
-    private void init() {
-        this.stage.setTitle(this.title);
+    public void start(Bundle bundle) {
+        this.init();
+        this.controller.setBundle(bundle);
+        this.controller.start();
+        this.show();
+    }
 
-        try {
-            this.loadView();
-            this.setView(this.root);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void start() {
+        this.start(Bundle.emptyBundle);
+    }
+
+    private void init() {
+        if (!this.isInit) {
+            this.isInit = true;
+            this.stage.setTitle(this.title);
+
+            try {
+                this.loadView();
+                this.setView(this.root);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -57,14 +70,6 @@ public class Window<T extends WindowController> {
 
     public T getController() {
         return this.controller;
-    }
-
-    public void send(String key, Object object) {
-        this.controller.send(key, object);
-    }
-
-    public Optional<Object> getState(String key) {
-        return this.controller.getState(key);
     }
 
     private URL getFXMLResourceURL() {
