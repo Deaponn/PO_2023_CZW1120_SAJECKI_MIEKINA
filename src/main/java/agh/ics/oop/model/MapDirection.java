@@ -12,14 +12,10 @@ public enum MapDirection {
     WEST      (new Vector2D(-1,  0)),
     NORTH_WEST(new Vector2D(-1,  1));
 
-    private final Vector2D moveOffset;
+    public final Vector2D moveOffset;
 
     MapDirection(Vector2D moveOffset) {
         this.moveOffset = moveOffset;
-    }
-
-    public Vector2D getMoveOffset() {
-        return this.moveOffset;
     }
 
     public MapDirection rotateBy(MoveDirection moveDirection) {
