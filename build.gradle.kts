@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application")
     id("org.openjfx.javafxplugin").version("0.0.13")
 }
 
@@ -25,6 +26,10 @@ javafx {
 
 dependencies {
     implementation("junit:junit:4.13.1")
+}
+
+application {
+    mainClass.set("agh.ics.oop.App")
 }
 
 tasks.test {
