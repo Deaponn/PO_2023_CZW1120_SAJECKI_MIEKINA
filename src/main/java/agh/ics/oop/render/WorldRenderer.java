@@ -3,24 +3,40 @@ package agh.ics.oop.render;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.WorldElement;
 import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.window.WorldView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class WorldRenderer {
-    private final ImageResourceAtlas imageResourceAtlas;
+    public final ImageMap imageMap;
+    public final WorldView worldView;
     private final AssignmentMap assignmentMap;
 
-    public WorldRenderer(ImageResourceAtlas imageResourceAtlas) {
-        this.imageResourceAtlas = imageResourceAtlas;
+    public WorldRenderer(ImageMap imageMap, WorldView worldView) {
+        this.imageMap = imageMap;
+        this.worldView = worldView;
         this.assignmentMap = new WorldRenderer.AssignmentMap();
     }
 
-    public void render(WorldMap worldMap) {
-        Boundary boundary = worldMap.getCurrentBounds();
-        // TODO("Complete tile rendering")
-        boundary.mapAllPositions(worldMap::getElement);
+    public void renderView(WorldMap worldMap) {
+        Boundary bounds = worldMap.getCurrentBounds();
+        this.worldView.updateViewSize();
+        bounds.mapAllPositions(worldMap::getElement)
+                .forEach(this::tryRenderElement);
+    }
+
+    public void renderElement(WorldElement element) throws IllegalRendererAssignment {
+        this.assignmentMap.renderElement(this, element);
+    }
+
+    private void tryRenderElement(WorldElement element) {
+        try {
+            this.renderElement(element);
+        } catch (IllegalRendererAssignment e) {
+            System.out.println("WorldRenderer: " + e.getMessage());
+        }
     }
 
     private static class AssignmentMap {

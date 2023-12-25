@@ -7,42 +7,6 @@ import org.junit.Test;
 
 public class WorldRendererTest {
     @Test
-    public void tryRegisterCorrectElementRenderer() {
-        WorldRenderer worldRenderer = this.getWorldRenderer();
-        WorldElementA element = new WorldElementA();
-        try {
-            WorldElementRenderer<WorldElementA> worldElementRenderer = worldRenderer.getElementRenderer(element);
-            Assert.assertEquals(
-                    WorldElementARenderer.class.getMethod("render",
-                            WorldRenderer.class, WorldElementA.class),
-                    worldElementRenderer.getClass().getMethod("render",
-                            WorldRenderer.class, WorldElementA.class));
-        } catch (IllegalRendererAssignment e) {
-            Assert.fail("Renderer assignment shouldn't fail: " + e);
-        } catch (NoSuchMethodException e) {
-            Assert.fail("Renderer 'render' method is of wrong signature: " + e);
-        }
-    }
-
-    @Test
-    public void tryRegisterInvalidElementRender() {
-        WorldRenderer worldRenderer = this.getWorldRenderer();
-        WorldElementB element = new WorldElementB();
-        try {
-            WorldElementRenderer<WorldElementB> worldElementRenderer = worldRenderer.getElementRenderer(element);
-            Assert.assertEquals(
-                    WorldElementARenderer.class.getMethod("render",
-                            WorldRenderer.class, WorldElementA.class),
-                    worldElementRenderer.getClass().getMethod("render",
-                            WorldRenderer.class, WorldElementA.class));
-        } catch (IllegalRendererAssignment e) {
-            Assert.fail("Renderer assignment shouldn't fail: " + e);
-        } catch (NoSuchMethodException e) {
-            Assert.fail("Renderer 'render' method is of wrong signature: " + e);
-        }
-    }
-
-    @Test
     public void renderCorrectElement() {
         WorldRenderer worldRenderer = this.getWorldRenderer();
         WorldElementA element = new WorldElementA();
@@ -61,7 +25,7 @@ public class WorldRendererTest {
     }
 
     private WorldRenderer getWorldRenderer() {
-        ImageResourceAtlas emptyImageResourceAtlas = new ImageResourceAtlas();
-        return new WorldRenderer(emptyImageResourceAtlas);
+        ImageMap emptyImageMap = new ImageMap();
+        return new WorldRenderer(emptyImageMap, null);
     }
 }

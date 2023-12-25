@@ -1,7 +1,6 @@
 package agh.ics.oop.render;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,19 +8,19 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ImageResourceAtlas {
+public class ImageMap {
     private final Map<String, Image> imageMap;
 
-    public ImageResourceAtlas() {
+    public ImageMap() {
         this.imageMap = new HashMap<>();
     }
 
-    public ImageResourceAtlas(Map<String, String> imagePathMap, String parentPath) {
+    public ImageMap(Map<String, String> imagePathMap, String parentPath) {
         this.imageMap = new HashMap<>();
         this.loadImages(imagePathMap, parentPath);
     }
 
-    public ImageResourceAtlas(Map<String, String> imagePathMap) {
+    public ImageMap(Map<String, String> imagePathMap) {
         this(imagePathMap, "");
     }
 
@@ -34,7 +33,7 @@ public class ImageResourceAtlas {
         try {
             this.loadImage(imageKey, new Image(Files.newInputStream(path)));
         } catch (IOException e) {
-            throw new RuntimeException("Image '" + relativePath + "' could not be loaded");
+            throw new RuntimeException("image '" + relativePath + "' could not be loaded");
         }
     }
 
@@ -44,9 +43,5 @@ public class ImageResourceAtlas {
 
     public Image getImage(String imageKey) {
         return this.imageMap.get(imageKey);
-    }
-
-    public ImageView getImageView(String imageKey) {
-        return new ImageView(this.getImage(imageKey));
     }
 }
