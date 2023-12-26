@@ -116,12 +116,12 @@ public class EquatorialWorldMap implements WorldMap {
     // left unimplemented since I don't see usage
     @Override
     public WorldElement getElement(Vector2D position) {
-        return null;
+        return this.plants.get(position);
     }
 
     @Override
     public Boundary getCurrentBounds() {
-        return new Boundary(new Vector2D(0, 0), new Vector2D(configuration.mapWidth(), configuration.mapHeight()));
+        return new Boundary(new Vector2D(), new Vector2D(configuration.mapWidth(), configuration.mapHeight()));
     }
 
     @Override
