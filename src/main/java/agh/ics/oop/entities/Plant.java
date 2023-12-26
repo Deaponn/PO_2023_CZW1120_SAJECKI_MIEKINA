@@ -2,16 +2,19 @@ package agh.ics.oop.entities;
 
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldElement;
-import agh.ics.oop.model.WorldEntity;
+import agh.ics.oop.render.AssignRenderer;
+import agh.ics.oop.render.renderer.PlantRenderer;
 
 import java.util.Objects;
 
+@AssignRenderer(renderer = PlantRenderer.class)
 public class Plant implements WorldElement {
     private final Vector2D position;
     public Plant(Vector2D initialPosition) {
         position = initialPosition;
     }
 
+    @Override
     public Vector2D getPosition() { return position; }
 
     @Override

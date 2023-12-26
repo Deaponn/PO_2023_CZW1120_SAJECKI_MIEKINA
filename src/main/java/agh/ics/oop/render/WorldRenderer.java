@@ -2,10 +2,12 @@ package agh.ics.oop.render;
 
 import agh.ics.oop.model.*;
 import agh.ics.oop.window.WorldView;
+import javafx.scene.image.Image;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class WorldRenderer {
     public final ImageMap imageMap;
@@ -20,8 +22,10 @@ public class WorldRenderer {
 
     public void renderView(WorldMap worldMap) {
         Boundary bounds = worldMap.getCurrentBounds();
-        this.worldView.updateViewSize();
+        this.worldView.setGridBounds(bounds);
+        System.out.println(bounds.mapAllPositions(worldMap::getElement).toList());
         bounds.mapAllPositions(worldMap::getElement)
+                .filter(Objects::nonNull)
                 .forEach(this::tryRenderElement);
     }
 
@@ -29,21 +33,23 @@ public class WorldRenderer {
         this.assignmentMap.renderElement(this, element);
     }
 
-    public void putImage(Vector2D position, String imageKey) {
-        try {
-            this.worldView.put(position, this.imageMap.getImage(imageKey));
-        } catch (OutOfMapBoundsException e) {
-            System.out.println("Attempted to write outside of bounds: " + e.getMessage());
-        } catch (NullPointerException e) {
-            System.out.println("Image resource " + imageKey + " not found");
-        }
-    }
-
     private void tryRenderElement(WorldElement element) {
         try {
             this.renderElement(element);
+            System.out.println("Render element @ " + element.getPosition());
         } catch (IllegalRendererAssignment e) {
             System.out.println("WorldRenderer: " + e.getMessage());
+        }
+    }
+
+    public void putImage(Vector2D position, String imageKey) {
+        try {
+            Image image = this.imageMap.getImage(imageKey);
+            if (image == null)
+                return;
+            this.worldView.put(position, image);
+        } catch (OutOfMapBoundsException e) {
+            System.out.println("Attempted to write outside of bounds: " + e.getMessage());
         }
     }
 
