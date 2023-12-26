@@ -1,15 +1,16 @@
 package agh.ics.oop.render;
 
+import agh.ics.oop.resource.ResourceNotFoundException;
+import agh.ics.oop.resource.Resources;
 import javafx.scene.image.Image;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ImageMap {
     private final Map<String, Image> imageMap;
@@ -18,49 +19,43 @@ public class ImageMap {
         this.imageMap = new HashMap<>();
     }
 
-    public ImageMap(Map<String, String> imagePathMap, String parentPath) {
-        this.imageMap = new HashMap<>();
-        this.loadImages(imagePathMap, parentPath);
-    }
-
-    public ImageMap(String searchPath, String extension) {
+    public ImageMap(String searchPath, String extension) throws ResourceNotFoundException {
         this();
-
-        File searchFile = new File(searchPath);
         String extensionPattern = "." + extension;
-        File[] imageFiles = searchFile.listFiles(
-                pathname -> pathname.isFile() && pathname.getName().contains(extensionPattern)
+        Stream<Map.Entry<String, InputStream>> namedInputStreamStream = Resources.listFilesAtPathAsNamedStream(
+                searchPath,
+                file -> file.getName().contains(extensionPattern),
+                ImageMap::getImageKeyFromFile
         );
 
-        if (imageFiles != null) {
-            Map<String, String> imagePathMap = Arrays.stream(imageFiles)
-                    .collect(Collectors.toMap(ImageMap::getImageKey, File::getName));
-            this.loadImages(imagePathMap, searchPath);
-        }
+        Map<String, InputStream> imageStreamMap = namedInputStreamStream.collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+        );
+        this.loadImages(imageStreamMap);
     }
 
     public void loadImage(String imageKey, Image image) {
         this.imageMap.put(imageKey, image);
     }
 
-    public void loadImage(String imageKey, String relativePath, String parentPath) {
-        Path path = Path.of(parentPath, relativePath);
-        try {
-            this.loadImage(imageKey, new Image(Files.newInputStream(path)));
-        } catch (IOException e) {
-            throw new RuntimeException("image '" + relativePath + "' could not be loaded");
-        }
+    public void loadImage(String imageKey, InputStream inputStream) {
+        Image image = new Image(inputStream);
+        this.loadImage(imageKey, image);
     }
 
-    public void loadImages(Map<String, String> imagePathMap, String parentPath) {
-        imagePathMap.forEach((key, value) -> this.loadImage(key, value, parentPath));
+    public void loadImages(Map<String, InputStream> imageStreamMap) {
+        imageStreamMap.forEach(this::loadImage);
     }
 
     public Image getImage(String imageKey) {
         return this.imageMap.get(imageKey);
     }
 
-    private static String getImageKey(File file) {
+    public Set<String> getImageKeys() {
+        return this.imageMap.keySet();
+    }
+
+    private static String getImageKeyFromFile(File file) {
         if (!file.isFile())
             return null;
         return file.getName().replaceFirst("\\.[^.]+$", "");

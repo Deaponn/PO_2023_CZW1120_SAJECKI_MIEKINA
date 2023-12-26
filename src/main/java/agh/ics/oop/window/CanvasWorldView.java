@@ -14,7 +14,6 @@ public class CanvasWorldView implements WorldView {
     private Float[] gridOffsetX;
     private Float[] gridOffsetY;
     private float imageScale;
-    private Image staticLayerImage;
 
     public CanvasWorldView(Canvas canvas) {
         this.canvas = canvas;
@@ -23,26 +22,34 @@ public class CanvasWorldView implements WorldView {
         this.gridBounds = new Boundary(new Vector2D(), new Vector2D());
     }
 
-    public void setGridBounds(int width, int height) {
-        this.gridBounds = new Boundary(
-                new Vector2D(),
-                new Vector2D(width - 1, height - 1)
-        );
+    @Override
+    public void setGridBounds(Vector2D size) {
+        this.gridBounds = Boundary.fromSize(size);
         this.updateViewSize();
     }
 
-    public void updateViewSize() {
-        this.graphicsContext.clearRect(
-                0, 0,
-                this.canvas.getWidth(), this.canvas.getHeight()
-        );
+    @Override
+    public void setGridBounds(Boundary bounds) {
+        this.gridBounds = bounds;
+        this.updateViewSize();
     }
 
+    @Override
+    public void updateViewSize() {
+        double width = this.canvas.getWidth();
+        double height = this.canvas.getHeight();
+        this.graphicsContext.clearRect(0, 0, width, height);
+        this.updateImageScale((float) width, (float) height);
+        this.updateGridOffsets((float) width, (float) height);
+    }
+
+    @Override
     public void put(Vector2D position, Image image) throws OutOfMapBoundsException {
         this.checkIfInBounds(position);
         this.drawAtGrid(position, image);
     }
 
+    @Override
     public Image get(Vector2D position) throws OutOfMapBoundsException {
         this.checkIfInBounds(position);
         return null;
@@ -63,25 +70,22 @@ public class CanvasWorldView implements WorldView {
 
     private void registerSizeListener() {
         this.canvas.widthProperty()
-                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateImageScale());
+                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateViewSize());
         this.canvas.heightProperty()
-                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateImageScale());
+                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateViewSize());
     }
 
-    private void updateImageScale() {
+    private void updateImageScale(float width, float height) {
         Vector2D gridSize = this.gridBounds.getSize();
-        float width = (float) this.canvas.getWidth();
-        float height = (float) this.canvas.getHeight();
         float imageWidth = width / gridSize.getX();
         float imageHeight = height / gridSize.getY();
         this.imageScale = Math.min(imageWidth, imageHeight);
-        this.updateGridOffsets();
     }
 
-    private void updateGridOffsets() {
+    private void updateGridOffsets(float width, float height) {
         Vector2D gridSize = gridBounds.getSize();
-        float padX = (float) (this.canvas.getWidth() - gridSize.getX() * this.imageScale);
-        float padY = (float) (this.canvas.getHeight() - gridSize.getY() * this.imageScale);
+        float padX = width - gridSize.getX() * this.imageScale;
+        float padY = height - gridSize.getY() * this.imageScale;
         float startX = padX / 2;
         float startY = padY / 2;
 
