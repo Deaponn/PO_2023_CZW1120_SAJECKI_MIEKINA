@@ -2,6 +2,7 @@ package agh.ics.oop.model;
 
 import agh.ics.oop.Configuration;
 import agh.ics.oop.entities.Animal;
+import agh.ics.oop.entities.Ground;
 import agh.ics.oop.entities.Plant;
 import agh.ics.oop.util.RandomNumber;
 
@@ -116,12 +117,14 @@ public class EquatorialWorldMap implements WorldMap {
     // left unimplemented since I don't see usage
     @Override
     public WorldElement getElement(Vector2D position) {
-        return this.plants.get(position);
+        Plant plant = this.plants.get(position);
+        if (plant == null) return new Ground(position);
+        return plant;
     }
 
     @Override
     public Boundary getCurrentBounds() {
-        return new Boundary(new Vector2D(), new Vector2D(configuration.mapWidth(), configuration.mapHeight()));
+        return Boundary.fromSize(configuration.mapWidth(), configuration.mapHeight());
     }
 
     @Override
