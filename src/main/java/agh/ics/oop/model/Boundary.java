@@ -90,4 +90,12 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
     public void forEachAllPositions(Consumer<Vector2D> action) {
         this.forEachAllPositions((x, y) -> action.accept(new Vector2D(x, y)));
     }
+
+    public static Boundary fromSize(int width, int height) {
+        return new Boundary(new Vector2D(), new Vector2D(width - 1, height - 1));
+    }
+
+    public static Boundary fromSize(Vector2D size) {
+        return Boundary.fromSize(size.getX(), size.getY());
+    }
 }
