@@ -15,7 +15,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         Window<Launcher> launcherWindow = new Window<>(
                 "Shiginima Launcher",
-                LayoutPath.LAUCHER.path
+                LayoutPath.LAUNCHER.path
         );
 
         launcherWindow.start();

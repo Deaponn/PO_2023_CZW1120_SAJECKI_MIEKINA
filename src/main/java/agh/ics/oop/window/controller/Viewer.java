@@ -1,5 +1,7 @@
 package agh.ics.oop.window.controller;
 
+import agh.ics.oop.entities.Plant;
+import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.ImageMap;
 import agh.ics.oop.render.WorldRenderer;
@@ -13,6 +15,7 @@ public class Viewer extends WindowController {
     public Canvas canvas;
     private WorldRenderer worldRenderer;
     private CanvasWorldView worldView;
+    private WorldMap worldMap;
 
     @Override
     public void start() {
@@ -23,9 +26,16 @@ public class Viewer extends WindowController {
                 (ImageMap) this.getParam("image_map").orElseThrow(),
                 this.worldView
         );
+
+        // temporary test
+        this.worldMap = (WorldMap) this.getParam("world_map").orElseThrow();
+        this.worldMap.placeElement(new Plant(new Vector2D(5, 5)));
+        System.out.println(this.worldRenderer.imageMap.getImageKeys());
+        System.out.println(this.worldRenderer.imageMap.getImage("sand3"));
+        this.render();
     }
 
     public void render() {
-        this.worldRenderer.renderView((WorldMap) this.getParam("world_map").orElseThrow());
+        this.worldRenderer.renderView(this.worldMap);
     }
 }
