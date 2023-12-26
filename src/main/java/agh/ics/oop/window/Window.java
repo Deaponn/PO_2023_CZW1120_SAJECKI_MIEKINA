@@ -1,5 +1,6 @@
 package agh.ics.oop.window;
 
+import agh.ics.oop.resource.Resources;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -31,6 +32,7 @@ public class Window<T extends WindowController> {
     public void start(Bundle bundle) {
         this.init();
         this.controller.setBundle(bundle);
+        this.controller.setWindow(this);
         this.controller.start();
         this.show();
     }
@@ -55,7 +57,10 @@ public class Window<T extends WindowController> {
 
     private void loadView() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(this.getFXMLResourceURL());
+        URL layoutURL = Resources.getResourceURL(Window.class, this.layoutPath)
+                        .orElseThrow();
+
+        loader.setLocation(layoutURL);
 
         this.root = loader.load();
         this.controller = loader.getController();
@@ -72,13 +77,11 @@ public class Window<T extends WindowController> {
         return this.controller;
     }
 
-    private URL getFXMLResourceURL() {
-        return this.getClass()
-                .getClassLoader()
-                .getResource(this.layoutPath);
-    }
-
     public void show() {
         this.stage.show();
+    }
+
+    public void close() {
+        this.stage.close();
     }
 }
