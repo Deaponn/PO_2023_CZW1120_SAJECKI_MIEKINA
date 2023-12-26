@@ -25,7 +25,6 @@ public class WorldRenderer {
         this.worldView.setGridBounds(bounds);
         System.out.println(bounds.mapAllPositions(worldMap::getElement).toList());
         bounds.mapAllPositions(worldMap::getElement)
-                .filter(Objects::nonNull)
                 .forEach(this::tryRenderElement);
     }
 

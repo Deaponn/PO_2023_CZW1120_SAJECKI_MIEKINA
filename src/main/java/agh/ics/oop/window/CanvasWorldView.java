@@ -4,12 +4,15 @@ import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.paint.Color;
 
 public class CanvasWorldView implements WorldView {
     private final Canvas canvas;
-    private final GraphicsContext graphicsContext;
+    private final PixelWriter canvasPixelWriter;
+
     private Boundary gridBounds;
     private Float[] gridOffsetX;
     private Float[] gridOffsetY;
@@ -18,7 +21,7 @@ public class CanvasWorldView implements WorldView {
     public CanvasWorldView(Canvas canvas) {
         this.canvas = canvas;
         this.registerSizeListener();
-        this.graphicsContext = canvas.getGraphicsContext2D();
+        this.canvasPixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
         this.gridBounds = new Boundary(new Vector2D(), new Vector2D());
     }
 
@@ -38,7 +41,7 @@ public class CanvasWorldView implements WorldView {
     public void updateViewSize() {
         double width = this.canvas.getWidth();
         double height = this.canvas.getHeight();
-        this.graphicsContext.clearRect(0, 0, width, height);
+//        this.graphicsContext.clearRect(0, 0, width, height);
         this.updateImageScale((float) width, (float) height);
         this.updateGridOffsets((float) width, (float) height);
     }
@@ -58,9 +61,32 @@ public class CanvasWorldView implements WorldView {
     private void drawAtGrid(Vector2D position, Image image) {
         float x = this.gridOffsetX[position.getX()];
         float y = this.gridOffsetY[position.getY()];
-        float w = this.imageScale;
-        float h = this.imageScale;
-        this.graphicsContext.drawImage(image, x, y, w, h);
+
+        this.renderImage(image, x, y, this.imageScale);
+    }
+
+    private void renderImage(Image image, float x, float y, float imageScale) {
+        PixelReader pixelReader = image.getPixelReader();
+        float imageWidth = (float) image.getWidth();
+        float imageHeight = (float) image.getHeight();
+        float ex = x + imageScale;
+        float ey = y + imageScale;
+        float ix = 0f;
+        float iy = 0f;
+        float dx = imageWidth / imageScale;
+        float dy = imageHeight / imageScale;
+
+        for (float py = y; py < ey; py++) {
+            for (float px = x; px < ex; px++) {
+                Color c = pixelReader.getColor((int) ix, (int) iy);
+                this.canvasPixelWriter.setColor((int) px, (int) py, c);
+                ix += dx;
+                if (ix >= 15f) ix = imageWidth - 1;
+            }
+            ix = 0;
+            iy += dy;
+            if (iy >= 15f) iy = imageHeight - 1;
+        }
     }
 
     private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {
