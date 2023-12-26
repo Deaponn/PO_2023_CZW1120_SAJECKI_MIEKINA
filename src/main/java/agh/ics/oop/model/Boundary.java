@@ -16,7 +16,8 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
     }
 
     public Vector2D getSize() {
-        return this.upperRight.subtract(this.lowerLeft);
+        return this.upperRight.subtract(this.lowerLeft)
+                .add(Boundary.excludeOffset);
     }
 
     public <T> Stream<T> mapAllPositions(BiFunction<Integer, Integer, T> mapper) {
@@ -37,13 +38,13 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
     public <T> Stream<T> mapColumns(Function<Integer, T> mapper) {
         int startX = this.lowerLeft.getX();
         int endX = this.upperRight.getX();
-        return IntStream.range(startX, endX).boxed().map(mapper);
+        return IntStream.range(startX, endX + 1).boxed().map(mapper);
     }
 
     public <T> Stream<T> mapRows(Function<Integer, T> mapper) {
         int startY = this.lowerLeft.getY();
         int endY = this.upperRight.getY();
-        return IntStream.range(startY, endY).boxed().map(mapper);
+        return IntStream.range(startY, endY + 1).boxed().map(mapper);
     }
 
     public <T> Stream<Stream<T>> mapByColumns(BiFunction<Integer, Integer, T> mapper) {
@@ -98,4 +99,6 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
     public static Boundary fromSize(Vector2D size) {
         return Boundary.fromSize(size.getX(), size.getY());
     }
+
+    private static final Vector2D excludeOffset = new Vector2D(1, 1);
 }
