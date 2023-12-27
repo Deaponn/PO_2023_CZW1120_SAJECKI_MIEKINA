@@ -4,14 +4,19 @@ import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
 public class CanvasWorldView implements WorldView {
     private final Canvas canvas;
-    private final PixelWriter canvasPixelWriter;
+    private final GraphicsContext contextContext;
+    private WritableImage buffer;
+    private PixelWriter bufferPixelWriter;
+    private PixelReader bufferPixelReader;
 
     private Boundary gridBounds;
     private Float[] gridOffsetX;
@@ -20,15 +25,17 @@ public class CanvasWorldView implements WorldView {
 
     public CanvasWorldView(Canvas canvas) {
         this.canvas = canvas;
+        this.contextContext = this.canvas.getGraphicsContext2D();
         this.registerSizeListener();
-        this.canvasPixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
         this.gridBounds = new Boundary(new Vector2D(), new Vector2D());
     }
 
-    @Override
-    public void setGridBounds(Vector2D size) {
-        this.gridBounds = Boundary.fromSize(size);
-        this.updateViewSize();
+    private void createBuffer(float width, float height) {
+        int bufferWidth = (int) Math.ceil(width);
+        int bufferHeight = (int) Math.ceil(height);
+        this.buffer = new WritableImage(bufferWidth, bufferHeight);
+        this.bufferPixelWriter = this.buffer.getPixelWriter();
+        this.bufferPixelReader = this.buffer.getPixelReader();
     }
 
     @Override
@@ -38,12 +45,17 @@ public class CanvasWorldView implements WorldView {
     }
 
     @Override
+    public void setGridBounds(Vector2D size) {
+        this.setGridBounds(Boundary.fromSize(size));
+    }
+
+    @Override
     public void updateViewSize() {
-        double width = this.canvas.getWidth();
-        double height = this.canvas.getHeight();
-//        this.graphicsContext.clearRect(0, 0, width, height);
-        this.updateImageScale((float) width, (float) height);
-        this.updateGridOffsets((float) width, (float) height);
+        float width = (float) this.canvas.getWidth();
+        float height = (float) this.canvas.getHeight();
+        this.createBuffer(width, height);
+        this.updateImageScale(width, height);
+        this.updateGridOffsets(width, height);
     }
 
     @Override
@@ -58,6 +70,11 @@ public class CanvasWorldView implements WorldView {
         return null;
     }
 
+    @Override
+    public void presentView() {
+        this.contextContext.drawImage(this.buffer, 0, 0);
+    }
+
     private void drawAtGrid(Vector2D position, Image image) {
         float x = this.gridOffsetX[position.getX()];
         float y = this.gridOffsetY[position.getY()];
@@ -66,7 +83,7 @@ public class CanvasWorldView implements WorldView {
     }
 
     private void renderImage(Image image, float x, float y, float imageScale) {
-        PixelReader pixelReader = image.getPixelReader();
+        PixelReader imagePixelReader = image.getPixelReader();
         float imageWidth = (float) image.getWidth();
         float imageHeight = (float) image.getHeight();
         float ex = x + imageScale;
@@ -78,8 +95,9 @@ public class CanvasWorldView implements WorldView {
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
-                Color c = pixelReader.getColor((int) ix, (int) iy);
-                this.canvasPixelWriter.setColor((int) px, (int) py, c);
+                Color c = imagePixelReader.getColor((int) ix, (int) iy);
+                this.blendPixel((int) px, (int) py, c);
+//                this.bufferPixelWriter.setColor((int) px, (int) py, c);
                 ix += dx;
                 if (ix >= 15f) ix = imageWidth - 1;
             }
@@ -87,6 +105,16 @@ public class CanvasWorldView implements WorldView {
             iy += dy;
             if (iy >= 15f) iy = imageHeight - 1;
         }
+    }
+
+    private void blendPixel(int x, int y, Color color) {
+        Color blendColor = color;
+        double opacity = color.getOpacity();
+        if (opacity < 1) {
+            Color prevColor = this.bufferPixelReader.getColor(x, y);
+            blendColor = prevColor.interpolate(color, opacity);
+        }
+        this.bufferPixelWriter.setColor(x, y, blendColor);
     }
 
     private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {
