@@ -26,6 +26,7 @@ public class WorldRenderer {
         System.out.println(bounds.mapAllPositions(worldMap::getElement).toList());
         bounds.mapAllPositions(worldMap::getElement)
                 .forEach(this::tryRenderElement);
+        this.worldView.presentView();
     }
 
     public void renderElement(WorldElement element) throws IllegalRendererAssignment {

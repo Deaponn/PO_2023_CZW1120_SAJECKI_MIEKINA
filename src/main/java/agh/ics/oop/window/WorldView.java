@@ -11,4 +11,5 @@ public interface WorldView {
     void updateViewSize();
     void put(Vector2D position, Image image) throws OutOfMapBoundsException;
     Image get(Vector2D position) throws OutOfMapBoundsException;
+    void presentView();
 }
