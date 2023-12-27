@@ -7,6 +7,7 @@ import agh.ics.oop.render.WorldRenderer;
 public class PlantRenderer extends WorldElementRenderer<Plant> {
     @Override
     public void render(WorldRenderer renderer, Plant element) {
-        renderer.putImage(element.getPosition(), "sand3");
+        renderer.putImage(element.getPosition(), "sand1");
+        renderer.putImage(element.getPosition(), "plant1");
     }
 }
