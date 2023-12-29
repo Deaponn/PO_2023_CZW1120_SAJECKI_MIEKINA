@@ -2,6 +2,7 @@ package agh.ics.oop.model;
 
 import agh.ics.oop.entities.Animal;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,7 +43,7 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      * @param position The position of the animal.
      * @return animal or null if the position is not occupied.
      */
-    WorldElement getElement(Vector2D position);
+    List<WorldElement> getElements(Vector2D position);
 
     /**
      * Retrieve current bounds of this map.

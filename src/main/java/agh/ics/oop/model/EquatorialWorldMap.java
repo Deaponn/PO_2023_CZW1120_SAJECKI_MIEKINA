@@ -116,10 +116,12 @@ public class EquatorialWorldMap implements WorldMap {
     // is this necessary? should it return Plant, or List<Animal>?
     // left unimplemented since I don't see usage
     @Override
-    public WorldElement getElement(Vector2D position) {
+    public List<WorldElement> getElements(Vector2D position) {
+        List<WorldElement> elementList = new LinkedList<>();
+        elementList.add(new Ground(position));
         Plant plant = this.plants.get(position);
-        if (plant == null) return new Ground(position);
-        return plant;
+        if (plant != null) elementList.add(plant);
+        return elementList;
     }
 
     @Override

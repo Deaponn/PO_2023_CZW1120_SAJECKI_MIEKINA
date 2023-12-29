@@ -6,8 +6,8 @@ import javafx.scene.image.Image;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class WorldRenderer {
     public final ImageMap imageMap;
@@ -23,14 +23,18 @@ public class WorldRenderer {
     public void renderView(WorldMap worldMap) {
         Boundary bounds = worldMap.getCurrentBounds();
         this.worldView.setGridBounds(bounds);
-        System.out.println(bounds.mapAllPositions(worldMap::getElement).toList());
-        bounds.mapAllPositions(worldMap::getElement)
-                .forEach(this::tryRenderElement);
+        System.out.println(bounds.mapAllPositions(worldMap::getElements).toList());
+        bounds.mapAllPositions(worldMap::getElements)
+                .forEach(this::tryRenderElementList);
         this.worldView.presentView();
     }
 
     public void renderElement(WorldElement element) throws IllegalRendererAssignment {
         this.assignmentMap.renderElement(this, element);
+    }
+
+    private void tryRenderElementList(List<WorldElement> elementList) {
+        elementList.forEach(this::tryRenderElement);
     }
 
     private void tryRenderElement(WorldElement element) {

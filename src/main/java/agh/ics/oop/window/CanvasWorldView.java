@@ -96,7 +96,7 @@ public class CanvasWorldView implements WorldView {
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
                 Color c = imagePixelReader.getColor((int) ix, (int) iy);
-                this.blendPixel((int) px, (int) py, c);
+                this.compositePixel((int) px, (int) py, c);
 //                this.bufferPixelWriter.setColor((int) px, (int) py, c);
                 ix += dx;
                 if (ix >= 15f) ix = imageWidth - 1;
@@ -107,14 +107,22 @@ public class CanvasWorldView implements WorldView {
         }
     }
 
-    private void blendPixel(int x, int y, Color color) {
+    private void compositePixel(int x, int y, Color color) {
         Color blendColor = color;
         double opacity = color.getOpacity();
         if (opacity < 1) {
             Color prevColor = this.bufferPixelReader.getColor(x, y);
-            blendColor = prevColor.interpolate(color, opacity);
+            blendColor = CanvasWorldView.blendOver(prevColor, color, opacity);
         }
         this.bufferPixelWriter.setColor(x, y, blendColor);
+    }
+
+    private static Color blendOver(Color colorOver, Color colorTop, double mixTop) {
+        double mixOver = 1 - mixTop;
+        double r = colorOver.getRed() * mixOver + colorTop.getRed() * mixTop;
+        double g = colorOver.getGreen() * mixOver + colorTop.getGreen() * mixTop;
+        double b = colorOver.getBlue() * mixOver + colorTop.getBlue() * mixTop;
+        return new Color(r, g, b, 1);
     }
 
     private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {
