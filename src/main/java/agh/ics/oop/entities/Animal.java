@@ -2,11 +2,14 @@ package agh.ics.oop.entities;
 
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.*;
+import agh.ics.oop.render.AssignRenderer;
+import agh.ics.oop.render.renderer.AnimalRenderer;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+@AssignRenderer(renderer = AnimalRenderer.class)
 public class Animal implements WorldElement, WorldEntity {
     private Vector2D position;
     private MapDirection direction;
@@ -64,6 +67,10 @@ public class Animal implements WorldElement, WorldEntity {
     public Vector2D getPosition() { return position; }
 
     public MapDirection getDirection() { return direction; }
+
+    public int getEnergy() {
+        return this.energy;
+    }
 
     public boolean isAtPosition(Vector2D other) { return Objects.equals(position, other); }
 

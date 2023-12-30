@@ -121,6 +121,8 @@ public class EquatorialWorldMap implements WorldMap {
         elementList.add(new Ground(position));
         Plant plant = this.plants.get(position);
         if (plant != null) elementList.add(plant);
+        List<Animal> animalList = this.animals.get(position);
+        if (animalList != null) elementList.addAll(animalList);
         return elementList;
     }
 
