@@ -74,16 +74,19 @@ public class EquatorialWorldMap implements WorldMap {
     public void placeElement(WorldElement worldElement) {
         if (worldElement instanceof Plant plant) {
             plants.put(worldElement.getPosition(), plant);
-            return;
         }
-        Animal animal = (Animal) worldElement;
-        if (animals.containsKey(animal.getPosition())) {
-            animals.get(animal.getPosition()).add(animal);
-        } else {
-            List<Animal> list = new ArrayList<>();
-            list.add(animal);
-            animals.put(animal.getPosition(), list);
+
+        if (worldElement instanceof Animal animal) {
+            if (animals.containsKey(animal.getPosition())) {
+                animals.get(animal.getPosition()).add(animal);
+            } else {
+                List<Animal> list = new ArrayList<>();
+                list.add(animal);
+                animals.put(animal.getPosition(), list);
+            }
         }
+
+        this.mapChangeNotify("place");
     }
 
     @Override
