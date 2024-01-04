@@ -23,7 +23,6 @@ public class WorldRenderer {
     public void renderView(WorldMap worldMap) {
         Boundary bounds = worldMap.getCurrentBounds();
         this.worldView.setGridBounds(bounds);
-        System.out.println(bounds.mapAllPositions(worldMap::getElements).toList());
         bounds.mapAllPositions(worldMap::getElements)
                 .forEach(this::tryRenderElementList);
         this.worldView.presentView();

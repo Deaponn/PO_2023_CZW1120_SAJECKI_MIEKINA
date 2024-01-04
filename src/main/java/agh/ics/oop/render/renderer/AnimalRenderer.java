@@ -9,7 +9,7 @@ public class AnimalRenderer extends WorldElementRenderer<Animal> {
     @Override
     public void render(WorldRenderer renderer, Animal element) {
         Vector2D position = element.getPosition();
-        renderer.putImage(position, "DICK");
+        renderer.putImage(position, "blob1");
         renderer.putImage(position, AnimalRenderer.getEnergyBarImageKey(element.getEnergy()));
     }
 

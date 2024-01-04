@@ -13,7 +13,7 @@ import javafx.scene.paint.Color;
 
 public class CanvasWorldView implements WorldView {
     private final Canvas canvas;
-    private final GraphicsContext contextContext;
+    private final GraphicsContext graphicsContext;
     private WritableImage buffer;
     private PixelWriter bufferPixelWriter;
     private PixelReader bufferPixelReader;
@@ -25,7 +25,7 @@ public class CanvasWorldView implements WorldView {
 
     public CanvasWorldView(Canvas canvas) {
         this.canvas = canvas;
-        this.contextContext = this.canvas.getGraphicsContext2D();
+        this.graphicsContext = this.canvas.getGraphicsContext2D();
         this.registerSizeListener();
         this.gridBounds = new Boundary(new Vector2D(), new Vector2D());
     }
@@ -70,9 +70,12 @@ public class CanvasWorldView implements WorldView {
         return null;
     }
 
+    /**
+     * double-buffer draw view (VSYNC)
+     */
     @Override
     public void presentView() {
-        this.contextContext.drawImage(this.buffer, 0, 0);
+        this.graphicsContext.drawImage(this.buffer, 0, 0);
     }
 
     private void drawAtGrid(Vector2D position, Image image) {
@@ -97,7 +100,6 @@ public class CanvasWorldView implements WorldView {
             for (float px = x; px < ex; px++) {
                 Color c = imagePixelReader.getColor((int) ix, (int) iy);
                 this.compositePixel((int) px, (int) py, c);
-//                this.bufferPixelWriter.setColor((int) px, (int) py, c);
                 ix += dx;
                 if (ix >= 15f) ix = imageWidth - 1;
             }
