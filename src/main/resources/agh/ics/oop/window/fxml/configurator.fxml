@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="agh.ics.oop.window.controller.Configurator"
+            minHeight="400.0" minWidth="600.0">
+    <center>
+        <HBox>
+            <TextField fx:id="mapWidth"/>
+            <TextField fx:id="mapHeight"/>
+            <ChoiceBox fx:id="mapType"/>
+            <TextField fx:id="genomeLength"/>
+            <TextField fx:id="randomGenomeChangeChance"/>
+            <TextField fx:id="startingPlantsNumber"/>
+            <TextField fx:id="plantEnergy"/>
+            <TextField fx:id="numberOfGrowingPlants"/>
+            <TextField fx:id="startingAnimalsNumber"/>
+            <TextField fx:id="requiredReproductionEnergy"/>
+            <TextField fx:id="energyPassedToChild"/>
+            <TextField fx:id="minMutationsNumber"/>
+            <TextField fx:id="maxMutationsNumber"/>
+            <TextField fx:id="equatorSize"/>
+            <TextField fx:id="plantGrowAtEquatorChance"/>
+            <CheckBox fx:id="saveSteps"/>
+        </HBox>
+    </center>
+</BorderPane>

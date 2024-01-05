@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="agh.ics.oop.window.controller.Launcher"
@@ -11,6 +12,9 @@
         <Label>huj ;_;</Label>
     </top>
     <center>
-        <Button onAction="#launchViewer">launch</Button>
+        <VBox>
+            <Button onAction="#launchViewer">launch</Button>
+            <Button onAction="#launchConfigurator">configure</Button>
+        </VBox>
     </center>
 </BorderPane>

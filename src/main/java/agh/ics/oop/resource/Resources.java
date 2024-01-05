@@ -1,8 +1,11 @@
 package agh.ics.oop.resource;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -12,37 +15,6 @@ import java.util.stream.Stream;
 public class Resources {
     public static Optional<URL> getResourceURL(Class<?> receiver, String path) {
         return Optional.ofNullable(receiver.getResource(path));
-    }
-
-    public static URL tryGetResourceURL(Class<?> receiver, String path)
-            throws ResourceNotFoundException {
-        Optional<URL> optionalURL = Resources.getResourceURL(receiver, path);
-        return optionalURL.orElseThrow(() -> new ResourceNotFoundException(receiver, path));
-    }
-
-    public static Optional<InputStream> getResourceAsStream(Class<?> receiver, String path) {
-        return Optional.ofNullable(receiver.getResourceAsStream(path));
-    }
-
-    public static InputStream tryGetResourceAsStream(Class<?> receiver, String path)
-            throws ResourceNotFoundException {
-        Optional<InputStream> optionalStream = Resources.getResourceAsStream(receiver, path);
-        return optionalStream.orElseThrow(() -> new ResourceNotFoundException(receiver, path));
-    }
-
-    public static Optional<InputStream> getFileAsStream(String path) {
-        try {
-            InputStream fileStream = new FileInputStream(path);
-            return Optional.of(fileStream);
-        } catch (FileNotFoundException e) {
-            return Optional.empty();
-        }
-    }
-
-    public static InputStream tryGetFileAsStream(String path)
-            throws ResourceNotFoundException {
-        Optional<InputStream> optionalStream = Resources.getFileAsStream(path);
-        return optionalStream.orElseThrow(() -> new ResourceNotFoundException(path));
     }
 
     public static Stream<File> listFilesAtPath(String parentPath, FileFilter fileFilter)
@@ -80,5 +52,31 @@ public class Resources {
     private static Optional<Map.Entry<String, InputStream>> getNamedInputStreamFromFile(File file, String name) {
         return Resources.getInputStreamFromFile(file)
                 .map(inputStream -> Map.entry(name, inputStream));
+    }
+
+    public static Object deserializeFromXML(String path)
+            throws ResourceNotFoundException {
+        try (XMLDecoder xmlDecoder = new XMLDecoder(Files.newInputStream(Path.of(path)))) {
+            return xmlDecoder.readObject();
+        } catch (IOException e) {
+            throw new ResourceNotFoundException(path);
+        }
+    }
+
+    public static void serializeToXML(String path, Object object)
+            throws ResourceNotFoundException {
+        try (XMLEncoder xmlEncoder = new XMLEncoder(Files.newOutputStream(Path.of(path)))) {
+            xmlEncoder.writeObject(object);
+        } catch (IOException e) {
+            throw new ResourceNotFoundException(path);
+        }
+    }
+
+    public static String getObjectXML(Object object) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        XMLEncoder xmlEncoder = new XMLEncoder(outputStream);
+        xmlEncoder.writeObject(object);
+        xmlEncoder.close();
+        return outputStream.toString();
     }
 }

@@ -14,12 +14,20 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 public class Launcher extends WindowController {
+    public void launchConfigurator() {
+        Window<Configurator> configuratorWindow = new Window<>(
+                "Configurator",
+                LayoutPath.CONFIGURATOR.path
+        );
+        configuratorWindow.start();
+    }
+
     public void launchViewer() {
         Window<Viewer> viewerWindow = new Window<>(
                 "Viewer",
                 LayoutPath.VIEWER.path
         );
-        Configuration configuration = new Configuration(13, 8, MapType.STANDARD, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.2f, 1, false);
+        Configuration configuration = new Configuration();
 
         try {
             WorldMap worldMap = new EquatorialWorldMap(configuration);

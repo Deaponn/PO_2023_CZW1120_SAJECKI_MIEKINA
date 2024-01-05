@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import static agh.ics.oop.Configuration.Fields.*;
+
 @AssignRenderer(renderer = AnimalRenderer.class)
 public class Animal implements WorldElement, WorldEntity {
     private Vector2D position;
@@ -26,16 +28,21 @@ public class Animal implements WorldElement, WorldEntity {
     private int ancestorsCount = 0;
     private int plantsEaten = 0;
     private final List<MoveDirection> genome;
-    private final Configuration configuration;
+    private final int addEnergy;
+    private final float randomGenomeChangeChance;
+    private final int genomeLength;
+
     private final Random random = new Random();
 
     public Animal(Vector2D initialPosition, int initialEnergy, List<MoveDirection> genome, Configuration configuration) {
-        energy = initialEnergy;
-        position = initialPosition;
-        direction = MapDirection.randomDirection();
-        activeGene = random.nextInt(configuration.genomeLength());
+        this.energy = initialEnergy;
+        this.position = initialPosition;
+        this.direction = MapDirection.randomDirection();
+        this.genomeLength = (int) configuration.get(GENOME_LENGTH);
+        this.activeGene = random.nextInt(this.genomeLength);
+        this.addEnergy = (int) configuration.get(PLANT_ENERGY);
+        this.randomGenomeChangeChance = (float) configuration.get(RANDOM_GENOME_CHANGE_CHANCE);
         this.genome = genome;
-        this.configuration = configuration;
     }
 
     public void update() {
@@ -54,7 +61,7 @@ public class Animal implements WorldElement, WorldEntity {
     public void refreshUpdateStatus() { wasUpdated = false; }
 
     public void eat() {
-        energy += configuration.plantEnergy();
+        energy += this.addEnergy;
         plantsEaten++;
     }
 
@@ -75,10 +82,10 @@ public class Animal implements WorldElement, WorldEntity {
     public boolean isAtPosition(Vector2D other) { return Objects.equals(position, other); }
 
     private void updateActiveGene() {
-        if (random.nextDouble() < configuration.randomGenomeChangeChance()) {
-            activeGene = random.nextInt(configuration.genomeLength());
+        if (random.nextDouble() < this.randomGenomeChangeChance) {
+            activeGene = random.nextInt(this.genomeLength);
         } else {
-            activeGene = (activeGene + 1) % configuration.genomeLength();
+            activeGene = (activeGene + 1) % this.genomeLength;
         }
     }
 

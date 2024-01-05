@@ -8,31 +8,40 @@ import agh.ics.oop.util.RandomNumber;
 
 import java.util.*;
 
+import static agh.ics.oop.Configuration.Fields.*;
+
 public class EquatorialWorldMap implements WorldMap {
     private final Configuration configuration;
     private final Map<Vector2D, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2D, Plant> plants = new HashMap<>();
     private final List<Vector2D> equator;
     private final List<Vector2D> regularField;
+    private final int mapWidth;
+    private final int mapHeight;
+    private final float equatorSize;
     private final List<MapChangeListener> subscribers = new LinkedList<>();
     private final UUID mapUUID = UUID.randomUUID();
 
     public EquatorialWorldMap(Configuration configuration) {
         this.configuration = configuration;
 
-        boolean[][] isEquator = new boolean[configuration.mapHeight()][configuration.mapWidth()];
+        this.mapWidth = (int) configuration.get(MAP_WIDTH);
+        this.mapHeight = (int) configuration.get(MAP_HEIGHT);
+        this.equatorSize = (float) configuration.get(EQUATOR_SIZE);
+
+        boolean[][] isEquator = new boolean[this.mapHeight][this.mapWidth];
 
         // TODO: this is hardcoded for equator, poisonous plants lack implementation
         //  probably can rename equator to "specialField' or something like that to generalize the names
         // generating equator
         // it will be at least two rows high, with every row populated randomly
-        final int equatorSize = (int) (configuration.mapWidth() * configuration.mapHeight() * configuration.equatorSize());
-        final int middleRow = configuration.mapHeight() / 2;
+        final int equatorSize = (int) (this.mapWidth * this.mapHeight * this.equatorSize);
+        final int middleRow = this.mapHeight / 2;
         int topRowOffset = -1;
         int bottomRowOffset = 0;
         // returns numbers in range [a, b) with no duplicates
-        RandomNumber topRowRandom = new RandomNumber(0, configuration.mapWidth());
-        RandomNumber bottomRowRandom = new RandomNumber(0, configuration.mapWidth());
+        RandomNumber topRowRandom = new RandomNumber(0, this.mapWidth);
+        RandomNumber bottomRowRandom = new RandomNumber(0, this.mapWidth);
         for (int i = 0; i < equatorSize; i += 2) {
             // both rows' free spaces for the equator end at the same time
             // refreshing random numbers, and marching one row further into the map
@@ -48,9 +57,9 @@ public class EquatorialWorldMap implements WorldMap {
 
         // generate lists of vectors, they will be used to choose position for the plant
         equator = new ArrayList<>(equatorSize);
-        regularField = new ArrayList<>(configuration.mapWidth() * configuration.mapHeight() - equatorSize);
-        for (int y = 0; y < configuration.mapHeight(); y++) {
-            for (int x = 0; x < configuration.mapWidth(); x++) {
+        regularField = new ArrayList<>(this.mapWidth * this.mapHeight - equatorSize);
+        for (int y = 0; y < this.mapHeight; y++) {
+            for (int x = 0; x < this.mapWidth; x++) {
                 if (isEquator[y][x]) equator.add(new Vector2D(x, y));
                 else regularField.add(new Vector2D(x, y));
             }
@@ -59,8 +68,8 @@ public class EquatorialWorldMap implements WorldMap {
         // code to test the above solution
         // TODO: remove when development is finished
         final StringBuilder sb = new StringBuilder("|");
-        for (int y = 0; y < configuration.mapHeight(); y++) {
-            for (int x = 0; x < configuration.mapWidth(); x++) {
+        for (int y = 0; y < this.mapHeight; y++) {
+            for (int x = 0; x < this.mapWidth; x++) {
                 if (isEquator[y][x]) sb.append("|*");
                 else sb.append("| ");
             }
@@ -100,7 +109,7 @@ public class EquatorialWorldMap implements WorldMap {
                 if (position.getX() > 0) {
                     animal.setPosition(new Vector2D(0, position.getY()));
                 } else {
-                    animal.setPosition(new Vector2D(configuration.mapWidth() - 1, position.getY()));
+                    animal.setPosition(new Vector2D(this.mapWidth - 1, position.getY()));
                 }
             }
         }
@@ -131,7 +140,7 @@ public class EquatorialWorldMap implements WorldMap {
 
     @Override
     public Boundary getCurrentBounds() {
-        return Boundary.fromSize(configuration.mapWidth(), configuration.mapHeight());
+        return Boundary.fromSize(this.mapWidth, this.mapHeight);
     }
 
     @Override
@@ -165,13 +174,13 @@ public class EquatorialWorldMap implements WorldMap {
     public NextMoveType moveType(Vector2D position, MapDirection direction) {
         // move would cause Y to go out of bounds
         Vector2D offset = direction.moveOffset;
-        if ((position.getY() == configuration.mapHeight() && offset.getY() == 1) ||
+        if ((position.getY() == this.mapHeight && offset.getY() == 1) ||
                 (position.getY() == 0 && offset.getY() == -1)
             ) {
             return NextMoveType.POLAR;
         }
         // move would cause X to go out of bounds
-        if ((position.getX() == configuration.mapWidth() && offset.getX() == 1) ||
+        if ((position.getX() == this.mapWidth && offset.getX() == 1) ||
                 (position.getX() == 0 && offset.getX() == -1)) {
             return NextMoveType.LEAP_TO_OTHER_SIDE;
         }
