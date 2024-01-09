@@ -2,50 +2,117 @@ package agh.ics.oop;
 
 import agh.ics.oop.model.MapType;
 
+import java.beans.JavaBean;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
+@JavaBean
 public class Configuration implements Serializable {
-    public EnumMap<Fields, Object> fieldMap;
+    public EnumMap<Fields, Field<?>> fieldMap;
 
     public Configuration() {
-        this.fieldMap = new EnumMap<>(Fields.class);
+        this.fieldMap = new EnumMap<>(
+            Map.ofEntries(
+                    Map.entry(
+                            Fields.MAP_WIDTH,
+                            Field.of(13, Integer.class)),
+                    Map.entry(
+                            Fields.MAP_HEIGHT,
+                            Field.of(8, Integer.class)),
+                    Map.entry(
+                            Fields.MAP_TYPE,
+                            Field.of(MapType.STANDARD, MapType.class)),
+                    Map.entry(
+                            Fields.GENOME_LENGTH,
+                            Field.of(8, Integer.class)),
+                    Map.entry(
+                            Fields.RANDOM_GENOME_CHANGE_CHANCE,
+                            Field.of(0f, Float.class)),
+                    Map.entry(
+                            Fields.STARTING_PLANTS_NUMBER,
+                            Field.of(20, Integer.class)),
+                    Map.entry(
+                            Fields.PLANT_ENERGY,
+                            Field.of(6, Integer.class)),
+                    Map.entry(
+                            Fields.NUMBER_OF_GROWING_PLANTS,
+                            Field.of(2, Integer.class)),
+                    Map.entry(
+                            Fields.STARTING_ANIMALS_NUMBER,
+                            Field.of(4, Integer.class)),
+                    Map.entry(
+                            Fields.REQUIRED_REPRODUCTION_ENERGY,
+                            Field.of(6, Integer.class)),
+                    Map.entry(
+                            Fields.ENERGY_PASSED_TO_CHILD,
+                            Field.of(3, Integer.class)),
+                    Map.entry(
+                            Fields.MIN_MUTATIONS_NUMBER,
+                            Field.of(0, Integer.class)),
+                    Map.entry(
+                            Fields.MAX_MUTATIONS_NUMBER,
+                            Field.of(3, Integer.class)),
+                    Map.entry(
+                            Fields.EQUATOR_SIZE,
+                            Field.of(0.2f, Float.class)),
+                    Map.entry(
+                            Fields.PLANT_GROW_AT_EQUATOR_CHANCE,
+                            Field.of(0.8f, Float.class)),
+                    Map.entry(
+                            Fields.SAVE_STEPS,
+                            Field.of(false, Boolean.class))
+            ));
     }
 
     public void set(Fields key, Object value) {
-        this.fieldMap.put(key, value);
+        this.getField(key).set(value);
     }
 
-    public Object get(Fields key) {
-        Object value = this.fieldMap.get(key);
-        if (value == null) return Configuration.getDefault(key);
-        return value;
+    public <V> V get(Fields key) {
+        return this.<V>getField(key).get();
     }
 
-    private static Object getDefault(Fields key) {
-        return Configuration.defaultFieldMap.get(key);
+    public <R> Stream<R> map(BiFunction<Fields, Field<?>, R> mapper) {
+        return this.fieldMap.entrySet().stream()
+                .map(entry -> mapper.apply(entry.getKey(), entry.getValue()));
     }
 
-    private static final EnumMap<Fields, Object> defaultFieldMap = new EnumMap<>(
-            Map.ofEntries(
-                    Map.entry(Fields.MAP_WIDTH, 13),
-                    Map.entry(Fields.MAP_HEIGHT, 8),
-                    Map.entry(Fields.MAP_TYPE, MapType.STANDARD),
-                    Map.entry(Fields.GENOME_LENGTH, 8),
-                    Map.entry(Fields.RANDOM_GENOME_CHANGE_CHANCE, 0f),
-                    Map.entry(Fields.STARTING_PLANTS_NUMBER, 20),
-                    Map.entry(Fields.PLANT_ENERGY, 6),
-                    Map.entry(Fields.NUMBER_OF_GROWING_PLANTS, 2),
-                    Map.entry(Fields.STARTING_ANIMALS_NUMBER, 4),
-                    Map.entry(Fields.REQUIRED_REPRODUCTION_ENERGY, 6),
-                    Map.entry(Fields.ENERGY_PASSED_TO_CHILD, 3),
-                    Map.entry(Fields.MIN_MUTATIONS_NUMBER, 0),
-                    Map.entry(Fields.MAX_MUTATIONS_NUMBER, 3),
-                    Map.entry(Fields.EQUATOR_SIZE, 0.2f),
-                    Map.entry(Fields.PLANT_GROW_AT_EQUATOR_CHANCE, 0.8f),
-                    Map.entry(Fields.SAVE_STEPS, false)
-            ));
+    @SuppressWarnings("unchecked")
+    public <V> Field<V> getField(Fields key) {
+        return (Field<V>) this.fieldMap.get(key);
+    }
+
+    @JavaBean
+    public static class Field<V> implements Serializable {
+        private Class<V> type;
+        public V value;
+        public V defaultValue;
+
+        public Field() {}
+
+        public void setType(Class<V> type) {
+            this.type = type;
+        }
+
+        public void set(Object value) {
+            this.value = this.type.cast(value);
+        }
+
+        public V get() {
+            if (this.value == null) return this.defaultValue;
+            return this.value;
+        }
+
+        public static <V> Field<V> of(V defaultValue, Class<V> type) {
+            Field<V> field = new Field<>();
+            field.value = defaultValue;
+            field.setType(type);
+            return field;
+        }
+    }
 
     public enum Fields {
         MAP_WIDTH,

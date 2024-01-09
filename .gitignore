@@ -126,6 +126,3 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
-### Resource graphics project files ###
-**/resources/gfx/src

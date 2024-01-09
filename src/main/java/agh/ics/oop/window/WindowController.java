@@ -15,8 +15,12 @@ public class WindowController {
         this.window = window;
     }
 
-    public Optional<Object> getParam(String key) {
-        return this.bundle.getParam(key);
+    public Optional<Object> getBundleItem(String key) {
+        return this.bundle.getItem(key);
+    }
+
+    public <I> Optional<I> getBundleItem(String key, Class<I> itemClass) {
+        return this.bundle.getItem(key, itemClass);
     }
 
     public void start() {

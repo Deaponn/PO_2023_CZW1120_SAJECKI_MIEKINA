@@ -25,9 +25,9 @@ public class EquatorialWorldMap implements WorldMap {
     public EquatorialWorldMap(Configuration configuration) {
         this.configuration = configuration;
 
-        this.mapWidth = (int) configuration.get(MAP_WIDTH);
-        this.mapHeight = (int) configuration.get(MAP_HEIGHT);
-        this.equatorSize = (float) configuration.get(EQUATOR_SIZE);
+        this.mapWidth = configuration.get(MAP_WIDTH);
+        this.mapHeight = configuration.get(MAP_HEIGHT);
+        this.equatorSize = configuration.get(EQUATOR_SIZE);
 
         boolean[][] isEquator = new boolean[this.mapHeight][this.mapWidth];
 
@@ -131,10 +131,13 @@ public class EquatorialWorldMap implements WorldMap {
     public List<WorldElement> getElements(Vector2D position) {
         List<WorldElement> elementList = new LinkedList<>();
         elementList.add(new Ground(position));
+
         Plant plant = this.plants.get(position);
         if (plant != null) elementList.add(plant);
+
         List<Animal> animalList = this.animals.get(position);
         if (animalList != null) elementList.addAll(animalList);
+
         return elementList;
     }
 

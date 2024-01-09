@@ -3,16 +3,15 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.MapType;
 import agh.ics.oop.window.WindowController;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
+import javafx.util.StringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
+
+import static agh.ics.oop.Configuration.Fields.*;
 
 public class Configurator extends WindowController {
     @FXML
@@ -50,63 +49,77 @@ public class Configurator extends WindowController {
     @FXML
     public CheckBox saveSteps;
 
+    private Configuration configuration;
+
     @Override
     public void start() {
-//        this.configuration = new Configuration();
-//
-//        addField(setIntegerFormatter(mapWidth), configuration.mapWidth());
-//        addField(setIntegerFormatter(mapHeight), configuration.mapHeight());
-//        addField(setMapTypeChoiceBox(mapType), configuration.mapType());
-//        addField(setIntegerFormatter(genomeLength), configuration.genomeLength());
-//        addField(setFloatFormatter(randomGenomeChangeChance), configuration.randomGenomeChangeChance());
-//        addField(setIntegerFormatter(startingPlantsNumber), configuration.startingPlantsNumber());
-//        addField(setIntegerFormatter(plantEnergy), configuration.plantEnergy());
-//        addField(setIntegerFormatter(numberOfGrowingPlants), configuration.numberOfGrowingPlants());
-//        addField(setIntegerFormatter(startingAnimalsNumber), configuration.startingAnimalsNumber());
-//        addField(setIntegerFormatter(requiredReproductionEnergy), configuration.requiredReproductionEnergy());
-//        addField(setIntegerFormatter(energyPassedToChild), configuration.energyPassedToChild());
-//        addField(setIntegerFormatter(minMutationsNumber), configuration.minMutationsNumber());
-//        addField(setIntegerFormatter(maxMutationsNumber), configuration.maxMutationsNumber());
-//        addField(setFloatFormatter(equatorSize), configuration.equatorSize());
-//        addField(setFloatFormatter(plantGrowAtEquatorChance), configuration.plantGrowAtEquatorChance());
-//        addField(saveSteps, configuration.saveSteps());
+        this.configuration = this.getBundleItem("configuration", Configuration.class).orElseThrow();
+
+        this.addIntegerField(MAP_WIDTH, this.mapWidth);
+        this.addIntegerField(MAP_HEIGHT, this.mapHeight);
+        this.addEnumField(MAP_TYPE, this.mapType, MapType.class);
+        this.addIntegerField(GENOME_LENGTH, this.genomeLength);
+        this.addFloatField(RANDOM_GENOME_CHANGE_CHANCE, this.randomGenomeChangeChance);
+        this.addIntegerField(STARTING_PLANTS_NUMBER, this.startingPlantsNumber);
+        this.addIntegerField(PLANT_ENERGY, this.plantEnergy);
+        this.addIntegerField(NUMBER_OF_GROWING_PLANTS, this.numberOfGrowingPlants);
+        this.addIntegerField(STARTING_ANIMALS_NUMBER, this.startingAnimalsNumber);
+        this.addIntegerField(REQUIRED_REPRODUCTION_ENERGY, this.requiredReproductionEnergy);
+        this.addIntegerField(ENERGY_PASSED_TO_CHILD, this.energyPassedToChild);
+        this.addIntegerField(MIN_MUTATIONS_NUMBER, this.minMutationsNumber);
+        this.addIntegerField(MAX_MUTATIONS_NUMBER, this.maxMutationsNumber);
+        this.addFloatField(EQUATOR_SIZE, this.equatorSize);
+        this.addFloatField(PLANT_GROW_AT_EQUATOR_CHANCE, this.plantGrowAtEquatorChance);
+        this.addBooleanField(SAVE_STEPS, this.saveSteps);
     }
 
-    private static TextFormatter<Integer> setIntegerFormatter(TextField textField) {
-        TextFormatter<Integer> formatter = new TextFormatter<>(new IntegerStringConverter());
+    private static <V> ChangeListener<V> createConfigurationFieldListener(
+            Configuration.Field<V> configurationField) {
+        return (observable, previousValue, newValue) -> configurationField.set(newValue);
+    }
+
+    private void addIntegerField(Configuration.Fields key, TextField textField) {
+        this.addAnyField(key, textField, new IntegerStringConverter());
+    }
+
+    private void addFloatField(Configuration.Fields key, TextField textField) {
+        this.addAnyField(key, textField, new FloatStringConverter());
+    }
+
+    private <V> void addAnyField(
+            Configuration.Fields key, TextField textField, StringConverter<V> stringConverter) {
+        Configuration.Field<V> configurationField = this.configuration.getField(key);
+        TextFormatter<V> formatter = new TextFormatter<>(stringConverter);
         textField.setTextFormatter(formatter);
-        return formatter;
+        this.configureValueProperty(formatter.valueProperty(), configurationField);
     }
 
-    private static TextFormatter<Float> setFloatFormatter(TextField textField) {
-        TextFormatter<Float> formatter = new TextFormatter<>(new FloatStringConverter());
-        textField.setTextFormatter(formatter);
-        return formatter;
+    private <T extends Enum<T>> void addEnumField(
+            Configuration.Fields key,
+            ChoiceBox<T> choiceBox,
+            Class<T> enumClass) {
+        Configuration.Field<T> configurationField = this.configuration.getField(key);
+        T[] enumValues = enumClass.getEnumConstants();
+        if (enumValues == null) throw new RuntimeException("not an enum");
+        choiceBox.getItems().addAll(enumValues);
+        try {
+            choiceBox.setValue(enumValues[0]);
+        } catch (IndexOutOfBoundsException e) {
+            throw new RuntimeException("empty enum");
+        }
+        this.configureValueProperty(choiceBox.valueProperty(), configurationField);
     }
 
-    private static ChoiceBox<MapType> setMapTypeChoiceBox(ChoiceBox<MapType> choiceBox) {
-        choiceBox.getItems().addAll(MapType.STANDARD, MapType.POISONOUS_PLANTS);
-        choiceBox.setValue(MapType.STANDARD);
-        return choiceBox;
+    private void addBooleanField(
+            Configuration.Fields key, CheckBox checkBox) {
+        Configuration.Field<Boolean> configurationField = this.configuration.getField(key);
+        this.configureValueProperty(checkBox.selectedProperty(), configurationField);
     }
 
-    private <V> void addField(TextFormatter<V> textFormatter, Property<V> field) {
-        field.bind(textFormatter.valueProperty());
-    }
-
-    private void addField(TextFormatter<Integer> textFormatter, IntegerProperty field) {
-        field.bind(textFormatter.valueProperty());
-    }
-
-    private void addField(TextFormatter<Float> textFormatter, FloatProperty field) {
-        field.bind(textFormatter.valueProperty());
-    }
-
-    private <V> void addField(ChoiceBox<V> choiceBox, Property<V> field) {
-        field.bind(choiceBox.valueProperty());
-    }
-
-    private void addField(CheckBox checkBox, Property<Boolean> field) {
-        field.bind(checkBox.selectedProperty());
+    private <V> void configureValueProperty(
+            Property<V> valueProperty,
+            Configuration.Field<V> configurationField) {
+        valueProperty.addListener(Configurator.createConfigurationFieldListener(configurationField));
+        valueProperty.setValue(configurationField.get());
     }
 }

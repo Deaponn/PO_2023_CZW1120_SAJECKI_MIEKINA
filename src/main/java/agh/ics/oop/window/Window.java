@@ -1,6 +1,7 @@
 package agh.ics.oop.window;
 
 import agh.ics.oop.resource.Resources;
+import agh.ics.oop.windowx.ErrorAlert;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -83,5 +84,9 @@ public class Window<T extends WindowController> {
 
     public void close() {
         this.stage.close();
+    }
+
+    public ErrorAlert showErrorAlert(String title, String headerText, String contentText) {
+        return new ErrorAlert(this, title, headerText, contentText);
     }
 }

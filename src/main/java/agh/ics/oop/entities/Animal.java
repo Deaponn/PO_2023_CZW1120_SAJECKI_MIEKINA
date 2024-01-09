@@ -38,10 +38,10 @@ public class Animal implements WorldElement, WorldEntity {
         this.energy = initialEnergy;
         this.position = initialPosition;
         this.direction = MapDirection.randomDirection();
-        this.genomeLength = (int) configuration.get(GENOME_LENGTH);
+        this.genomeLength = configuration.get(GENOME_LENGTH);
         this.activeGene = random.nextInt(this.genomeLength);
-        this.addEnergy = (int) configuration.get(PLANT_ENERGY);
-        this.randomGenomeChangeChance = (float) configuration.get(RANDOM_GENOME_CHANGE_CHANCE);
+        this.addEnergy = configuration.get(PLANT_ENERGY);
+        this.randomGenomeChangeChance = configuration.get(RANDOM_GENOME_CHANGE_CHANCE);
         this.genome = genome;
     }
 

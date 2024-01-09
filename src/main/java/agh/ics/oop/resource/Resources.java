@@ -2,7 +2,10 @@ package agh.ics.oop.resource;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +18,10 @@ import java.util.stream.Stream;
 public class Resources {
     public static Optional<URL> getResourceURL(Class<?> receiver, String path) {
         return Optional.ofNullable(receiver.getResource(path));
+    }
+
+    public static Optional<InputStream> getResourceInputStream(Class<?> receiver, String path) {
+        return Optional.ofNullable(receiver.getResourceAsStream(path));
     }
 
     public static Stream<File> listFilesAtPath(String parentPath, FileFilter fileFilter)
@@ -70,13 +77,5 @@ public class Resources {
         } catch (IOException e) {
             throw new ResourceNotFoundException(path);
         }
-    }
-
-    public static String getObjectXML(Object object) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        XMLEncoder xmlEncoder = new XMLEncoder(outputStream);
-        xmlEncoder.writeObject(object);
-        xmlEncoder.close();
-        return outputStream.toString();
     }
 }

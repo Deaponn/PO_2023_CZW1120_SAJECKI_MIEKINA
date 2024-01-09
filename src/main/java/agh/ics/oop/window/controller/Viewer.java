@@ -31,11 +31,11 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         this.worldView = new CanvasWorldView(this.canvas);
         this.worldRenderer = new WorldRenderer(
-                (ImageMap) this.getParam("image_map").orElseThrow(),
+                this.getBundleItem("image_map", ImageMap.class).orElseThrow(),
                 this.worldView
         );
 
-        this.worldMap = (WorldMap) this.getParam("world_map").orElseThrow();
+        this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);
         // temporary test
         Configuration configuration = new Configuration();
