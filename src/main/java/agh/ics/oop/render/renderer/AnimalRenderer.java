@@ -15,7 +15,7 @@ public class AnimalRenderer extends WorldElementRenderer<Animal> {
 
     private static String getEnergyBarImageKey(int energy) {
         return switch (energy) {
-            case 0 -> "TODO";
+            case 0 -> "bar0";
             case 1 -> "bar1";
             case 2 -> "bar2";
             case 3 -> "bar3";

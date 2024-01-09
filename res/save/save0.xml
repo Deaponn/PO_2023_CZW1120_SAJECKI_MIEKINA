@@ -17,7 +17,7 @@
       <string>value</string>
       <void method="set">
        <object idref="Configuration$Field0"/>
-       <int>40</int>
+       <int>16</int>
       </void>
      </void>
     </void>
@@ -31,7 +31,7 @@
   </void>
   <void idref="EnumMap0"/>
   <object idref="Configuration$Field1"/>
-  <int>30</int>
+  <int>6</int>
  </void>
 </void>
 </java>

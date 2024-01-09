@@ -2,10 +2,12 @@ package agh.ics.oop.window;
 
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.windowx.ErrorAlert;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -84,6 +86,10 @@ public class Window<T extends WindowController> {
 
     public void close() {
         this.stage.close();
+    }
+
+    public void setOnClose(EventHandler<WindowEvent> eventHandler) {
+        this.stage.setOnHiding(eventHandler);
     }
 
     public ErrorAlert showErrorAlert(String title, String headerText, String contentText) {

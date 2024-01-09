@@ -53,6 +53,8 @@ public class Configurator extends WindowController {
 
     @Override
     public void start() {
+        super.start();
+
         this.configuration = this.getBundleItem("configuration", Configuration.class).orElseThrow();
 
         this.addIntegerField(MAP_WIDTH, this.mapWidth);
@@ -64,10 +66,10 @@ public class Configurator extends WindowController {
         this.addIntegerField(PLANT_ENERGY, this.plantEnergy);
         this.addIntegerField(NUMBER_OF_GROWING_PLANTS, this.numberOfGrowingPlants);
         this.addIntegerField(STARTING_ANIMALS_NUMBER, this.startingAnimalsNumber);
-        this.addIntegerField(REQUIRED_REPRODUCTION_ENERGY, this.requiredReproductionEnergy);
-        this.addIntegerField(ENERGY_PASSED_TO_CHILD, this.energyPassedToChild);
-        this.addIntegerField(MIN_MUTATIONS_NUMBER, this.minMutationsNumber);
-        this.addIntegerField(MAX_MUTATIONS_NUMBER, this.maxMutationsNumber);
+        this.addIntegerField(MIN_REPRODUCE_ENERGY, this.requiredReproductionEnergy);
+        this.addIntegerField(ENERGY_PASSED, this.energyPassedToChild);
+        this.addIntegerField(MIN_MUTATIONS, this.minMutationsNumber);
+        this.addIntegerField(MAX_MUTATIONS, this.maxMutationsNumber);
         this.addFloatField(EQUATOR_SIZE, this.equatorSize);
         this.addFloatField(PLANT_GROW_AT_EQUATOR_CHANCE, this.plantGrowAtEquatorChance);
         this.addBooleanField(SAVE_STEPS, this.saveSteps);
@@ -122,4 +124,6 @@ public class Configurator extends WindowController {
         valueProperty.addListener(Configurator.createConfigurationFieldListener(configurationField));
         valueProperty.setValue(configurationField.get());
     }
+
+    public static final String configurationPath = "res/save/save0.xml";
 }

@@ -11,7 +11,6 @@ import java.util.*;
 import static agh.ics.oop.Configuration.Fields.*;
 
 public class EquatorialWorldMap implements WorldMap {
-    private final Configuration configuration;
     private final Map<Vector2D, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2D, Plant> plants = new HashMap<>();
     private final List<Vector2D> equator;
@@ -23,8 +22,6 @@ public class EquatorialWorldMap implements WorldMap {
     private final UUID mapUUID = UUID.randomUUID();
 
     public EquatorialWorldMap(Configuration configuration) {
-        this.configuration = configuration;
-
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
         this.equatorSize = configuration.get(EQUATOR_SIZE);

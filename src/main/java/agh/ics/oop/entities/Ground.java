@@ -6,20 +6,8 @@ import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.renderer.GroundRenderer;
 
 @AssignRenderer(renderer = GroundRenderer.class)
-public class Ground implements WorldElement {
-    private final Vector2D position;
-
+public class Ground extends WorldElement {
     public Ground(Vector2D position) {
-        this.position = position;
-    }
-
-    @Override
-    public Vector2D getPosition() {
-        return this.position;
-    }
-
-    @Override
-    public boolean isAtPosition(Vector2D position) {
-        return this.position.equals(position);
+        super(position);
     }
 }

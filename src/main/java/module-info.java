@@ -10,11 +10,13 @@ module Project.main {
     opens agh.ics.oop;
     opens agh.ics.oop.model;
 
+    exports agh.ics.oop.model;
     exports agh.ics.oop.resource;
     exports agh.ics.oop.window;
     exports agh.ics.oop.windowx;
 
+    opens agh.ics.oop.window.controller to javafx.fxml;
+
     exports agh.ics.oop to javafx.graphics;
     exports agh.ics.oop.window.controller to javafx.fxml;
-    opens agh.ics.oop.window.controller to javafx.fxml;
 }

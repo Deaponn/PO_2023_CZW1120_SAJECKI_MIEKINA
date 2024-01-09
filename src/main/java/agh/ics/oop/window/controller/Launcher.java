@@ -5,13 +5,21 @@ import agh.ics.oop.model.EquatorialWorldMap;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.ImageMap;
 import agh.ics.oop.resource.ResourceNotFoundException;
+import agh.ics.oop.resource.Resources;
 import agh.ics.oop.window.Bundle;
 import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
 
 public class Launcher extends WindowController {
-    private final Configuration configuration = new Configuration();
+    private Configuration configuration = new Configuration();
+
+    @Override
+    public void start() {
+        super.start();
+
+        this.loadConfiguration();
+    }
 
     public void launchConfigurator() {
         Window<Configurator> configuratorWindow = new Window<>(
@@ -23,6 +31,7 @@ public class Launcher extends WindowController {
                 .send("configuration", this.configuration);
 
         configuratorWindow.start(configuratorBundle);
+        configuratorWindow.setOnClose(event -> this.saveConfiguration());
     }
 
     public void launchViewer() {
@@ -45,6 +54,31 @@ public class Launcher extends WindowController {
                     "Fatal error",
                     "Image map resource not found.\nReinstall the application to fix this issue.",
                     "Could not get resources " + e.getMessage()).setCloseWindow();
+        }
+    }
+
+    private void loadConfiguration() {
+        try {
+            this.configuration = (Configuration) Resources.deserializeFromXML(
+                    Configurator.configurationPath);
+        } catch (ResourceNotFoundException e) {
+            this.window.showErrorAlert(
+                    "Error",
+                    "Could not load a configuration.",
+                    "Could not load XML " + e.getMessage()).setDoNothing();
+        }
+    }
+
+    private void saveConfiguration() {
+        try {
+            Resources.serializeToXML(
+                    Configurator.configurationPath,
+                    this.configuration);
+        } catch (ResourceNotFoundException e) {
+            this.window.showErrorAlert(
+                    "Error",
+                    "Could not save a configuration.",
+                    "Could not save XML " + e.getMessage()).setDoNothing();
         }
     }
 }

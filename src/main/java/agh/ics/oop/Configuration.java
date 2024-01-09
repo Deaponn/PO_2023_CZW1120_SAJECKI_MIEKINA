@@ -44,16 +44,16 @@ public class Configuration implements Serializable {
                             Fields.STARTING_ANIMALS_NUMBER,
                             Field.of(4, Integer.class)),
                     Map.entry(
-                            Fields.REQUIRED_REPRODUCTION_ENERGY,
+                            Fields.MIN_REPRODUCE_ENERGY,
                             Field.of(6, Integer.class)),
                     Map.entry(
-                            Fields.ENERGY_PASSED_TO_CHILD,
+                            Fields.ENERGY_PASSED,
                             Field.of(3, Integer.class)),
                     Map.entry(
-                            Fields.MIN_MUTATIONS_NUMBER,
+                            Fields.MIN_MUTATIONS,
                             Field.of(0, Integer.class)),
                     Map.entry(
-                            Fields.MAX_MUTATIONS_NUMBER,
+                            Fields.MAX_MUTATIONS,
                             Field.of(3, Integer.class)),
                     Map.entry(
                             Fields.EQUATOR_SIZE,
@@ -127,13 +127,13 @@ public class Configuration implements Serializable {
         PLANT_ENERGY,
         NUMBER_OF_GROWING_PLANTS,
         STARTING_ANIMALS_NUMBER,
-        REQUIRED_REPRODUCTION_ENERGY,
+        MIN_REPRODUCE_ENERGY,
         // TODO: percentage or integer amount?
         //      if percentage, should the max be 200%?
         //      (for both parents to give out all the energy)
-        ENERGY_PASSED_TO_CHILD,
-        MIN_MUTATIONS_NUMBER,
-        MAX_MUTATIONS_NUMBER,
+        ENERGY_PASSED,
+        MIN_MUTATIONS,
+        MAX_MUTATIONS,
         // default is 0.2, according to Pareto rule
         EQUATOR_SIZE,
         // default is 0.8, according to Pareto rule
