@@ -1,9 +1,7 @@
 package agh.ics.oop.model;
 
 import agh.ics.oop.Configuration;
-import agh.ics.oop.entities.Animal;
-import agh.ics.oop.entities.Ground;
-import agh.ics.oop.entities.Plant;
+import agh.ics.oop.entities.*;
 import agh.ics.oop.util.RandomNumber;
 
 import java.util.*;
@@ -11,6 +9,9 @@ import java.util.*;
 import static agh.ics.oop.Configuration.Fields.*;
 
 public class EquatorialWorldMap implements WorldMap {
+    private final GenomeFactory genomeFactory;
+    private final AnimalFactory animalFactory;
+    private final PlantFactory plantFactory;
     private final Map<Vector2D, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2D, Plant> plants = new HashMap<>();
     private final List<Vector2D> equator;
@@ -25,6 +26,10 @@ public class EquatorialWorldMap implements WorldMap {
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
         this.equatorSize = configuration.get(EQUATOR_SIZE);
+
+        this.genomeFactory = new GenomeFactory(configuration);
+        this.animalFactory = new AnimalFactory(configuration, this.genomeFactory);
+        this.plantFactory = new PlantFactory(configuration);
 
         boolean[][] isEquator = new boolean[this.mapHeight][this.mapWidth];
 

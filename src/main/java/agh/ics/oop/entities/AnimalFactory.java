@@ -8,7 +8,6 @@ import agh.ics.oop.model.Vector2D;
 import java.util.Random;
 
 import static agh.ics.oop.Configuration.Fields.*;
-import static agh.ics.oop.Configuration.Fields.MAX_MUTATIONS;
 
 public class AnimalFactory {
     private final int minReproduceEnergy;
