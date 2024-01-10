@@ -3,8 +3,12 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.MapType;
 import agh.ics.oop.window.WindowController;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
@@ -77,7 +81,20 @@ public class Configurator extends WindowController {
 
     private static <V> ChangeListener<V> createConfigurationFieldListener(
             Configuration.Field<V> configurationField) {
-        return (observable, previousValue, newValue) -> configurationField.set(newValue);
+        return (observable, previousValue, newValue) -> {
+            try {
+                configurationField.set(newValue);
+            } catch (IllegalArgumentException e) {
+                System.out.println("TODO: add toast: " + e);
+            }
+        };
+    }
+
+    private <V> void configureValueProperty(
+            Property<V> valueProperty,
+            Configuration.Field<V> configurationField) {
+        valueProperty.addListener(Configurator.createConfigurationFieldListener(configurationField));
+        valueProperty.setValue(configurationField.get());
     }
 
     private void addIntegerField(Configuration.Fields key, TextField textField) {
@@ -116,13 +133,6 @@ public class Configurator extends WindowController {
             Configuration.Fields key, CheckBox checkBox) {
         Configuration.Field<Boolean> configurationField = this.configuration.getField(key);
         this.configureValueProperty(checkBox.selectedProperty(), configurationField);
-    }
-
-    private <V> void configureValueProperty(
-            Property<V> valueProperty,
-            Configuration.Field<V> configurationField) {
-        valueProperty.addListener(Configurator.createConfigurationFieldListener(configurationField));
-        valueProperty.setValue(configurationField.get());
     }
 
     public static final String configurationPath = "res/save/save0.xml";
