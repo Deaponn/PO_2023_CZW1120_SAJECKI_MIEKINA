@@ -10,6 +10,7 @@ import agh.ics.oop.window.Bundle;
 import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
+import agh.ics.oop.windowx.Toast;
 
 public class Launcher extends WindowController {
     private Configuration configuration = new Configuration();
@@ -19,6 +20,8 @@ public class Launcher extends WindowController {
         super.start();
 
         this.loadConfiguration();
+
+        this.window.addNode(new Toast(this.window, "hey!", Toast.Duration.SHORT));
     }
 
     public void launchConfigurator() {

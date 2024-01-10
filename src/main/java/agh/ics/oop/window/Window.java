@@ -2,8 +2,15 @@ package agh.ics.oop.window;
 
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.windowx.ErrorAlert;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.FloatBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -78,6 +85,14 @@ public class Window<T extends WindowController> {
 
     public T getController() {
         return this.controller;
+    }
+
+    public Pane getRoot() {
+        return this.root;
+    }
+
+    public void addNode(Node node) {
+        this.root.getChildren().add(node);
     }
 
     public void show() {
