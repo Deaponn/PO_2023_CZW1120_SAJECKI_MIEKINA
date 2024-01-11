@@ -2,6 +2,7 @@ package agh.ics.oop.window;
 
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.windowx.ErrorAlert;
+import agh.ics.oop.windowx.Toast;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -107,5 +108,10 @@ public class Window<T extends WindowController> {
 
     public ErrorAlert showErrorAlert(String title, String headerText, String contentText) {
         return new ErrorAlert(this, title, headerText, contentText);
+    }
+
+    public void showToast(String message, Toast.Duration duration) {
+        Toast toast = new Toast(this, message, duration);
+        this.addNode(toast);
     }
 }

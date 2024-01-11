@@ -3,14 +3,14 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.MapType;
 import agh.ics.oop.window.WindowController;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import agh.ics.oop.windowx.Toast;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.util.StringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
@@ -79,21 +79,25 @@ public class Configurator extends WindowController {
         this.addBooleanField(SAVE_STEPS, this.saveSteps);
     }
 
-    private static <V> ChangeListener<V> createConfigurationFieldListener(
+    private <V> ChangeListener<V> createConfigurationFieldListener(
+            Configuration.Fields configurationKey,
             Configuration.Field<V> configurationField) {
         return (observable, previousValue, newValue) -> {
             try {
                 configurationField.set(newValue);
             } catch (IllegalArgumentException e) {
-                System.out.println("TODO: add toast: " + e);
+                String fieldName = configurationKey.name();
+                this.window.showToast("Incorrect value in " + fieldName, Toast.Duration.LONG);
             }
         };
     }
 
     private <V> void configureValueProperty(
             Property<V> valueProperty,
+            Configuration.Fields configurationKey,
             Configuration.Field<V> configurationField) {
-        valueProperty.addListener(Configurator.createConfigurationFieldListener(configurationField));
+        valueProperty.addListener(this.createConfigurationFieldListener(
+                configurationKey, configurationField));
         valueProperty.setValue(configurationField.get());
     }
 
@@ -110,7 +114,7 @@ public class Configurator extends WindowController {
         Configuration.Field<V> configurationField = this.configuration.getField(key);
         TextFormatter<V> formatter = new TextFormatter<>(stringConverter);
         textField.setTextFormatter(formatter);
-        this.configureValueProperty(formatter.valueProperty(), configurationField);
+        this.configureValueProperty(formatter.valueProperty(), key, configurationField);
     }
 
     private <T extends Enum<T>> void addEnumField(
@@ -126,13 +130,13 @@ public class Configurator extends WindowController {
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("empty enum");
         }
-        this.configureValueProperty(choiceBox.valueProperty(), configurationField);
+        this.configureValueProperty(choiceBox.valueProperty(), key, configurationField);
     }
 
     private void addBooleanField(
             Configuration.Fields key, CheckBox checkBox) {
         Configuration.Field<Boolean> configurationField = this.configuration.getField(key);
-        this.configureValueProperty(checkBox.selectedProperty(), configurationField);
+        this.configureValueProperty(checkBox.selectedProperty(), key, configurationField);
     }
 
     public static final String configurationPath = "res/save/save0.xml";

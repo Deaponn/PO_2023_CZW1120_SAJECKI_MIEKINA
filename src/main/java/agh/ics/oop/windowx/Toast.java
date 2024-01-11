@@ -61,7 +61,8 @@ public class Toast extends StackPane {
     }
 
     private double getToastWidth() {
-        return this.text.getFont().getSize() * (this.text.getText().length() + 2);
+        int charCount = this.text.getText().length() + 2;
+        return this.text.getFont().getSize() * Toast.widthSizeMultiplier * charCount;
     }
 
     private double getToastHeight() {
@@ -82,6 +83,7 @@ public class Toast extends StackPane {
     private static final Paint textPaint = Paint.valueOf("#e4e4e4");
     private static final Paint backgroundPaint = Paint.valueOf("#303030");
     private static final Paint borderPaint = Paint.valueOf("#444444");
+    private static final double widthSizeMultiplier = 0.6;
     private static final double verticalMargin = 5;
 
     public enum Duration {

@@ -104,7 +104,7 @@ public class Configuration implements Serializable {
             if (this.valueBounds == null || this.valueBounds.test(newValue))
                 this.value = this.type.cast(value);
             else
-                throw new IllegalArgumentException("Assigned field value out of bounds.");
+                throw new IllegalArgumentException("Configuration field: value out of bounds.");
         }
 
         public V get() {
