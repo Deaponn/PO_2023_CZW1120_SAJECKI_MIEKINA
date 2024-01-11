@@ -13,21 +13,8 @@
       <class>agh.ics.oop.Configuration$Fields</class>
       <string>MAP_WIDTH</string>
      </object>
-     <void class="agh.ics.oop.Configuration$Field" method="getField">
-      <string>value</string>
-      <void method="set">
-       <object idref="Configuration$Field0"/>
-       <int>16</int>
-      </void>
-     </void>
     </void>
     <void id="Configuration$Field1" method="get">
-     <object class="java.lang.Enum" method="valueOf">
-      <class>agh.ics.oop.Configuration$Fields</class>
-      <string>MAP_HEIGHT</string>
-     </object>
-    </void>
-    <void id="Configuration$Field2" method="get">
      <object class="java.lang.Enum" method="valueOf">
       <class>agh.ics.oop.Configuration$Fields</class>
       <string>MAP_TYPE</string>
@@ -35,7 +22,7 @@
      <void class="agh.ics.oop.Configuration$Field" method="getField">
       <string>value</string>
       <void method="set">
-       <object idref="Configuration$Field2"/>
+       <object idref="Configuration$Field1"/>
        <object class="java.lang.Enum" method="valueOf">
         <class>agh.ics.oop.model.MapType</class>
         <string>POISONOUS_PLANTS</string>
@@ -46,8 +33,8 @@
    </void>
   </void>
   <void idref="EnumMap0"/>
-  <object idref="Configuration$Field1"/>
-  <int>6</int>
+  <object idref="Configuration$Field0"/>
+  <int>16</int>
  </void>
 </void>
 </java>

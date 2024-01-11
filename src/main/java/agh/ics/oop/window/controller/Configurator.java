@@ -80,6 +80,7 @@ public class Configurator extends WindowController {
     }
 
     private <V> ChangeListener<V> createConfigurationFieldListener(
+            Property<V> property,
             Configuration.Fields configurationKey,
             Configuration.Field<V> configurationField) {
         return (observable, previousValue, newValue) -> {
@@ -87,6 +88,7 @@ public class Configurator extends WindowController {
                 configurationField.set(newValue);
             } catch (IllegalArgumentException e) {
                 String fieldName = configurationKey.name();
+                property.setValue(previousValue);
                 this.window.showToast("Incorrect value in " + fieldName, Toast.Duration.LONG);
             }
         };
@@ -97,7 +99,7 @@ public class Configurator extends WindowController {
             Configuration.Fields configurationKey,
             Configuration.Field<V> configurationField) {
         valueProperty.addListener(this.createConfigurationFieldListener(
-                configurationKey, configurationField));
+                valueProperty, configurationKey, configurationField));
         valueProperty.setValue(configurationField.get());
     }
 
