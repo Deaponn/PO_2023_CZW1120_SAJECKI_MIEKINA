@@ -10,6 +10,7 @@ import agh.ics.oop.window.Bundle;
 import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
+import agh.ics.oop.windowx.Toast;
 
 public class Launcher extends WindowController {
     private Configuration configuration = new Configuration();
@@ -62,10 +63,7 @@ public class Launcher extends WindowController {
             this.configuration = (Configuration) Resources.deserializeFromXML(
                     Configurator.configurationPath);
         } catch (ResourceNotFoundException e) {
-            this.window.showErrorAlert(
-                    "Error",
-                    "Could not load a configuration.",
-                    "Could not load XML " + e.getMessage()).setDoNothing();
+            this.window.showToast("Running with new configuration", Toast.Duration.SHORT);
         }
     }
 
