@@ -1,7 +1,7 @@
 package agh.ics.oop.render;
 
 import agh.ics.oop.model.*;
-import agh.ics.oop.window.WorldView;
+import agh.ics.oop.view.WorldView;
 import javafx.scene.image.Image;
 
 import java.lang.reflect.InvocationTargetException;

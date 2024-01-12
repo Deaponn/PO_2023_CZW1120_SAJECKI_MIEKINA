@@ -17,6 +17,6 @@ module Project.main {
 
     opens agh.ics.oop.window.controller to javafx.fxml;
 
-    exports agh.ics.oop to javafx.graphics;
     exports agh.ics.oop.window.controller to javafx.fxml;
+    exports agh.ics.oop.view to javafx.graphics;
 }

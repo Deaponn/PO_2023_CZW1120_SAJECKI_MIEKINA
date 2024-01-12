@@ -7,7 +7,7 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.ImageMap;
 import agh.ics.oop.render.WorldRenderer;
-import agh.ics.oop.window.CanvasWorldView;
+import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -32,6 +32,7 @@ public class Viewer extends WindowController implements MapChangeListener {
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);
 
+        // Testing code
         Thread thread = new Thread(() -> {
             this.worldMap.placeElement(new Plant(new Vector2D(5, 5), 5));
             try {

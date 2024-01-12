@@ -1,8 +1,9 @@
-package agh.ics.oop.window;
+package agh.ics.oop.view;
 
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -76,6 +77,11 @@ public class CanvasWorldView implements WorldView {
     @Override
     public void presentView() {
         this.graphicsContext.drawImage(this.buffer, 0, 0);
+    }
+
+    @Override
+    public Node getRoot() {
+        return this.canvas;
     }
 
     private void drawAtGrid(Vector2D position, Image image) {
