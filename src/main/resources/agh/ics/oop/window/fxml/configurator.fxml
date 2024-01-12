@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="agh.ics.oop.window.controller.Configurator"
+            minWidth="600" minHeight="400">
+    <padding>
+        <Insets top="20" bottom="20" left="20" right="20"/>
+    </padding>
+    <center>
+        <GridPane hgap="10.0" vgap="10.0">
+            <VBox GridPane.columnIndex="0"
+                  minWidth="400.0"
+                  spacing="10.0">
+                <TitledPane collapsible="false" text="Map">
+                    <GridPane hgap="5.0" vgap="5.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label GridPane.rowIndex="0"
+                               GridPane.columnIndex="0">map width</Label>
+                        <TextField GridPane.rowIndex="0"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="mapWidth"/>
+                        <Label GridPane.rowIndex="1"
+                               GridPane.columnIndex="0">map height
+                        </Label>
+                        <TextField GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="mapHeight"/>
+                        <Label GridPane.rowIndex="2"
+                               GridPane.columnIndex="0">map type</Label>
+                        <ChoiceBox GridPane.rowIndex="2"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="mapType"/>
+                        <Label GridPane.rowIndex="3"
+                               GridPane.columnIndex="0">equator size</Label>
+                        <TextField GridPane.rowIndex="3"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="equatorSize"/>
+                        <Label GridPane.rowIndex="4"
+                               GridPane.columnIndex="0">plant at equator chance</Label>
+                        <TextField GridPane.rowIndex="4"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="plantGrowAtEquatorChance"/>
+                    </GridPane>
+                </TitledPane>
+                <TitledPane collapsible="false" text="Genome">
+                    <GridPane hgap="5.0" vgap="5.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label GridPane.rowIndex="0"
+                               GridPane.columnIndex="0">genome length</Label>
+                        <TextField GridPane.rowIndex="0"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="genomeLength"/>
+                        <Label GridPane.rowIndex="1"
+                               GridPane.columnIndex="0">random genome change chance</Label>
+                        <TextField GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="randomGenomeChangeChance"/>
+                    </GridPane>
+                </TitledPane>
+                <TitledPane collapsible="false" text="Saves">
+                    <GridPane hgap="5.0" vgap="5.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label GridPane.rowIndex="0"
+                               GridPane.columnIndex="0">save steps</Label>
+                        <CheckBox GridPane.rowIndex="0"
+                                  GridPane.columnIndex="1"
+                                  fx:id="saveSteps"/>
+                    </GridPane>
+                </TitledPane>
+            </VBox>
+            <VBox GridPane.columnIndex="1"
+                  minWidth="400.0"
+                  spacing="10.0">
+                <TitledPane collapsible="false" text="Plants">
+                    <GridPane hgap="5.0" vgap="5.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label GridPane.rowIndex="0"
+                               GridPane.columnIndex="0">starting plants</Label>
+                        <TextField GridPane.rowIndex="0"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="startingPlantsNumber"/>
+                        <Label GridPane.rowIndex="1"
+                               GridPane.columnIndex="0">plant energy</Label>
+                        <TextField GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="plantEnergy"/>
+                        <Label GridPane.rowIndex="2"
+                               GridPane.columnIndex="0">growing plants</Label>
+                        <TextField GridPane.rowIndex="2"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="numberOfGrowingPlants"/>
+                    </GridPane>
+                </TitledPane>
+                <TitledPane collapsible="false" text="Animals"
+                            GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <GridPane hgap="5.0" vgap="5.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label GridPane.rowIndex="0"
+                               GridPane.columnIndex="0">starting animals</Label>
+                        <TextField GridPane.rowIndex="0"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="startingAnimalsNumber"/>
+                        <Label GridPane.rowIndex="1"
+                               GridPane.columnIndex="0">required reproduction energy</Label>
+                        <TextField GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="requiredReproductionEnergy"/>
+                        <Label GridPane.rowIndex="2"
+                               GridPane.columnIndex="0">energy passed to child</Label>
+                        <TextField GridPane.rowIndex="2"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="energyPassedToChild"/>
+                        <Label GridPane.rowIndex="3"
+                               GridPane.columnIndex="0">min mutations</Label>
+                        <TextField GridPane.rowIndex="3"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="minMutationsNumber"/>
+                        <Label GridPane.rowIndex="4"
+                               GridPane.columnIndex="0">max mutations</Label>
+                        <TextField GridPane.rowIndex="4"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="maxMutationsNumber"/>
+                    </GridPane>
+                </TitledPane>
+            </VBox>
+        </GridPane>
+    </center>
+</BorderPane>

@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application")
     id("org.openjfx.javafxplugin").version("0.0.13")
 }
 
@@ -31,6 +32,10 @@ sourceSets.test {
     java {
         srcDirs("test")
     }
+}
+
+application {
+    mainClass.set("agh.ics.oop.App")
 }
 
 tasks.test {
