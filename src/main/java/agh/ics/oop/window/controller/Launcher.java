@@ -63,7 +63,7 @@ public class Launcher extends WindowController {
             this.configuration = (Configuration) Resources.deserializeFromXML(
                     Configurator.configurationPath);
         } catch (ResourceNotFoundException e) {
-            this.window.showToast("Running with new configuration", Toast.Duration.SHORT);
+            this.window.showToast("Running with new configuration", Toast.Duration.MEDIUM);
         }
     }
 
