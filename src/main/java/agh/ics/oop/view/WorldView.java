@@ -10,8 +10,14 @@ public interface WorldView {
     void setGridBounds(Vector2D size);
     void setGridBounds(Boundary bounds);
     void updateViewSize();
-    void put(Vector2D position, Image image) throws OutOfMapBoundsException;
-    Image get(Vector2D position) throws OutOfMapBoundsException;
+
+    void putImageAtGrid(Vector2D position, Image image) throws OutOfMapBoundsException;
+    void putImageAtScreenCoords(Vector2D screenPosition, Image image);
+    void putTextAtScreenCoords(Vector2D position, String text);
+    Image getImageAtGrid(Vector2D position) throws OutOfMapBoundsException;
+
     void presentView();
     Node getRoot();
+
+
 }

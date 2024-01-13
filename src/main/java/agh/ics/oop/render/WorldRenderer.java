@@ -25,11 +25,12 @@ public class WorldRenderer {
         this.worldView.setGridBounds(bounds);
         bounds.mapAllPositions(worldMap::getElements)
                 .forEach(this::tryRenderElementList);
+        overlayList.forEach(this::tryRenderOverlay);
         this.worldView.presentView();
     }
 
-    public void renderElement(WorldElement element) throws IllegalRendererAssignment {
-        this.unitRendererAssignmentMap.renderElement(this, element);
+    public void renderUnit(Object unit) throws IllegalRendererAssignment {
+        this.unitRendererAssignmentMap.renderUnit(this, unit);
     }
 
     private void tryRenderElementList(List<WorldElement> elementList) {
@@ -38,21 +39,40 @@ public class WorldRenderer {
 
     private void tryRenderElement(WorldElement element) {
         try {
-            this.renderElement(element);
+            this.renderUnit(element);
             System.out.println("Render element @ " + element.getPosition());
         } catch (IllegalRendererAssignment e) {
             System.out.println("WorldRenderer: " + e.getMessage());
         }
     }
 
-    public void putImage(Vector2D position, String imageKey) {
+    private void tryRenderOverlay(Overlay overlay) {
+        try {
+            this.renderUnit(overlay);
+        } catch (IllegalRendererAssignment e) {
+            System.out.println("WorldRenderer: " + e.getMessage());
+        }
+    }
+
+    public void putImageAtGrid(Vector2D position, String imageKey) {
         try {
             Image image = this.imageMap.getImage(imageKey);
             if (image == null)
                 return;
-            this.worldView.put(position, image);
+            this.worldView.putImageAtGrid(position, image);
         } catch (OutOfMapBoundsException e) {
             System.out.println("Attempted to write outside of bounds: " + e.getMessage());
         }
+    }
+
+    public void putImageAtScreenCoords(Vector2D position, String imageKey) {
+        Image image = this.imageMap.getImage(imageKey);
+        if (image == null)
+            return;
+        this.worldView.putImageAtScreenCoords(position, image);
+    }
+
+    public void putTextAtScreenCoords(Vector2D position, String text) {
+        this.worldView.putTextAtScreenCoords(position, text);
     }
 }

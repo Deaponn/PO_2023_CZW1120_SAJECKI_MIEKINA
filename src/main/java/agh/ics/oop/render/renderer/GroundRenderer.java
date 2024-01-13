@@ -7,7 +7,7 @@ import agh.ics.oop.render.WorldRenderer;
 
 import java.util.Random;
 
-public class GroundRenderer extends UnitRenderer<Ground> {
+public class GroundRenderer implements UnitRenderer<Ground> {
     private final Random random = new Random();
 
     @Override
@@ -16,7 +16,7 @@ public class GroundRenderer extends UnitRenderer<Ground> {
         random.setSeed((position.getX() * 7193L + position.getY() * 37L) * 9000L);
         int frame = random.nextInt(16);
 
-        renderer.putImage(position, GroundRenderer.frames[frame]);
+        renderer.putImageAtGrid(position, GroundRenderer.frames[frame]);
     }
 
     private static final String[] frames = new String[]{

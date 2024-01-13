@@ -11,7 +11,7 @@ public class UnitRendererAssignmentMap {
         this.registeredUnitRendererMap = new HashMap<>();
     }
 
-    private Class<? extends UnitRenderer<?>> getAssignedRenderer(Class<?> unitClass)
+    private Class<? extends UnitRenderer<?>> getAssignedRendererClass(Class<?> unitClass)
             throws IllegalRendererAssignment {
         try {
             AssignRenderer assignRenderer = unitClass.getAnnotation(AssignRenderer.class);
@@ -25,7 +25,7 @@ public class UnitRendererAssignmentMap {
     private <U> void tryRegisterUnitRenderer(U unit)
             throws IllegalRendererAssignment {
         Class<?> elementClass = unit.getClass();
-        Class<? extends UnitRenderer<?>> elementRendererClass = this.getAssignedRenderer(elementClass);
+        Class<? extends UnitRenderer<?>> elementRendererClass = this.getAssignedRendererClass(elementClass);
         try {
             this.registeredUnitRendererMap.put(unit.getClass(), elementRendererClass
                     .getConstructor()
@@ -50,12 +50,12 @@ public class UnitRendererAssignmentMap {
     }
 
     @SuppressWarnings("unchecked")
-    public <U> UnitRenderer<U> getElementRenderer(U unit)
+    public <U> UnitRenderer<U> getUnitRenderer(U unit)
             throws IllegalRendererAssignment {
         UnitRenderer<?> unitRenderer = this.registeredUnitRendererMap.get(unit.getClass());
         if (unitRenderer == null) {
             this.tryRegisterUnitRenderer(unit);
-            unitRenderer = this.getElementRenderer(unit);
+            unitRenderer = this.getUnitRenderer(unit);
         }
         try {
             return (UnitRenderer<U>) unitRenderer;
@@ -65,9 +65,9 @@ public class UnitRendererAssignmentMap {
         }
     }
 
-    public <U> void renderElement(WorldRenderer renderer, U unit)
+    public <U> void renderUnit(WorldRenderer renderer, U unit)
             throws IllegalRendererAssignment {
-        UnitRenderer<U> unitRenderer = this.getElementRenderer(unit);
+        UnitRenderer<U> unitRenderer = this.getUnitRenderer(unit);
         try {
             unitRenderer.render(renderer, unit);
         } catch (ClassCastException e) {

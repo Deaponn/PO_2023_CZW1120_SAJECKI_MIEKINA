@@ -60,14 +60,24 @@ public class CanvasWorldView implements WorldView {
     }
 
     @Override
-    public void put(Vector2D position, Image image) throws OutOfMapBoundsException {
-        this.checkIfInBounds(position);
-        this.drawAtGrid(position, image);
+    public void putImageAtGrid(Vector2D gridPosition, Image image) throws OutOfMapBoundsException {
+        this.checkIfInBounds(gridPosition);
+        this.drawImageAtGrid(gridPosition, image);
     }
 
     @Override
-    public Image get(Vector2D position) throws OutOfMapBoundsException {
-        this.checkIfInBounds(position);
+    public void putImageAtScreenCoords(Vector2D screenPosition, Image image) {
+        this.drawImageAtScreenCoords(screenPosition, image);
+    }
+
+    @Override
+    public void putTextAtScreenCoords(Vector2D position, String text) {
+        this.drawTextAtScreenCoords(position, text);
+    }
+
+    @Override
+    public Image getImageAtGrid(Vector2D gridPosition) throws OutOfMapBoundsException {
+        this.checkIfInBounds(gridPosition);
         return null;
     }
 
@@ -84,9 +94,16 @@ public class CanvasWorldView implements WorldView {
         return this.canvas;
     }
 
-    private void drawAtGrid(Vector2D position, Image image) {
-        float x = this.gridOffsetX[position.getX()];
-        float y = this.gridOffsetY[position.getY()];
+    private void drawImageAtGrid(Vector2D gridPosition, Image image) {
+        float x = this.gridOffsetX[gridPosition.getX()];
+        float y = this.gridOffsetY[gridPosition.getY()];
+
+        this.renderImage(image, x, y, this.imageScale);
+    }
+
+    private void drawImageAtScreenCoords(Vector2D screenPosition, Image image) {
+        float x = screenPosition.getX();
+        float y = screenPosition.getY();
 
         this.renderImage(image, x, y, this.imageScale);
     }
@@ -131,6 +148,10 @@ public class CanvasWorldView implements WorldView {
         double g = colorOver.getGreen() * mixOver + colorTop.getGreen() * mixTop;
         double b = colorOver.getBlue() * mixOver + colorTop.getBlue() * mixTop;
         return new Color(r, g, b, 1);
+    }
+
+    private void drawTextAtScreenCoords(Vector2D position, String text) {
+        // TODO
     }
 
     private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {
