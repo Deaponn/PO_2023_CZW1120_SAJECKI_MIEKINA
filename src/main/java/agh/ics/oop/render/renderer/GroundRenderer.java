@@ -2,12 +2,12 @@ package agh.ics.oop.render.renderer;
 
 import agh.ics.oop.entities.Ground;
 import agh.ics.oop.model.Vector2D;
-import agh.ics.oop.render.WorldElementRenderer;
+import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 
 import java.util.Random;
 
-public class GroundRenderer extends WorldElementRenderer<Ground> {
+public class GroundRenderer extends UnitRenderer<Ground> {
     private final Random random = new Random();
 
     @Override

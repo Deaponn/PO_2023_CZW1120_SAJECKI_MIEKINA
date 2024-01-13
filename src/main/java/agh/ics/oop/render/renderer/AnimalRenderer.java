@@ -2,10 +2,10 @@ package agh.ics.oop.render.renderer;
 
 import agh.ics.oop.entities.Animal;
 import agh.ics.oop.model.Vector2D;
-import agh.ics.oop.render.WorldElementRenderer;
+import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 
-public class AnimalRenderer extends WorldElementRenderer<Animal> {
+public class AnimalRenderer extends UnitRenderer<Animal> {
     @Override
     public void render(WorldRenderer renderer, Animal element) {
         Vector2D position = element.getPosition();
