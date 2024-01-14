@@ -15,6 +15,8 @@ public class Genome {
         this.activeGene = 0;
     }
 
+    public MoveDirection getGeneAt(int index) { return this.geneList.get(index); }
+
     public MoveDirection getActiveGene() {
         return this.geneList.get(this.activeGene);
     }

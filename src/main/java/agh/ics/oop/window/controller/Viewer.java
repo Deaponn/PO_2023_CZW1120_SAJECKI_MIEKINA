@@ -45,11 +45,13 @@ public class Viewer extends WindowController implements MapChangeListener {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Animal(new Vector2D(2, 2), 4, 0, 4, null));
+            // TODO: shouldn't it be done using AnimalFactory? or something like worldMap.populate(configuration)
+            //          i will implement above method soon
+            this.worldMap.placeElement(new Animal(new Vector2D(2, 2), 4, null));
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Animal(new Vector2D(3, 3), 4, 0, 2, null));
+            this.worldMap.placeElement(new Animal(new Vector2D(3, 3), 2, null));
         });
         thread.start();
     }

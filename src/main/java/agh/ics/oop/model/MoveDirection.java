@@ -1,5 +1,7 @@
 package agh.ics.oop.model;
 
+import java.util.Random;
+
 public enum MoveDirection {
     ROTATE_0,
     ROTATE_45,
@@ -12,5 +14,11 @@ public enum MoveDirection {
 
     public int getRotation() {
         return this.ordinal();
+    }
+
+    public static MoveDirection randomDirection() {
+        Random random = new Random();
+        MoveDirection[] moveDirections = MoveDirection.values();
+        return moveDirections[random.nextInt(moveDirections.length)];
     }
 }

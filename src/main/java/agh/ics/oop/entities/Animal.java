@@ -17,16 +17,12 @@ public class Animal extends WorldEntity implements EnergyHolder {
     // it won't double move already moved Animal
     private boolean wasUpdated = false;
     private boolean isAlive = true;
-    private final int minReproduceEnergy;
-    private final int energyPassed;
     private int energy;
     private final AnimalStatistics statistics;
     private final Genome genome;
 
-    public Animal(Vector2D position, int minReproduceEnergy, int energyPassed, int energy, Genome genome) {
+    public Animal(Vector2D position, int energy, Genome genome) {
         super(position, MapDirection.randomDirection());
-        this.minReproduceEnergy = minReproduceEnergy;
-        this.energyPassed = energyPassed;
         this.energy = energy;
         this.statistics = new AnimalStatistics();
         this.genome = genome;
@@ -77,6 +73,10 @@ public class Animal extends WorldEntity implements EnergyHolder {
         return seenAlready;
     }
 
+    public int getAge() { return this.statistics.age; }
+
+    public Genome getGenome() { return this.genome; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,4 +91,16 @@ public class Animal extends WorldEntity implements EnergyHolder {
     }
 
     static private final Random random = new Random();
+
+    // returns true if Animal first is stronger, false otherwise
+    static public boolean compare(Animal first, Animal second) {
+        if (first.energy > second.energy) return true;
+        if (first.energy < second.energy) return false;
+        if (first.getAge() > second.getAge()) return true;
+        if (first.getAge() < second.getAge()) return false;
+        if (first.kidsCount() > second.kidsCount()) return true;
+        if (first.kidsCount() < second.kidsCount()) return false;
+        // randomly choose between first and second
+        return random.nextInt(2) == 0;
+    }
 }
