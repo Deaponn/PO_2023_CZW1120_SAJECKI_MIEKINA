@@ -3,6 +3,7 @@ package agh.ics.oop.view;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
+import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -32,7 +33,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
         this.gridBounds = new Boundary(new Vector2D(), new Vector2D());
     }
 
-    private void createBuffer(float width, float height) {
+    private synchronized void createBuffer(float width, float height) {
         this.bufferWidth = (int) Math.ceil(width);
         this.bufferHeight = (int) Math.ceil(height);
         this.buffer = new WritableImage(this.bufferWidth, this.bufferHeight);
@@ -52,13 +53,9 @@ public class CanvasWorldView implements WorldView<Canvas> {
         float height = (float) this.canvas.getHeight();
         if (width <= 0 || height <= 0)
             return;
-        System.out.println("canvas size update");
-        System.out.println(width);
-        System.out.println(height);
         this.createBuffer(width, height);
         this.updateImageScale(width, height);
         this.updateGridOffsets(width, height);
-        this.presentView();
     }
 
     @Override
@@ -87,11 +84,13 @@ public class CanvasWorldView implements WorldView<Canvas> {
      * double-buffer draw view (VSYNC)
      */
     @Override
-    public void presentView() {
-        this.graphicsContext.clearRect(
-                0, 0,
-                this.canvas.getWidth(), this.canvas.getHeight());
-        this.graphicsContext.drawImage(this.buffer, 0, 0);
+    public synchronized void presentView() {
+        Platform.runLater(() -> {
+            this.graphicsContext.clearRect(
+                    0, 0,
+                    this.canvas.getWidth(), this.canvas.getHeight());
+            this.graphicsContext.drawImage(this.buffer, 0, 0);
+        });
     }
 
     @Override

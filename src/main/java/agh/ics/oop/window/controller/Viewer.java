@@ -64,12 +64,13 @@ public class Viewer extends WindowController implements MapChangeListener {
         thread.start();
     }
 
-    public void render() {
-        this.worldRenderer.renderView(this.worldMap);
+    public void render(WorldMap worldMap) {
+        this.worldRenderer.setWorldMap(worldMap);
+        this.worldRenderer.renderView();
     }
 
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
-        Platform.runLater(this::render);
+        Platform.runLater(() -> this.render(worldMap));
     }
 }

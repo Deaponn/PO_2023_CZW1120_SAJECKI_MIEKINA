@@ -12,6 +12,7 @@ public class WorldRenderer {
     public final WorldView<?> worldView;
     public final List<Overlay> overlayList;
     private final UnitRendererAssignmentMap unitRendererAssignmentMap;
+    private WorldMap worldMap;
 
     public WorldRenderer(ImageMap imageMap, WorldView<?> worldView) {
         this.imageMap = imageMap;
@@ -20,12 +21,16 @@ public class WorldRenderer {
         this.unitRendererAssignmentMap = new UnitRendererAssignmentMap();
     }
 
-    public void renderView(WorldMap worldMap) {
-        Boundary bounds = worldMap.getCurrentBounds();
+    public void setWorldMap(WorldMap worldMap) {
+        this.worldMap = worldMap;
+    }
+
+    public synchronized void renderView() {
+        Boundary bounds = this.worldMap.getCurrentBounds();
         this.worldView.setGridBounds(bounds);
-        bounds.mapAllPositions(worldMap::getElements)
-                .forEach(this::tryRenderElementList);
-        overlayList.forEach(this::tryRenderOverlay);
+        bounds.mapAllPositions(this.worldMap::getElements)
+                .forEach(this::tryRender);
+        this.overlayList.forEach(this::tryRender);
         this.worldView.presentView();
     }
 
@@ -33,22 +38,13 @@ public class WorldRenderer {
         this.unitRendererAssignmentMap.renderUnit(this, unit);
     }
 
-    private void tryRenderElementList(List<WorldElement> elementList) {
-        elementList.forEach(this::tryRenderElement);
+    private <U> void tryRender(List<U> unitList) {
+        unitList.forEach(this::tryRender);
     }
 
-    private void tryRenderElement(WorldElement element) {
+    private <U> void tryRender(U unit) {
         try {
-            this.renderUnit(element);
-            System.out.println("Render element @ " + element.getPosition());
-        } catch (IllegalRendererAssignment e) {
-            System.out.println("WorldRenderer: " + e.getMessage());
-        }
-    }
-
-    private void tryRenderOverlay(Overlay overlay) {
-        try {
-            this.renderUnit(overlay);
+            this.renderUnit(unit);
         } catch (IllegalRendererAssignment e) {
             System.out.println("WorldRenderer: " + e.getMessage());
         }
