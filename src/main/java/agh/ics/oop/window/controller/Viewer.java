@@ -6,6 +6,7 @@ import agh.ics.oop.model.MapChangeListener;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.ImageMap;
+import agh.ics.oop.render.ImageOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
@@ -24,10 +25,18 @@ public class Viewer extends WindowController implements MapChangeListener {
         super.start();
 
         CanvasWorldView worldView = new CanvasWorldView(this.canvas);
+        worldView.getRoot().widthProperty()
+                .bind(this.window.getRoot().widthProperty());
+        worldView.getRoot().heightProperty()
+                .bind(this.window.getRoot().heightProperty());
+
         this.worldRenderer = new WorldRenderer(
                 this.getBundleItem("image_map", ImageMap.class).orElseThrow(),
                 worldView
         );
+
+        ImageOverlay testImageOverlay = new ImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+        this.worldRenderer.overlayList.add(testImageOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);

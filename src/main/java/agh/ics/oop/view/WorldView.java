@@ -6,18 +6,14 @@ import agh.ics.oop.model.Vector2D;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 
-public interface WorldView {
-    void setGridBounds(Vector2D size);
+public interface WorldView<N extends Node> {
     void setGridBounds(Boundary bounds);
     void updateViewSize();
 
     void putImageAtGrid(Vector2D position, Image image) throws OutOfMapBoundsException;
-    void putImageAtScreenCoords(Vector2D screenPosition, Image image);
+    void putImageAtScreenCoords(Vector2D screenPosition, Image image, float scale);
     void putTextAtScreenCoords(Vector2D position, String text);
-    Image getImageAtGrid(Vector2D position) throws OutOfMapBoundsException;
 
     void presentView();
-    Node getRoot();
-
-
+    N getRoot();
 }

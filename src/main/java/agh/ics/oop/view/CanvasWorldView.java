@@ -3,7 +3,6 @@ package agh.ics.oop.view;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -12,17 +11,19 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
-public class CanvasWorldView implements WorldView {
+public class CanvasWorldView implements WorldView<Canvas> {
     private final Canvas canvas;
     private final GraphicsContext graphicsContext;
     private WritableImage buffer;
+    private int bufferWidth;
+    private int bufferHeight;
     private PixelWriter bufferPixelWriter;
     private PixelReader bufferPixelReader;
 
     private Boundary gridBounds;
     private Float[] gridOffsetX;
     private Float[] gridOffsetY;
-    private float imageScale;
+    private float gridImageSize;
 
     public CanvasWorldView(Canvas canvas) {
         this.canvas = canvas;
@@ -32,9 +33,9 @@ public class CanvasWorldView implements WorldView {
     }
 
     private void createBuffer(float width, float height) {
-        int bufferWidth = (int) Math.ceil(width);
-        int bufferHeight = (int) Math.ceil(height);
-        this.buffer = new WritableImage(bufferWidth, bufferHeight);
+        this.bufferWidth = (int) Math.ceil(width);
+        this.bufferHeight = (int) Math.ceil(height);
+        this.buffer = new WritableImage(this.bufferWidth, this.bufferHeight);
         this.bufferPixelWriter = this.buffer.getPixelWriter();
         this.bufferPixelReader = this.buffer.getPixelReader();
     }
@@ -46,28 +47,35 @@ public class CanvasWorldView implements WorldView {
     }
 
     @Override
-    public void setGridBounds(Vector2D size) {
-        this.setGridBounds(Boundary.fromSize(size));
-    }
-
-    @Override
     public void updateViewSize() {
         float width = (float) this.canvas.getWidth();
         float height = (float) this.canvas.getHeight();
+        if (width <= 0 || height <= 0)
+            return;
+        System.out.println("canvas size update");
+        System.out.println(width);
+        System.out.println(height);
         this.createBuffer(width, height);
         this.updateImageScale(width, height);
         this.updateGridOffsets(width, height);
+        this.presentView();
     }
 
     @Override
     public void putImageAtGrid(Vector2D gridPosition, Image image) throws OutOfMapBoundsException {
         this.checkIfInBounds(gridPosition);
-        this.drawImageAtGrid(gridPosition, image);
+        float x = this.gridOffsetX[gridPosition.getX()];
+        float y = this.gridOffsetY[gridPosition.getY()];
+
+        this.rasterizeImageAbsoluteSized(image, x, y, this.gridImageSize);
     }
 
     @Override
-    public void putImageAtScreenCoords(Vector2D screenPosition, Image image) {
-        this.drawImageAtScreenCoords(screenPosition, image);
+    public void putImageAtScreenCoords(Vector2D screenPosition, Image image, float scale) {
+        float x = screenPosition.getX();
+        float y = screenPosition.getY();
+
+        this.rasterizeImageScaled(image, x, y, scale);
     }
 
     @Override
@@ -75,64 +83,79 @@ public class CanvasWorldView implements WorldView {
         this.drawTextAtScreenCoords(position, text);
     }
 
-    @Override
-    public Image getImageAtGrid(Vector2D gridPosition) throws OutOfMapBoundsException {
-        this.checkIfInBounds(gridPosition);
-        return null;
-    }
-
     /**
      * double-buffer draw view (VSYNC)
      */
     @Override
     public void presentView() {
+        this.graphicsContext.clearRect(
+                0, 0,
+                this.canvas.getWidth(), this.canvas.getHeight());
         this.graphicsContext.drawImage(this.buffer, 0, 0);
     }
 
     @Override
-    public Node getRoot() {
+    public Canvas getRoot() {
         return this.canvas;
     }
 
-    private void drawImageAtGrid(Vector2D gridPosition, Image image) {
-        float x = this.gridOffsetX[gridPosition.getX()];
-        float y = this.gridOffsetY[gridPosition.getY()];
-
-        this.renderImage(image, x, y, this.imageScale);
-    }
-
-    private void drawImageAtScreenCoords(Vector2D screenPosition, Image image) {
-        float x = screenPosition.getX();
-        float y = screenPosition.getY();
-
-        this.renderImage(image, x, y, this.imageScale);
-    }
-
-    private void renderImage(Image image, float x, float y, float imageScale) {
+    private void rasterizeImageScaled(Image image, float x, float y, float imageScale) {
         PixelReader imagePixelReader = image.getPixelReader();
         float imageWidth = (float) image.getWidth();
         float imageHeight = (float) image.getHeight();
-        float ex = x + imageScale;
-        float ey = y + imageScale;
+        // absolute ends of (0, imageScale) drawing area
+        float ex = x + imageWidth * imageScale;
+        float ey = y + imageHeight * imageScale;
+        // image source pixel position
         float ix = 0f;
         float iy = 0f;
-        float dx = imageWidth / imageScale;
-        float dy = imageHeight / imageScale;
+        // image source pixel step deltas
+        float dx = 1f / imageScale;
+        float dy = 1f / imageScale;
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
                 Color c = imagePixelReader.getColor((int) ix, (int) iy);
                 this.compositePixel((int) px, (int) py, c);
                 ix += dx;
-                if (ix >= 15f) ix = imageWidth - 1;
+                if (ix >= imageWidth) ix = imageWidth - 1;
             }
             ix = 0;
             iy += dy;
-            if (iy >= 15f) iy = imageHeight - 1;
+            if (iy >= imageHeight) iy = imageHeight - 1;
+        }
+    }
+
+    private void rasterizeImageAbsoluteSized(Image image, float x, float y, float imageSize) {
+        PixelReader imagePixelReader = image.getPixelReader();
+        float imageWidth = (float) image.getWidth();
+        float imageHeight = (float) image.getHeight();
+        // absolute ends of (0, imageScale) drawing area
+        float ex = x + imageSize;
+        float ey = y + imageSize;
+        // image source pixel position
+        float ix = 0f;
+        float iy = 0f;
+        // image source pixel step deltas
+        float dx = imageWidth / imageSize;
+        float dy = imageHeight / imageSize;
+
+        for (float py = y; py < ey; py++) {
+            for (float px = x; px < ex; px++) {
+                Color c = imagePixelReader.getColor((int) ix, (int) iy);
+                this.compositePixel((int) px, (int) py, c);
+                ix += dx;
+                if (ix >= imageWidth) ix = imageWidth - 1;
+            }
+            ix = 0;
+            iy += dy;
+            if (iy >= imageHeight) iy = imageHeight - 1;
         }
     }
 
     private void compositePixel(int x, int y, Color color) {
+        if (x < 0 || y < 0 || x >= this.bufferWidth || y >= this.bufferHeight)
+            return;
         Color blendColor = color;
         double opacity = color.getOpacity();
         if (opacity < 1) {
@@ -161,30 +184,30 @@ public class CanvasWorldView implements WorldView {
 
     private void registerSizeListener() {
         this.canvas.widthProperty()
-                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateViewSize());
+                .addListener((observable, previousValue, newValue) -> CanvasWorldView.this.updateViewSize());
         this.canvas.heightProperty()
-                .addListener((observable, previous_value, current_value) -> CanvasWorldView.this.updateViewSize());
+                .addListener((observable, previousValue, newValue) -> CanvasWorldView.this.updateViewSize());
     }
 
     private void updateImageScale(float width, float height) {
         Vector2D gridSize = this.gridBounds.getSize();
         float imageWidth = width / gridSize.getX();
         float imageHeight = height / gridSize.getY();
-        this.imageScale = Math.min(imageWidth, imageHeight);
+        this.gridImageSize = Math.min(imageWidth, imageHeight);
     }
 
     private void updateGridOffsets(float width, float height) {
         Vector2D gridSize = gridBounds.getSize();
-        float padX = width - gridSize.getX() * this.imageScale;
-        float padY = height - gridSize.getY() * this.imageScale;
+        float padX = width - gridSize.getX() * this.gridImageSize;
+        float padY = height - gridSize.getY() * this.gridImageSize;
         float startX = padX / 2;
         float startY = padY / 2;
 
         this.gridOffsetX = this.gridBounds
-                .mapColumns(x -> startX + x * this.imageScale)
+                .mapColumns(x -> startX + x * this.gridImageSize)
                 .toArray(Float[]::new);
         this.gridOffsetY = this.gridBounds
-                .mapRows(y -> startY + y * this.imageScale)
+                .mapRows(y -> startY + y * this.gridImageSize)
                 .toArray(Float[]::new);
     }
 }

@@ -9,11 +9,11 @@ import java.util.List;
 
 public class WorldRenderer {
     public final ImageMap imageMap;
-    public final WorldView worldView;
+    public final WorldView<?> worldView;
     public final List<Overlay> overlayList;
     private final UnitRendererAssignmentMap unitRendererAssignmentMap;
 
-    public WorldRenderer(ImageMap imageMap, WorldView worldView) {
+    public WorldRenderer(ImageMap imageMap, WorldView<?> worldView) {
         this.imageMap = imageMap;
         this.worldView = worldView;
         this.overlayList = new LinkedList<>();
@@ -65,11 +65,11 @@ public class WorldRenderer {
         }
     }
 
-    public void putImageAtScreenCoords(Vector2D position, String imageKey) {
+    public void putImageAtScreenCoords(Vector2D position, String imageKey, float scale) {
         Image image = this.imageMap.getImage(imageKey);
         if (image == null)
             return;
-        this.worldView.putImageAtScreenCoords(position, image);
+        this.worldView.putImageAtScreenCoords(position, image, scale);
     }
 
     public void putTextAtScreenCoords(Vector2D position, String text) {
