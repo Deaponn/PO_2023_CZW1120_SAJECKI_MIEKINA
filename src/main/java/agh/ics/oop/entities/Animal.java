@@ -4,6 +4,8 @@ import agh.ics.oop.model.*;
 import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.renderer.AnimalRenderer;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -63,6 +65,17 @@ public class Animal extends WorldEntity implements EnergyHolder {
 
     @Override
     public int getEnergy() { return this.energy; }
+
+    public int kidsCount() { return this.statistics.countKids(); }
+
+    public int ancestorsCount() {
+        return constructAncestorsList(new LinkedList<>()).size();
+    }
+
+    public List<Animal> constructAncestorsList(List<Animal> seenAlready) {
+        this.statistics.addAncestorsToList(seenAlready);
+        return seenAlready;
+    }
 
     @Override
     public boolean equals(Object o) {
