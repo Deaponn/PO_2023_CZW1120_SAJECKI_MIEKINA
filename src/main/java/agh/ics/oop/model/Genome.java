@@ -12,7 +12,7 @@ public class Genome {
     public Genome(float randomGenomeChangeChance, List<MoveDirection> geneList) {
         this.randomGenomeChangeChance = randomGenomeChangeChance;
         this.geneList = geneList;
-        this.activeGene = 0;
+        this.activeGene = Genome.random.nextInt(this.geneList.size());
     }
 
     public MoveDirection getGeneAt(int index) { return this.geneList.get(index); }

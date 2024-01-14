@@ -9,16 +9,18 @@ import java.util.*;
 import static agh.ics.oop.Configuration.Fields.*;
 
 public class EquatorialWorldMap implements WorldMap {
-    private final GenomeFactory genomeFactory;
     private final AnimalFactory animalFactory;
     private final PlantFactory plantFactory;
     private final Map<Vector2D, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2D, Plant> plants = new HashMap<>();
     private final List<Vector2D> equator;
+    private final RandomNumber randomEquatorIndex;
     private final List<Vector2D> regularField;
+    private final RandomNumber randomRegularFieldIndex;
     private final int mapWidth;
     private final int mapHeight;
     private final float equatorSize;
+    private final float plantGrowAtEquatorChance;
     private final List<MapChangeListener> subscribers = new LinkedList<>();
     private final UUID mapUUID = UUID.randomUUID();
 
@@ -26,21 +28,33 @@ public class EquatorialWorldMap implements WorldMap {
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
         this.equatorSize = configuration.get(EQUATOR_SIZE);
+        this.plantGrowAtEquatorChance = configuration.get(PLANT_GROW_AT_EQUATOR_CHANCE);
 
-        this.genomeFactory = new GenomeFactory(configuration);
-        this.animalFactory = new AnimalFactory(configuration, this.genomeFactory);
+        GenomeFactory genomeFactory = new GenomeFactory(configuration);
+        this.animalFactory = new AnimalFactory(configuration, genomeFactory);
         this.plantFactory = new PlantFactory(configuration);
 
+        List<List<Vector2D>> fields = buildFields();
+        equator = fields.get(0);
+        regularField = fields.get(1);
+        randomEquatorIndex = new RandomNumber(0, equator.size());
+        randomRegularFieldIndex = new RandomNumber(0, regularField.size());
+
+        growPlants(configuration.get(STARTING_PLANTS_NUMBER));
+
+        populateWithAnimals(configuration.get(STARTING_ANIMALS_NUMBER), configuration.get(INITIAL_ANIMAL_ENERGY));
+    }
+
+    private List<List<Vector2D>> buildFields() {
         boolean[][] isEquator = new boolean[this.mapHeight][this.mapWidth];
 
-        // TODO: this is hardcoded for equator, poisonous plants lack implementation
-        //  probably can rename equator to "specialField' or something like that to generalize the names
         // generating equator
         // it will be at least two rows high, with every row populated randomly
         final int equatorSize = (int) (this.mapWidth * this.mapHeight * this.equatorSize);
         final int middleRow = this.mapHeight / 2;
         int topRowOffset = -1;
         int bottomRowOffset = 0;
+
         // returns numbers in range [a, b) with no duplicates
         RandomNumber topRowRandom = new RandomNumber(0, this.mapWidth);
         RandomNumber bottomRowRandom = new RandomNumber(0, this.mapWidth);
@@ -58,8 +72,8 @@ public class EquatorialWorldMap implements WorldMap {
         }
 
         // generate lists of vectors, they will be used to choose position for the plant
-        equator = new ArrayList<>(equatorSize);
-        regularField = new ArrayList<>(this.mapWidth * this.mapHeight - equatorSize);
+        List<Vector2D> equator = new ArrayList<>(equatorSize);
+        List<Vector2D> regularField = new ArrayList<>(this.mapWidth * this.mapHeight - equatorSize);
         for (int y = 0; y < this.mapHeight; y++) {
             for (int x = 0; x < this.mapWidth; x++) {
                 if (isEquator[y][x]) equator.add(new Vector2D(x, y));
@@ -78,6 +92,26 @@ public class EquatorialWorldMap implements WorldMap {
             sb.append("||\n|");
         }
         System.out.println(sb);
+
+        return List.of(equator, regularField);
+    }
+
+    private void growPlants(int numberOfPlants) {
+        for (int i = 0; i < numberOfPlants; i++) {
+            Vector2D plantPosition;
+            if (random.nextDouble() < this.plantGrowAtEquatorChance)
+                plantPosition = equator.get(randomEquatorIndex.next());
+            else plantPosition = regularField.get(randomRegularFieldIndex.next());
+            this.placeElement(plantFactory.create(plantPosition));
+        }
+    }
+
+    private void populateWithAnimals(int startingAnimalsNumber, int initialAnimalEnergy) {
+        for (int i = 0; i < startingAnimalsNumber; i++) {
+            Vector2D randomPosition = new Vector2D(random.nextInt(this.mapWidth), random.nextInt(this.mapHeight));
+            Animal animal = this.animalFactory.create(randomPosition, initialAnimalEnergy);
+            this.placeElement(animal);
+        }
     }
 
     // below function assumes that Plant positions are always unique
@@ -107,13 +141,8 @@ public class EquatorialWorldMap implements WorldMap {
         switch (moveType(position, direction)) {
             case REGULAR -> animal.setPosition(position.add(direction.moveOffset));
             case POLAR -> animal.rotateBy(MoveDirection.ROTATE_180);
-            case LEAP_TO_OTHER_SIDE -> {
-                if (position.getX() > 0) {
-                    animal.setPosition(new Vector2D(0, position.getY()));
-                } else {
-                    animal.setPosition(new Vector2D(this.mapWidth - 1, position.getY()));
-                }
-            }
+            case LEAP_TO_LEFT -> animal.setPosition(new Vector2D(0, position.getY()));
+            case LEAP_TO_RIGHT -> animal.setPosition(new Vector2D(this.mapWidth - 1, position.getY()));
         }
         if (position != animal.getPosition()) {
             animals.get(position).remove(animal);
@@ -179,16 +208,18 @@ public class EquatorialWorldMap implements WorldMap {
     public NextMoveType moveType(Vector2D position, MapDirection direction) {
         // move would cause Y to go out of bounds
         Vector2D offset = direction.moveOffset;
-        if ((position.getY() == this.mapHeight && offset.getY() == 1) ||
+        if ((position.getY() == this.mapHeight - 1 && offset.getY() == 1) ||
                 (position.getY() == 0 && offset.getY() == -1)
             ) {
             return NextMoveType.POLAR;
         }
         // move would cause X to go out of bounds
-        if ((position.getX() == this.mapWidth && offset.getX() == 1) ||
-                (position.getX() == 0 && offset.getX() == -1)) {
-            return NextMoveType.LEAP_TO_OTHER_SIDE;
-        }
+        if (position.getX() == this.mapWidth - 1 && offset.getX() == 1)
+            return NextMoveType.LEAP_TO_LEFT;
+        if (position.getX() == 0 && offset.getX() == -1)
+            return NextMoveType.LEAP_TO_RIGHT;
         return NextMoveType.REGULAR;
     }
+
+    private final static Random random = new Random();
 }
