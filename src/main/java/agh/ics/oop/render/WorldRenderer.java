@@ -1,24 +1,27 @@
 package agh.ics.oop.render;
 
-import agh.ics.oop.model.*;
+import agh.ics.oop.model.Boundary;
+import agh.ics.oop.model.OutOfMapBoundsException;
+import agh.ics.oop.model.Vector2D;
+import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.image.ImageSampler;
+import agh.ics.oop.render.image.ImageSamplerMap;
 import agh.ics.oop.view.WorldView;
 import javafx.application.Platform;
-import javafx.scene.image.Image;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class WorldRenderer {
-    public final ImageMap imageMap;
+    public final ImageSamplerMap imageSamplerMap;
     public final WorldView<?> worldView;
     public final List<Overlay> overlayList;
     private final UnitRendererAssignmentMap unitRendererAssignmentMap;
     private WorldMap worldMap;
 
     public WorldRenderer(ImageMap imageMap, WorldView<?> worldView) {
-        this.imageMap = imageMap;
+        this.imageSamplerMap = new ImageSamplerMap(imageMap);
         this.worldView = worldView;
         this.overlayList = new LinkedList<>();
         this.unitRendererAssignmentMap = new UnitRendererAssignmentMap();
@@ -57,10 +60,7 @@ public class WorldRenderer {
 
     public void putImageAtGrid(Vector2D position, String imageKey) {
         try {
-            Image image = this.imageMap.getImage(imageKey);
-            if (image == null)
-                return;
-            ImageSampler sampler = new ImageSampler(image);
+            ImageSampler sampler = this.imageSamplerMap.getImageSampler(imageKey);
             this.worldView.putImageAtGrid(position, sampler);
         } catch (OutOfMapBoundsException e) {
             System.out.println("Attempted to write outside of bounds: " + e.getMessage());
@@ -68,10 +68,7 @@ public class WorldRenderer {
     }
 
     public void putImageAtScreenCoords(Vector2D position, String imageKey, float scale) {
-        Image image = this.imageMap.getImage(imageKey);
-        if (image == null)
-            return;
-        ImageSampler sampler = new ImageSampler(image);
+        ImageSampler sampler = this.imageSamplerMap.getImageSampler(imageKey);
         this.worldView.putImageAtScreenCoords(position, sampler, scale);
     }
 

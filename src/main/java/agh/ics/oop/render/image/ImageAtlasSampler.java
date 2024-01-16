@@ -4,14 +4,14 @@ import agh.ics.oop.model.Boundary;
 import javafx.scene.image.Image;
 import agh.ics.oop.model.Vector2D;
 
-public class ImageAtlasSamplerFactory {
+public class ImageAtlasSampler {
     private final Image image;
     private int tx;
     private int ty;
 
     private ImageSampler[] samplerArray;
 
-    public ImageAtlasSamplerFactory(Image image, Vector2D tileSize) {
+    public ImageAtlasSampler(Image image, Vector2D tileSize) {
         this.image = image;
         this.setTileSize(tileSize);
     }
@@ -28,7 +28,7 @@ public class ImageAtlasSamplerFactory {
                 .toArray(ImageSampler[]::new);
     }
 
-    public ImageSampler createTileSampler(int absoluteIndex) {
+    public ImageSampler getTileSampler(int absoluteIndex) {
         return this.samplerArray[absoluteIndex];
     }
 }
