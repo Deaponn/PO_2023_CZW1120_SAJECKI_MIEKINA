@@ -17,6 +17,10 @@ public class UnitRendererAssignmentMap {
             AssignRenderer assignRenderer = unitClass.getAnnotation(AssignRenderer.class);
             return assignRenderer.renderer();
         } catch (NullPointerException e) {
+            // try searching in a superclass
+            Class<?> unitSuperClass = unitClass.getSuperclass();
+            if (unitSuperClass != null)
+                return this.getAssignedRendererClass(unitSuperClass);
             // assign a renderer to the element class (@AssignRenderer)
             throw new IllegalRendererAssignment("no assigned renderer found", unitClass);
         }

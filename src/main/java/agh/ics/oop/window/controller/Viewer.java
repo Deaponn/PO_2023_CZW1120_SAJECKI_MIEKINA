@@ -5,12 +5,12 @@ import agh.ics.oop.entities.Plant;
 import agh.ics.oop.model.MapChangeListener;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
-import agh.ics.oop.render.ImageMap;
+import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.ImageOverlay;
 import agh.ics.oop.render.WorldRenderer;
+import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 
@@ -35,11 +35,13 @@ public class Viewer extends WindowController implements MapChangeListener {
                 worldView
         );
 
-        ImageOverlay testImageOverlay = new ImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+        ImageOverlay testImageOverlay = new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
         this.worldRenderer.overlayList.add(testImageOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);
+
+        this.worldRenderer.setWorldMap(this.worldMap);
 
         // Testing code
         Thread thread = new Thread(() -> {
@@ -64,13 +66,9 @@ public class Viewer extends WindowController implements MapChangeListener {
         thread.start();
     }
 
-    public void render(WorldMap worldMap) {
-        this.worldRenderer.setWorldMap(worldMap);
-        this.worldRenderer.renderView();
-    }
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
-        Platform.runLater(() -> this.render(worldMap));
+        this.worldRenderer.setWorldMap(worldMap);
+        this.worldRenderer.renderView();
     }
 }

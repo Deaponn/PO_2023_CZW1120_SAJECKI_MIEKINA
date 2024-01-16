@@ -3,7 +3,7 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.EquatorialWorldMap;
 import agh.ics.oop.model.WorldMap;
-import agh.ics.oop.render.ImageMap;
+import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.window.Bundle;

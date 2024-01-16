@@ -1,4 +1,4 @@
-package agh.ics.oop.render;
+package agh.ics.oop.render.image;
 
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,10 +48,6 @@ public class ImageMap {
 
     public Image getImage(String imageKey) {
         return this.imageMap.get(imageKey);
-    }
-
-    public Set<String> getImageKeys() {
-        return this.imageMap.keySet();
     }
 
     private static String getImageKeyFromFile(File file) {

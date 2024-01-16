@@ -1,7 +1,10 @@
 package agh.ics.oop.render;
 
 import agh.ics.oop.model.*;
+import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.render.image.ImageSampler;
 import agh.ics.oop.view.WorldView;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 
 import java.util.LinkedList;
@@ -26,12 +29,14 @@ public class WorldRenderer {
     }
 
     public synchronized void renderView() {
-        Boundary bounds = this.worldMap.getCurrentBounds();
-        this.worldView.setGridBounds(bounds);
-        bounds.mapAllPositions(this.worldMap::getElements)
-                .forEach(this::tryRender);
-        this.overlayList.forEach(this::tryRender);
-        this.worldView.presentView();
+        Platform.runLater(() -> {
+            Boundary bounds = this.worldMap.getCurrentBounds();
+            this.worldView.setGridBounds(bounds);
+            bounds.mapAllPositions(this.worldMap::getElements)
+                    .forEach(this::tryRender);
+            this.overlayList.forEach(this::tryRender);
+            this.worldView.presentView();
+        });
     }
 
     public void renderUnit(Object unit) throws IllegalRendererAssignment {
@@ -55,7 +60,8 @@ public class WorldRenderer {
             Image image = this.imageMap.getImage(imageKey);
             if (image == null)
                 return;
-            this.worldView.putImageAtGrid(position, image);
+            ImageSampler sampler = new ImageSampler(image);
+            this.worldView.putImageAtGrid(position, sampler);
         } catch (OutOfMapBoundsException e) {
             System.out.println("Attempted to write outside of bounds: " + e.getMessage());
         }
@@ -65,7 +71,8 @@ public class WorldRenderer {
         Image image = this.imageMap.getImage(imageKey);
         if (image == null)
             return;
-        this.worldView.putImageAtScreenCoords(position, image, scale);
+        ImageSampler sampler = new ImageSampler(image);
+        this.worldView.putImageAtScreenCoords(position, sampler, scale);
     }
 
     public void putTextAtScreenCoords(Vector2D position, String text) {

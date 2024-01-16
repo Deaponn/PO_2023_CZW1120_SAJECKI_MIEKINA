@@ -2,6 +2,7 @@ package agh.ics.oop.render;
 
 import agh.ics.oop.model.WorldElementA;
 import agh.ics.oop.model.WorldElementB;
+import agh.ics.oop.render.image.ImageMap;
 import org.junit.Assert;
 import org.junit.Test;
 

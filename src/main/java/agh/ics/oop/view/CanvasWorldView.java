@@ -3,10 +3,9 @@ package agh.ics.oop.view;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
-import javafx.application.Platform;
+import agh.ics.oop.render.image.ImageSampler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -59,20 +58,25 @@ public class CanvasWorldView implements WorldView<Canvas> {
     }
 
     @Override
-    public void putImageAtGrid(Vector2D gridPosition, Image image) throws OutOfMapBoundsException {
+    public void putImageAtGrid(
+            Vector2D gridPosition,
+            ImageSampler sampler) throws OutOfMapBoundsException {
         this.checkIfInBounds(gridPosition);
         float x = this.gridOffsetX[gridPosition.getX()];
         float y = this.gridOffsetY[gridPosition.getY()];
 
-        this.rasterizeImageAbsoluteSized(image, x, y, this.gridImageSize);
+        this.rasterizeImageAbsoluteSized(sampler, x, y, this.gridImageSize);
     }
 
     @Override
-    public void putImageAtScreenCoords(Vector2D screenPosition, Image image, float scale) {
+    public void putImageAtScreenCoords(
+            Vector2D screenPosition,
+            ImageSampler sampler,
+            float scale) {
         float x = screenPosition.getX();
         float y = screenPosition.getY();
 
-        this.rasterizeImageScaled(image, x, y, scale);
+        this.rasterizeImageScaled(sampler, x, y, scale);
     }
 
     @Override
@@ -85,12 +89,10 @@ public class CanvasWorldView implements WorldView<Canvas> {
      */
     @Override
     public synchronized void presentView() {
-        Platform.runLater(() -> {
-            this.graphicsContext.clearRect(
-                    0, 0,
-                    this.canvas.getWidth(), this.canvas.getHeight());
-            this.graphicsContext.drawImage(this.buffer, 0, 0);
-        });
+        this.graphicsContext.clearRect(
+                0, 0,
+                this.canvas.getWidth(), this.canvas.getHeight());
+        this.graphicsContext.drawImage(this.buffer, 0, 0);
     }
 
     @Override
@@ -98,10 +100,9 @@ public class CanvasWorldView implements WorldView<Canvas> {
         return this.canvas;
     }
 
-    private void rasterizeImageScaled(Image image, float x, float y, float imageScale) {
-        PixelReader imagePixelReader = image.getPixelReader();
-        float imageWidth = (float) image.getWidth();
-        float imageHeight = (float) image.getHeight();
+    private void rasterizeImageScaled(ImageSampler sampler, float x, float y, float imageScale) {
+        float imageWidth = (float) sampler.getWidth();
+        float imageHeight = (float) sampler.getHeight();
         // absolute ends of (0, imageScale) drawing area
         float ex = x + imageWidth * imageScale;
         float ey = y + imageHeight * imageScale;
@@ -114,7 +115,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
-                Color c = imagePixelReader.getColor((int) ix, (int) iy);
+                Color c = sampler.getPixelAt((int) ix, (int) iy);
                 this.compositePixel((int) px, (int) py, c);
                 ix += dx;
                 if (ix >= imageWidth) ix = imageWidth - 1;
@@ -125,10 +126,9 @@ public class CanvasWorldView implements WorldView<Canvas> {
         }
     }
 
-    private void rasterizeImageAbsoluteSized(Image image, float x, float y, float imageSize) {
-        PixelReader imagePixelReader = image.getPixelReader();
-        float imageWidth = (float) image.getWidth();
-        float imageHeight = (float) image.getHeight();
+    private void rasterizeImageAbsoluteSized(ImageSampler sampler, float x, float y, float imageSize) {
+        float imageWidth = (float) sampler.getWidth();
+        float imageHeight = (float) sampler.getHeight();
         // absolute ends of (0, imageScale) drawing area
         float ex = x + imageSize;
         float ey = y + imageSize;
@@ -141,7 +141,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
-                Color c = imagePixelReader.getColor((int) ix, (int) iy);
+                Color c = sampler.getPixelAt((int) ix, (int) iy);
                 this.compositePixel((int) px, (int) py, c);
                 ix += dx;
                 if (ix >= imageWidth) ix = imageWidth - 1;

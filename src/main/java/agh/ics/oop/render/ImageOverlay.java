@@ -4,7 +4,7 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.render.renderer.ImageOverlayRenderer;
 
 @AssignRenderer(renderer = ImageOverlayRenderer.class)
-public class ImageOverlay extends Overlay {
+public abstract class ImageOverlay extends Overlay {
     public String imageKey;
     public float imageScale;
 

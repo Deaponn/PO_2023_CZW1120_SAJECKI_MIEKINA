@@ -14,6 +14,7 @@ module Project.main {
     exports agh.ics.oop.resource;
     exports agh.ics.oop.window;
     exports agh.ics.oop.windowx;
+    exports agh.ics.oop.render.image;
 
     opens agh.ics.oop.window.controller to javafx.fxml;
 

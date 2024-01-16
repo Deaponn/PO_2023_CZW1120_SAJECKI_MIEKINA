@@ -8,4 +8,6 @@ public abstract class Overlay {
     public Overlay(Vector2D screenPosition) {
         this.screenPosition = screenPosition;
     }
+
+    public abstract void updateOnFrame(WorldRenderer renderer);
 }
