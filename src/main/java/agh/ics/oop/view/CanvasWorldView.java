@@ -90,14 +90,20 @@ public class CanvasWorldView implements WorldView<Canvas> {
             String text) {
         float x = screenPosition.getX();
         float y = screenPosition.getY();
+        float zx = x;
 
         float dx = sampler.getTileWidth() * scale;
+        float dy = sampler.getTileHeight() * scale;
 
         for (byte sym : text.getBytes(StandardCharsets.US_ASCII)) {
-            ImageSampler glyphSampler = sampler.getTileSampler(sym);
-            System.out.println(sym);
-            this.rasterizeImageScaled(glyphSampler, x, y, scale);
-            x += dx;
+            if (sym == '\n') {
+                x = zx;
+                y += dy;
+            } else {
+                ImageSampler glyphSampler = sampler.getTileSampler(sym);
+                this.rasterizeImageScaled(glyphSampler, x, y, scale);
+                x += dx;
+            }
         }
     }
 

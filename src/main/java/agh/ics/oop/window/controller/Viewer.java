@@ -46,7 +46,7 @@ public class Viewer extends WindowController implements MapChangeListener {
         ImageOverlay testImageOverlay = new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
         this.worldRenderer.overlayList.add(testImageOverlay);
 
-        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 4f, "abcdef");
+        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 4f, "abc\ndef");
         this.worldRenderer.overlayList.add(testTextOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
