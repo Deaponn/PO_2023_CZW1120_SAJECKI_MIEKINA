@@ -28,6 +28,14 @@ public class ImageAtlasSampler {
                 .toArray(ImageSampler[]::new);
     }
 
+    public int getTileWidth() {
+        return this.tx;
+    }
+
+    public int getTileHeight() {
+        return this.ty;
+    }
+
     public ImageSampler getTileSampler(int absoluteIndex) {
         return this.samplerArray[absoluteIndex];
     }

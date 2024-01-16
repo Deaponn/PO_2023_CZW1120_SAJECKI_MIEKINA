@@ -5,12 +5,12 @@ import agh.ics.oop.render.renderer.ImageOverlayRenderer;
 
 @AssignRenderer(renderer = ImageOverlayRenderer.class)
 public abstract class ImageOverlay extends Overlay {
-    public String imageKey;
+    public String samplerKey;
     public float imageScale;
 
-    public ImageOverlay(Vector2D screenPosition, String imageKey, float imageScale) {
+    public ImageOverlay(Vector2D screenPosition, String samplerKey, float imageScale) {
         super(screenPosition);
-        this.imageKey = imageKey;
+        this.samplerKey = samplerKey;
         this.imageScale = imageScale;
     }
 }

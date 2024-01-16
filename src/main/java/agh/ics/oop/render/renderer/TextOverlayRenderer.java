@@ -7,6 +7,10 @@ import agh.ics.oop.render.WorldRenderer;
 public class TextOverlayRenderer implements UnitRenderer<TextOverlay> {
     @Override
     public void render(WorldRenderer renderer, TextOverlay overlay) {
-        renderer.putTextAtScreenCoords(overlay.screenPosition, overlay.text);
+        renderer.putTextAtScreenCoords(
+                overlay.screenPosition,
+                overlay.samplerKey,
+                overlay.fontScale,
+                overlay.text);
     }
 }

@@ -26,8 +26,8 @@ public record Boundary(Vector2D lowerLeft, Vector2D upperRight) {
         int startY = this.lowerLeft.getY();
         int endY = this.upperRight.getY();
 
-        return IntStream.range(startX, endX + 1).boxed().flatMap(x ->
-                IntStream.range(startY, endY + 1).boxed().map(y -> mapper.apply(x, y))
+        return IntStream.range(startY, endY + 1).boxed().flatMap(y ->
+                IntStream.range(startX, endX + 1).boxed().map(x -> mapper.apply(x, y))
         );
     }
 

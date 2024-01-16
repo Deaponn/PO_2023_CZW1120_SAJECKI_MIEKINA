@@ -9,7 +9,7 @@ public class ImageOverlayRenderer implements UnitRenderer<ImageOverlay> {
     public void render(WorldRenderer renderer, ImageOverlay overlay) {
         renderer.putImageAtScreenCoords(
                 overlay.screenPosition,
-                overlay.imageKey,
+                overlay.samplerKey,
                 overlay.imageScale);
     }
 }

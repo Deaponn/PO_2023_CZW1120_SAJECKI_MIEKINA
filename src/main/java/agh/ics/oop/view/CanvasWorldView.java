@@ -3,6 +3,7 @@ package agh.ics.oop.view;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
+import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageSampler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,6 +11,8 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+
+import java.nio.charset.StandardCharsets;
 
 public class CanvasWorldView implements WorldView<Canvas> {
     private final Canvas canvas;
@@ -80,8 +83,22 @@ public class CanvasWorldView implements WorldView<Canvas> {
     }
 
     @Override
-    public void putTextAtScreenCoords(Vector2D position, String text) {
-        this.drawTextAtScreenCoords(position, text);
+    public void putTextAtScreenCoords(
+            Vector2D screenPosition,
+            ImageAtlasSampler sampler,
+            float scale,
+            String text) {
+        float x = screenPosition.getX();
+        float y = screenPosition.getY();
+
+        float dx = sampler.getTileWidth() * scale;
+
+        for (byte sym : text.getBytes(StandardCharsets.US_ASCII)) {
+            ImageSampler glyphSampler = sampler.getTileSampler(sym);
+            System.out.println(sym);
+            this.rasterizeImageScaled(glyphSampler, x, y, scale);
+            x += dx;
+        }
     }
 
     /**
@@ -170,10 +187,6 @@ public class CanvasWorldView implements WorldView<Canvas> {
         double g = colorOver.getGreen() * mixOver + colorTop.getGreen() * mixTop;
         double b = colorOver.getBlue() * mixOver + colorTop.getBlue() * mixTop;
         return new Color(r, g, b, 1);
-    }
-
-    private void drawTextAtScreenCoords(Vector2D position, String text) {
-        // TODO
     }
 
     private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {

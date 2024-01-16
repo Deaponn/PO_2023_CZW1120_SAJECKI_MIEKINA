@@ -4,6 +4,7 @@ import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.image.ImageSampler;
 import agh.ics.oop.render.image.ImageSamplerMap;
@@ -58,21 +59,22 @@ public class WorldRenderer {
         }
     }
 
-    public void putImageAtGrid(Vector2D position, String imageKey) {
+    public void putImageAtGrid(Vector2D position, String samplerKey) {
         try {
-            ImageSampler sampler = this.imageSamplerMap.getImageSampler(imageKey);
+            ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
             this.worldView.putImageAtGrid(position, sampler);
         } catch (OutOfMapBoundsException e) {
             System.out.println("Attempted to write outside of bounds: " + e.getMessage());
         }
     }
 
-    public void putImageAtScreenCoords(Vector2D position, String imageKey, float scale) {
-        ImageSampler sampler = this.imageSamplerMap.getImageSampler(imageKey);
+    public void putImageAtScreenCoords(Vector2D position, String samplerKey, float scale) {
+        ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
         this.worldView.putImageAtScreenCoords(position, sampler, scale);
     }
 
-    public void putTextAtScreenCoords(Vector2D position, String text) {
-        this.worldView.putTextAtScreenCoords(position, text);
+    public void putTextAtScreenCoords(Vector2D position, String samplerKey, float scale, String text) {
+        ImageAtlasSampler sampler = this.imageSamplerMap.getImageAtlasSampler(samplerKey);
+        this.worldView.putTextAtScreenCoords(position, sampler, scale, text);
     }
 }
