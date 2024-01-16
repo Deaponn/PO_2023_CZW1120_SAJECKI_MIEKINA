@@ -13,17 +13,21 @@ public class UnitRendererAssignmentMap {
 
     private Class<? extends UnitRenderer<?>> getAssignedRendererClass(Class<?> unitClass)
             throws IllegalRendererAssignment {
-        try {
-            AssignRenderer assignRenderer = unitClass.getAnnotation(AssignRenderer.class);
+        return this.getAssignedRendererClass(unitClass, false);
+    }
+
+    private Class<? extends UnitRenderer<?>> getAssignedRendererClass(Class<?> unitClass, boolean isSuperclass)
+            throws IllegalRendererAssignment {
+        AssignRenderer assignRenderer = unitClass.getAnnotation(AssignRenderer.class);
+        if (assignRenderer != null && !(isSuperclass && assignRenderer.restrictInherit()))
             return assignRenderer.renderer();
-        } catch (NullPointerException e) {
-            // try searching in a superclass
-            Class<?> unitSuperClass = unitClass.getSuperclass();
-            if (unitSuperClass != null)
-                return this.getAssignedRendererClass(unitSuperClass);
-            // assign a renderer to the element class (@AssignRenderer)
-            throw new IllegalRendererAssignment("no assigned renderer found", unitClass);
-        }
+
+        // try searching in a superclass
+        Class<?> unitSuperClass = unitClass.getSuperclass();
+        if (unitSuperClass != null)
+            return this.getAssignedRendererClass(unitSuperClass, true);
+        // assign a renderer to the element class (@AssignRenderer)
+        throw new IllegalRendererAssignment("no assigned renderer found", unitClass);
     }
 
     private <U> void tryRegisterUnitRenderer(U unit)

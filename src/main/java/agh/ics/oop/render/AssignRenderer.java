@@ -8,5 +8,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AssignRenderer {
+    // unit renderer to use
     Class<? extends UnitRenderer<?>> renderer();
+    // cannot be used by classes extending this class
+    boolean restrictInherit() default false;
 }
