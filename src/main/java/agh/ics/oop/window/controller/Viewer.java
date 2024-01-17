@@ -46,7 +46,8 @@ public class Viewer extends WindowController implements MapChangeListener {
         ImageOverlay testImageOverlay = new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
         this.worldRenderer.overlayList.add(testImageOverlay);
 
-        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 4f, "abc\ndef");
+        String testText = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789_?!-=><;:,.";
+        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 2f, testText);
         this.worldRenderer.overlayList.add(testTextOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
@@ -56,23 +57,37 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         // Testing code
         Thread thread = new Thread(() -> {
-            this.worldMap.placeElement(new Plant(new Vector2D(5, 5), 5));
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Plant(new Vector2D(8, 5), 5));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Plant(new Vector2D(6, 7), 4));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Animal(new Vector2D(2, 2), 4, 0, 4, null));
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-            this.worldMap.placeElement(new Animal(new Vector2D(3, 3), 4, 0, 2, null));
+                this.worldMap.placeElement(new Plant(new Vector2D(5, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(8, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(6, 7), 4));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(7, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(4, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(9, 7), 4));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(10, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(2, 5), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(1, 7), 4));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(10, 6), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(3, 3), 5));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Plant(new Vector2D(2, 2), 4));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Animal(new Vector2D(2, 2), 4, 0, 4, null));
+                Thread.sleep(100);
+                this.worldMap.placeElement(new Animal(new Vector2D(3, 3), 4, 0, 2, null));
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            }
         });
         thread.start();
     }

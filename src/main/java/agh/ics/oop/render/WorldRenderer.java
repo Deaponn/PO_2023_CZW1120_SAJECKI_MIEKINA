@@ -1,7 +1,6 @@
 package agh.ics.oop.render;
 
 import agh.ics.oop.model.Boundary;
-import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.image.ImageAtlasSampler;
@@ -34,12 +33,15 @@ public class WorldRenderer {
 
     public synchronized void renderView() {
         Platform.runLater(() -> {
+            long startNanoTime = System.nanoTime();
             Boundary bounds = this.worldMap.getCurrentBounds();
             this.worldView.setGridBounds(bounds);
             bounds.mapAllPositions(this.worldMap::getElements)
                     .forEach(this::tryRender);
             this.overlayList.forEach(this::tryRender);
             this.worldView.presentView();
+            long endNanoTime = System.nanoTime();
+            System.out.println("Render execution time: " + (endNanoTime - startNanoTime) / 1_000_000L + "ms");
         });
     }
 
@@ -60,12 +62,8 @@ public class WorldRenderer {
     }
 
     public void putImageAtGrid(Vector2D position, String samplerKey) {
-        try {
-            ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
-            this.worldView.putImageAtGrid(position, sampler);
-        } catch (OutOfMapBoundsException e) {
-            System.out.println("Attempted to write outside of bounds: " + e.getMessage());
-        }
+        ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
+        this.worldView.putImageAtGrid(position, sampler);
     }
 
     public void putImageAtScreenCoords(Vector2D position, String samplerKey, float scale) {
@@ -73,7 +71,11 @@ public class WorldRenderer {
         this.worldView.putImageAtScreenCoords(position, sampler, scale);
     }
 
-    public void putTextAtScreenCoords(Vector2D position, String samplerKey, float scale, String text) {
+    public void putTextAtScreenCoords(
+            Vector2D position,
+            String samplerKey,
+            float scale,
+            String text) {
         ImageAtlasSampler sampler = this.imageSamplerMap.getImageAtlasSampler(samplerKey);
         this.worldView.putTextAtScreenCoords(position, sampler, scale, text);
     }

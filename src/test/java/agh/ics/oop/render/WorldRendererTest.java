@@ -1,5 +1,6 @@
 package agh.ics.oop.render;
 
+import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldElementA;
 import agh.ics.oop.model.WorldElementB;
 import agh.ics.oop.render.image.ImageMap;
@@ -10,7 +11,7 @@ public class WorldRendererTest {
     @Test
     public void renderCorrectElement() {
         WorldRenderer worldRenderer = this.getWorldRenderer();
-        WorldElementA element = new WorldElementA();
+        WorldElementA element = new WorldElementA(new Vector2D());
         try {
             worldRenderer.renderUnit(element);
         } catch (IllegalRendererAssignment e) {

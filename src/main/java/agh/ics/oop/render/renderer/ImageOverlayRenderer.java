@@ -5,6 +5,8 @@ import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 
 public class ImageOverlayRenderer implements UnitRenderer<ImageOverlay> {
+    public ImageOverlayRenderer(WorldRenderer renderer) {}
+
     @Override
     public void render(WorldRenderer renderer, ImageOverlay overlay) {
         renderer.putImageAtScreenCoords(
