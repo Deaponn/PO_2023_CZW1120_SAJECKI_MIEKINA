@@ -4,8 +4,12 @@ import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.WorldElementARenderer;
 
 @AssignRenderer(renderer = WorldElementARenderer.class)
-public class WorldElementA implements WorldElement {
+public class WorldElementA extends WorldElement {
     Vector2D position;
+
+    public WorldElementA(Vector2D position) {
+        super(position);
+    }
 
     @Override
     public Vector2D getPosition() {

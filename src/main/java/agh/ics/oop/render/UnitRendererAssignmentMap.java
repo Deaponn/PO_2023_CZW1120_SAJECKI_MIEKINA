@@ -30,16 +30,16 @@ public class UnitRendererAssignmentMap {
         throw new IllegalRendererAssignment("no assigned renderer found", unitClass);
     }
 
-    private <U> void tryRegisterUnitRenderer(U unit)
+    private <U> void tryRegisterUnitRenderer(WorldRenderer renderer, U unit)
             throws IllegalRendererAssignment {
         Class<?> elementClass = unit.getClass();
         Class<? extends UnitRenderer<?>> elementRendererClass = this.getAssignedRendererClass(elementClass);
         try {
             this.registeredUnitRendererMap.put(unit.getClass(), elementRendererClass
-                    .getConstructor()
-                    .newInstance());
+                    .getConstructor(WorldRenderer.class)
+                    .newInstance(renderer));
         } catch (NoSuchMethodException e) {
-            // you need to implement 0-parameter renderer constructor.
+            // you need to implement 1-parameter renderer constructor.
             throw new IllegalRendererAssignment("renderer constructor not found",
                     elementClass, elementRendererClass);
         } catch (InvocationTargetException e) {
@@ -58,12 +58,12 @@ public class UnitRendererAssignmentMap {
     }
 
     @SuppressWarnings("unchecked")
-    public <U> UnitRenderer<U> getUnitRenderer(U unit)
+    public <U> UnitRenderer<U> getUnitRenderer(WorldRenderer renderer, U unit)
             throws IllegalRendererAssignment {
         UnitRenderer<?> unitRenderer = this.registeredUnitRendererMap.get(unit.getClass());
         if (unitRenderer == null) {
-            this.tryRegisterUnitRenderer(unit);
-            unitRenderer = this.getUnitRenderer(unit);
+            this.tryRegisterUnitRenderer(renderer, unit);
+            unitRenderer = this.getUnitRenderer(renderer, unit);
         }
         try {
             return (UnitRenderer<U>) unitRenderer;
@@ -75,7 +75,7 @@ public class UnitRendererAssignmentMap {
 
     public <U> void renderUnit(WorldRenderer renderer, U unit)
             throws IllegalRendererAssignment {
-        UnitRenderer<U> unitRenderer = this.getUnitRenderer(unit);
+        UnitRenderer<U> unitRenderer = this.getUnitRenderer(renderer, unit);
         try {
             unitRenderer.render(renderer, unit);
         } catch (ClassCastException e) {

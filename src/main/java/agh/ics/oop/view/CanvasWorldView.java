@@ -1,7 +1,6 @@
 package agh.ics.oop.view;
 
 import agh.ics.oop.model.Boundary;
-import agh.ics.oop.model.OutOfMapBoundsException;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageSampler;
@@ -63,8 +62,9 @@ public class CanvasWorldView implements WorldView<Canvas> {
     @Override
     public void putImageAtGrid(
             Vector2D gridPosition,
-            ImageSampler sampler) throws OutOfMapBoundsException {
-        this.checkIfInBounds(gridPosition);
+            ImageSampler sampler) {
+        if (!this.gridBounds.isInBounds(gridPosition))
+            return;
         float x = this.gridOffsetX[gridPosition.getX()];
         float y = this.gridOffsetY[gridPosition.getY()];
 
@@ -193,11 +193,6 @@ public class CanvasWorldView implements WorldView<Canvas> {
         double g = colorOver.getGreen() * mixOver + colorTop.getGreen() * mixTop;
         double b = colorOver.getBlue() * mixOver + colorTop.getBlue() * mixTop;
         return new Color(r, g, b, 1);
-    }
-
-    private void checkIfInBounds(Vector2D position) throws OutOfMapBoundsException {
-        if (!this.gridBounds.isInBounds(position))
-            throw new OutOfMapBoundsException(position);
     }
 
     private void registerSizeListener() {
