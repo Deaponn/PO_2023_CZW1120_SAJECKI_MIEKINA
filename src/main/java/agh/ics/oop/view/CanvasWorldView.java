@@ -68,7 +68,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
         float x = this.gridOffsetX[gridPosition.getX()];
         float y = this.gridOffsetY[gridPosition.getY()];
 
-        this.rasterizeImageAbsoluteSized(sampler, x, y, this.gridImageSize);
+        this.rasterizeSamplerAbsoluteSized(sampler, x, y, this.gridImageSize);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
         float x = screenPosition.getX();
         float y = screenPosition.getY();
 
-        this.rasterizeImageScaled(sampler, x, y, scale);
+        this.rasterizeSamplerScaled(sampler, x, y, scale);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class CanvasWorldView implements WorldView<Canvas> {
                 y += dy;
             } else {
                 ImageSampler glyphSampler = sampler.getTileSampler(sym);
-                this.rasterizeImageScaled(glyphSampler, x, y, scale);
+                this.rasterizeSamplerOpaqueScaled(glyphSampler, x, y, scale);
                 x += dx;
             }
         }
@@ -123,18 +123,18 @@ public class CanvasWorldView implements WorldView<Canvas> {
         return this.canvas;
     }
 
-    private void rasterizeImageScaled(ImageSampler sampler, float x, float y, float imageScale) {
+    private void rasterizeSamplerScaled(ImageSampler sampler, float x, float y, float scale) {
         float imageWidth = (float) sampler.getWidth();
         float imageHeight = (float) sampler.getHeight();
         // absolute ends of (0, imageScale) drawing area
-        float ex = x + imageWidth * imageScale;
-        float ey = y + imageHeight * imageScale;
+        float ex = x + imageWidth * scale;
+        float ey = y + imageHeight * scale;
         // image source pixel position
         float ix = 0f;
         float iy = 0f;
         // image source pixel step deltas
-        float dx = 1f / imageScale;
-        float dy = 1f / imageScale;
+        float dx = 1f / scale;
+        float dy = 1f / scale;
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
@@ -149,18 +149,44 @@ public class CanvasWorldView implements WorldView<Canvas> {
         }
     }
 
-    private void rasterizeImageAbsoluteSized(ImageSampler sampler, float x, float y, float imageSize) {
+    private void rasterizeSamplerOpaqueScaled(ImageSampler sampler, float x, float y, float scale) {
         float imageWidth = (float) sampler.getWidth();
         float imageHeight = (float) sampler.getHeight();
         // absolute ends of (0, imageScale) drawing area
-        float ex = x + imageSize;
-        float ey = y + imageSize;
+        float ex = x + imageWidth * scale;
+        float ey = y + imageHeight * scale;
         // image source pixel position
         float ix = 0f;
         float iy = 0f;
         // image source pixel step deltas
-        float dx = imageWidth / imageSize;
-        float dy = imageHeight / imageSize;
+        float dx = 1f / scale;
+        float dy = 1f / scale;
+
+        for (float py = y; py < ey; py++) {
+            for (float px = x; px < ex; px++) {
+                Color c = sampler.getPixelAt((int) ix, (int) iy);
+                this.bufferPixelWriter.setColor((int) px, (int) py, c);
+                ix += dx;
+                if (ix >= imageWidth) ix = imageWidth - 1;
+            }
+            ix = 0;
+            iy += dy;
+            if (iy >= imageHeight) iy = imageHeight - 1;
+        }
+    }
+
+    private void rasterizeSamplerAbsoluteSized(ImageSampler sampler, float x, float y, float size) {
+        float imageWidth = (float) sampler.getWidth();
+        float imageHeight = (float) sampler.getHeight();
+        // absolute ends of (0, imageScale) drawing area
+        float ex = x + size;
+        float ey = y + size;
+        // image source pixel position
+        float ix = 0f;
+        float iy = 0f;
+        // image source pixel step deltas
+        float dx = imageWidth / size;
+        float dy = imageHeight / size;
 
         for (float py = y; py < ey; py++) {
             for (float px = x; px < ex; px++) {
