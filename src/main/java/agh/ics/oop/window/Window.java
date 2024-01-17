@@ -19,6 +19,7 @@ public class Window<T extends WindowController> {
     private final String title;
     private final String layoutPath;
     private boolean isInit;
+    private boolean isClosed;
 
     private Pane root;
     private T controller;
@@ -28,6 +29,7 @@ public class Window<T extends WindowController> {
         this.title = title;
         this.layoutPath = layoutPath;
         this.isInit = false;
+        this.isClosed = false;
     }
 
     public Window(String title, String layoutPath) {
@@ -39,6 +41,7 @@ public class Window<T extends WindowController> {
         this.controller.setBundle(bundle);
         this.controller.setWindow(this);
         this.controller.start();
+        this.setOnClose(event -> isClosed = true);
         this.show();
     }
 
@@ -100,6 +103,11 @@ public class Window<T extends WindowController> {
 
     public void close() {
         this.stage.close();
+        this.isClosed = true;
+    }
+
+    public boolean isClosed() {
+        return this.isClosed;
     }
 
     public void setOnClose(EventHandler<WindowEvent> eventHandler) {

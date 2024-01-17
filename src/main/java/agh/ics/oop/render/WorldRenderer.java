@@ -42,6 +42,7 @@ public class WorldRenderer {
             this.worldView.presentView();
             long endNanoTime = System.nanoTime();
             System.out.println("Render execution time: " + (endNanoTime - startNanoTime) / 1_000_000L + "ms");
+            this.overlayList.forEach(overlay -> overlay.updateOnFrame(this));
         });
     }
 

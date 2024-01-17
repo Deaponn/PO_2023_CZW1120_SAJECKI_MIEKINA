@@ -12,6 +12,6 @@ public class ImageOverlayRenderer implements UnitRenderer<ImageOverlay> {
         renderer.putImageAtScreenCoords(
                 overlay.screenPosition,
                 overlay.samplerKey,
-                overlay.imageScale);
+                overlay.scale);
     }
 }

@@ -60,6 +60,11 @@ public class CanvasWorldView implements WorldView<Canvas> {
     }
 
     @Override
+    public Vector2D getViewSize() {
+        return new Vector2D(this.bufferWidth, this.bufferHeight);
+    }
+
+    @Override
     public void putImageAtGrid(
             Vector2D gridPosition,
             ImageSampler sampler) {

@@ -9,6 +9,7 @@ import javafx.scene.Node;
 public interface WorldView<N extends Node> {
     void setGridBounds(Boundary bounds);
     void updateViewSize();
+    Vector2D getViewSize();
 
     void putImageAtGrid(Vector2D position, ImageSampler sampler);
     void putImageAtScreenCoords(Vector2D screenPosition, ImageSampler sampler, float scale);
