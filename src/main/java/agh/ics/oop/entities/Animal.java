@@ -3,6 +3,7 @@ package agh.ics.oop.entities;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.renderer.AnimalRenderer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Objects;
 import java.util.Random;
 
 @AssignRenderer(renderer = AnimalRenderer.class)
-public class Animal extends WorldEntity implements EnergyHolder {
+public class Animal extends WorldEntity implements EnergyHolder, Comparable<Animal> {
     // prevents updating multiple times:
     // when HashMap key (2, 2) is updated,
     // animal moves to (2, 3), and then HashMap key (2, 3) is updated,
@@ -62,6 +63,8 @@ public class Animal extends WorldEntity implements EnergyHolder {
     @Override
     public int getEnergy() { return this.energy; }
 
+    public void addKid(Animal kid) { this.statistics.addKid(kid); }
+
     public int kidsCount() { return this.statistics.countKids(); }
 
     public int ancestorsCount() {
@@ -75,7 +78,13 @@ public class Animal extends WorldEntity implements EnergyHolder {
 
     public int getAge() { return this.statistics.age; }
 
+    public boolean getAlive() { return this.isAlive; }
+
     public Genome getGenome() { return this.genome; }
+
+    public int compareTo(@NotNull Animal other) {
+        return Animal.compare(this, other);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -90,17 +99,21 @@ public class Animal extends WorldEntity implements EnergyHolder {
         return Objects.hash(getPosition(), getDirection(), isAlive, energy, genome);
     }
 
+    public String toString() {
+        return this.mapDirection.toString();
+    }
+
     static private final Random random = new Random();
 
     // returns true if Animal first is stronger, false otherwise
-    static public boolean compare(Animal first, Animal second) {
-        if (first.energy > second.energy) return true;
-        if (first.energy < second.energy) return false;
-        if (first.getAge() > second.getAge()) return true;
-        if (first.getAge() < second.getAge()) return false;
-        if (first.kidsCount() > second.kidsCount()) return true;
-        if (first.kidsCount() < second.kidsCount()) return false;
+    static public int compare(Animal first, Animal second) {
+        if (first.energy > second.energy) return 1;
+        if (first.energy < second.energy) return -1;
+        if (first.getAge() > second.getAge()) return 1;
+        if (first.getAge() < second.getAge()) return -1;
+        if (first.kidsCount() > second.kidsCount()) return 1;
+        if (first.kidsCount() < second.kidsCount()) return -1;
         // randomly choose between first and second
-        return random.nextInt(2) == 0;
+        return random.nextInt(2);
     }
 }

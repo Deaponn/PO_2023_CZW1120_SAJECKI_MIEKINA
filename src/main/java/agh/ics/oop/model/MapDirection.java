@@ -21,7 +21,7 @@ public enum MapDirection {
     public MapDirection rotateBy(MoveDirection moveDirection) {
         MapDirection[] mapDirections = MapDirection.values();
         int rotation = moveDirection.getRotation();
-        int newRotation = this.ordinal() + rotation % mapDirections.length;
+        int newRotation = (this.ordinal() + rotation) % mapDirections.length;
         return mapDirections[newRotation];
     }
 
@@ -29,5 +29,19 @@ public enum MapDirection {
         Random random = new Random();
         MapDirection[] mapDirections = MapDirection.values();
         return mapDirections[random.nextInt(mapDirections.length)];
+    }
+
+    // corresponds to directions of keyboard numpad
+    public String toString() {
+        return switch(this) {
+            case NORTH -> "8";
+            case NORTH_EAST -> "9";
+            case EAST -> "6";
+            case SOUTH_EAST -> "3";
+            case SOUTH -> "2";
+            case SOUTH_WEST -> "1";
+            case WEST -> "4";
+            case NORTH_WEST -> "7";
+        };
     }
 }

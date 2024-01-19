@@ -57,6 +57,7 @@ public class Viewer extends WindowController implements MapChangeListener {
     }
 
     public void render() {
+        this.worldMap.step();
         this.worldRenderer.renderView(this.worldMap);
     }
 

@@ -37,6 +37,8 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      */
     boolean isOccupied(Vector2D position);
 
+    void step();
+
     /**
      * Return an animal at a given position.
      *

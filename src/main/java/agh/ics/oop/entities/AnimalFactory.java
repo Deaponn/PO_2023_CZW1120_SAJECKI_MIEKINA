@@ -38,7 +38,7 @@ public class AnimalFactory {
     public Animal breedAnimals(Animal firstParent, Animal secondParent) {
         Animal strongerParent;
         Animal weakerParent;
-        if (Animal.compare(firstParent, secondParent)) {
+        if (Animal.compare(firstParent, secondParent) > 0) {
             strongerParent = firstParent;
             weakerParent = secondParent;
         } else {
@@ -47,7 +47,10 @@ public class AnimalFactory {
         }
         float proportion = strongerParent.getEnergy() / (float)(strongerParent.getEnergy() + weakerParent.getEnergy());
         Genome kidGenome = this.genomeFactory.genomeFrom(strongerParent.getGenome(), weakerParent.getGenome(), proportion);
-        return this.create(strongerParent.getPosition(), 2 * this.energyPassed, kidGenome);
+        Animal kid = this.create(strongerParent.getPosition(), 2 * this.energyPassed, kidGenome);
+        strongerParent.addKid(kid);
+        weakerParent.addKid(kid);
+        return kid;
     }
 
     private static final Random random = new Random();

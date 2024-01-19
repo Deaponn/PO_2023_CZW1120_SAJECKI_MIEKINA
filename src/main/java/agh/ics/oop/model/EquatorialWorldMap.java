@@ -5,14 +5,16 @@ import agh.ics.oop.entities.*;
 import agh.ics.oop.util.RandomNumber;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static agh.ics.oop.Configuration.Fields.*;
 
 public class EquatorialWorldMap implements WorldMap {
     private final AnimalFactory animalFactory;
     private final PlantFactory plantFactory;
-    private final Map<Vector2D, List<Animal>> animals = new HashMap<>();
-    private final Map<Vector2D, Plant> plants = new HashMap<>();
+    private final Map<Vector2D, List<Animal>> animals = new ConcurrentHashMap<>();
+    private final Map<Vector2D, Plant> plants = new ConcurrentHashMap<>();
     private final List<Vector2D> equator;
     private final RandomNumber randomEquatorIndex;
     private final List<Vector2D> regularField;
@@ -21,6 +23,7 @@ public class EquatorialWorldMap implements WorldMap {
     private final int mapHeight;
     private final float equatorSize;
     private final float plantGrowAtEquatorChance;
+    private final int numberOfGrowingPlants;
     private final List<MapChangeListener> subscribers = new LinkedList<>();
     private final UUID mapUUID = UUID.randomUUID();
 
@@ -29,6 +32,7 @@ public class EquatorialWorldMap implements WorldMap {
         this.mapHeight = configuration.get(MAP_HEIGHT);
         this.equatorSize = configuration.get(EQUATOR_SIZE);
         this.plantGrowAtEquatorChance = configuration.get(PLANT_GROW_AT_EQUATOR_CHANCE);
+        this.numberOfGrowingPlants = configuration.get(NUMBER_OF_GROWING_PLANTS);
 
         GenomeFactory genomeFactory = new GenomeFactory(configuration);
         this.animalFactory = new AnimalFactory(configuration, genomeFactory);
@@ -43,6 +47,8 @@ public class EquatorialWorldMap implements WorldMap {
         growPlants(configuration.get(STARTING_PLANTS_NUMBER));
 
         populateWithAnimals(configuration.get(STARTING_ANIMALS_NUMBER), configuration.get(INITIAL_ANIMAL_ENERGY));
+
+        System.out.println("MAP OBJECT IS BUILT CORRECTLY");
     }
 
     private List<List<Vector2D>> buildFields() {
@@ -83,26 +89,35 @@ public class EquatorialWorldMap implements WorldMap {
 
         // code to test the above solution
         // TODO: remove when development is finished
+        this.printMapState();
+
+        return List.of(equator, regularField);
+    }
+
+    public void printMapState() {
         final StringBuilder sb = new StringBuilder("|");
         for (int y = 0; y < this.mapHeight; y++) {
             for (int x = 0; x < this.mapWidth; x++) {
-                if (isEquator[y][x]) sb.append("|*");
+                Vector2D position = new Vector2D(x, y);
+                if (this.animals.containsKey(position) && !this.animals.get(position).isEmpty())
+                    sb.append("|").append(this.animals.get(position).get(0));
+                else if (this.plants.containsKey(position)) sb.append("|*");
                 else sb.append("| ");
             }
             sb.append("||\n|");
         }
         System.out.println(sb);
-
-        return List.of(equator, regularField);
     }
+
+    private void growPlants() { this.growPlants(this.numberOfGrowingPlants); }
 
     private void growPlants(int numberOfPlants) {
         for (int i = 0; i < numberOfPlants; i++) {
-            Vector2D plantPosition;
-            if (random.nextDouble() < this.plantGrowAtEquatorChance)
+            Vector2D plantPosition = null;
+            if (random.nextDouble() < this.plantGrowAtEquatorChance && randomEquatorIndex.hasNext())
                 plantPosition = equator.get(randomEquatorIndex.next());
-            else plantPosition = regularField.get(randomRegularFieldIndex.next());
-            this.placeElement(plantFactory.create(plantPosition));
+            else if (randomRegularFieldIndex.hasNext()) plantPosition = regularField.get(randomRegularFieldIndex.next());
+            if (plantPosition != null) this.placeElement(plantFactory.create(plantPosition));
         }
     }
 
@@ -111,6 +126,75 @@ public class EquatorialWorldMap implements WorldMap {
             Vector2D randomPosition = new Vector2D(random.nextInt(this.mapWidth), random.nextInt(this.mapHeight));
             Animal animal = this.animalFactory.create(randomPosition, initialAnimalEnergy);
             this.placeElement(animal);
+        }
+    }
+
+    public void step() {
+        this.removeDead();
+        this.moveAnimals();
+        this.orderOnFields();
+        this.eatPlants();
+        this.breedAnimals();
+        this.growPlants();
+        this.refreshAnimals();
+    }
+
+    private void removeDead() {
+        for (List<Animal> animalList : this.animals.values()) {
+            for (int i = animalList.size() - 1; i >= 0; i--) {
+                if (!animalList.get(i).getAlive()) animalList.remove(i);
+            }
+        }
+    }
+
+    private void moveAnimals() {
+        Set<Vector2D> uniqueAnimalsPositions = this.animals.keySet();
+        for (Vector2D uniquePosition : uniqueAnimalsPositions) {
+            List<Animal> animalList = this.animals.get(uniquePosition);
+            if (animalList.isEmpty()) continue;
+            for (int i = animalList.size() - 1; i >= 0; i--) {
+                Animal animal = animalList.get(i);
+                animal.update();
+                moveAnimal(animal);
+            }
+        }
+    }
+
+    private void orderOnFields() {
+        for (List<Animal> animalList : this.animals.values()) {
+            animalList.sort(null);
+        }
+    }
+
+    private void eatPlants() {
+        for (Plant plant : this.plants.values()) {
+            Vector2D position = plant.getPosition();
+            if (this.animals.containsKey(position) && !this.animals.get(position).isEmpty()) {
+                Animal animal = this.animals.get(position).get(0);
+                animal.eat(plant);
+                plants.remove(position);
+                int equatorIndex = equator.indexOf(position);
+                if (equatorIndex != -1) randomEquatorIndex.restoreNumber(equatorIndex);
+                else randomRegularFieldIndex.restoreNumber(regularField.indexOf(position));
+            }
+        }
+    }
+
+    private void breedAnimals() {
+        for (List<Animal> animalList : this.animals.values()) {
+            for (int i = 0; i < animalList.size() - 1; i += 2) {
+                if (!this.animalFactory.canBreed(animalList.get(i), animalList.get(i + 1))) break;
+                Animal kid = this.animalFactory.breedAnimals(animalList.get(i), animalList.get(i + 1));
+                this.placeElement(kid);
+            }
+        }
+    }
+
+    private void refreshAnimals() {
+        for (List<Animal> animalList : this.animals.values()) {
+            for (Animal animal : animalList) {
+                animal.refreshUpdateStatus();
+            }
         }
     }
 
@@ -125,7 +209,7 @@ public class EquatorialWorldMap implements WorldMap {
             if (animals.containsKey(animal.getPosition())) {
                 animals.get(animal.getPosition()).add(animal);
             } else {
-                List<Animal> list = new ArrayList<>();
+                List<Animal> list = new CopyOnWriteArrayList<>();
                 list.add(animal);
                 animals.put(animal.getPosition(), list);
             }
@@ -156,8 +240,6 @@ public class EquatorialWorldMap implements WorldMap {
         return false;
     }
 
-    // is this necessary? should it return Plant, or List<Animal>?
-    // left unimplemented since I don't see usage
     @Override
     public List<WorldElement> getElements(Vector2D position) {
         List<WorldElement> elementList = new LinkedList<>();
