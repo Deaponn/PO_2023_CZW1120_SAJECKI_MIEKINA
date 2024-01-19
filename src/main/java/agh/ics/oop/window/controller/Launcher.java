@@ -46,6 +46,7 @@ public class Launcher extends WindowController {
             ImageMap imageMap = new ImageMap("res/gfx", "png");
 
             Bundle viewerBundle = new Bundle()
+                    .send("configuration", this.configuration)
                     .send("world_map", worldMap)
                     .send("image_map", imageMap);
 

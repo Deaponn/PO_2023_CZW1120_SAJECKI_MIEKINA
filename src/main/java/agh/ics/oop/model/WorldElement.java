@@ -19,7 +19,7 @@ public abstract class WorldElement {
         return this.position.equals(position);
     }
 
-    protected WorldElement(Vector2D position) {
+    public WorldElement(Vector2D position) {
         this.position = position;
     }
 
