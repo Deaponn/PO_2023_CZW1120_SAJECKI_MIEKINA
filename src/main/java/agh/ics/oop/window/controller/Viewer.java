@@ -60,7 +60,7 @@ public class Viewer extends WindowController implements MapChangeListener {
         // Testing code
         Thread thread = new Thread(() -> {
             long frameMillis = 400;
-            try {
+            try 
                 this.worldMap.placeElement(new Plant(new Vector2D(5, 5), 5));
                 Thread.sleep(frameMillis);
                 this.worldMap.placeElement(new Plant(new Vector2D(8, 5), 5));

@@ -45,6 +45,9 @@ public class Configuration implements Serializable {
                             Fields.STARTING_ANIMALS_NUMBER,
                             Field.of(4, Integer.class, Field::positiveInteger)),
                     Map.entry(
+                            Fields.INITIAL_ANIMAL_ENERGY,
+                            Field.of(5, Integer.class, Field::positiveInteger)),
+                    Map.entry(
                             Fields.MIN_REPRODUCE_ENERGY,
                             Field.of(6, Integer.class, Field::positiveInteger)),
                     Map.entry(
@@ -153,6 +156,7 @@ public class Configuration implements Serializable {
         PLANT_ENERGY,
         NUMBER_OF_GROWING_PLANTS,
         STARTING_ANIMALS_NUMBER,
+        INITIAL_ANIMAL_ENERGY,
         MIN_REPRODUCE_ENERGY,
         // TODO: percentage or integer amount?
         //      if percentage, should the max be 200%?

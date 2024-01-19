@@ -3,28 +3,27 @@ package agh.ics.oop.entities;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.renderer.AnimalRenderer;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 @AssignRenderer(renderer = AnimalRenderer.class)
-public class Animal extends WorldEntity implements EnergyHolder {
+public class Animal extends WorldEntity implements EnergyHolder, Comparable<Animal> {
     // prevents updating multiple times:
     // when HashMap key (2, 2) is updated,
     // animal moves to (2, 3), and then HashMap key (2, 3) is updated,
     // it won't double move already moved Animal
     private boolean wasUpdated = false;
     private boolean isAlive = true;
-    private final int minReproduceEnergy;
-    private final int energyPassed;
     private int energy;
     private final AnimalStatistics statistics;
     private final Genome genome;
 
-    public Animal(Vector2D position, int minReproduceEnergy, int energyPassed, int energy, Genome genome) {
+    public Animal(Vector2D position, int energy, Genome genome) {
         super(position, MapDirection.randomDirection());
-        this.minReproduceEnergy = minReproduceEnergy;
-        this.energyPassed = energyPassed;
         this.energy = energy;
         this.statistics = new AnimalStatistics();
         this.genome = genome;
@@ -64,6 +63,29 @@ public class Animal extends WorldEntity implements EnergyHolder {
     @Override
     public int getEnergy() { return this.energy; }
 
+    public void addKid(Animal kid) { this.statistics.addKid(kid); }
+
+    public int kidsCount() { return this.statistics.countKids(); }
+
+    public int ancestorsCount() {
+        return constructAncestorsList(new LinkedList<>()).size();
+    }
+
+    public List<Animal> constructAncestorsList(List<Animal> seenAlready) {
+        this.statistics.addAncestorsToList(seenAlready);
+        return seenAlready;
+    }
+
+    public int getAge() { return this.statistics.age; }
+
+    public boolean getAlive() { return this.isAlive; }
+
+    public Genome getGenome() { return this.genome; }
+
+    public int compareTo(@NotNull Animal other) {
+        return Animal.compare(this, other);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -77,5 +99,21 @@ public class Animal extends WorldEntity implements EnergyHolder {
         return Objects.hash(getPosition(), getDirection(), isAlive, energy, genome);
     }
 
+    public String toString() {
+        return this.mapDirection.toString();
+    }
+
     static private final Random random = new Random();
+
+    // returns true if Animal first is stronger, false otherwise
+    static public int compare(Animal first, Animal second) {
+        if (first.energy > second.energy) return 1;
+        if (first.energy < second.energy) return -1;
+        if (first.getAge() > second.getAge()) return 1;
+        if (first.getAge() < second.getAge()) return -1;
+        if (first.kidsCount() > second.kidsCount()) return 1;
+        if (first.kidsCount() < second.kidsCount()) return -1;
+        // randomly choose between first and second
+        return random.nextInt(2);
+    }
 }

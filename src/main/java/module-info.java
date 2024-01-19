@@ -6,6 +6,7 @@ module Project.main {
     requires javafx.media;
     requires javafx.swing;
     requires javafx.web;
+    requires org.jetbrains.annotations;
 
     opens agh.ics.oop;
     opens agh.ics.oop.model;
