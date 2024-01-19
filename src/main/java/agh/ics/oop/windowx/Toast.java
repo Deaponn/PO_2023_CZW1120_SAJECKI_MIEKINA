@@ -1,7 +1,7 @@
 package agh.ics.oop.windowx;
 
 import agh.ics.oop.window.Window;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -42,21 +42,20 @@ public class Toast extends StackPane {
         this.followWindowSize();
 
         this.toastFadeOut = new ToastFadeOut(this);
-        this.startDelay();
+        this.startTimeout();
     }
 
-    private void startDelay() {
-        Task<Long> hideTask = new Task<>() {
-            @Override
-            protected Long call() throws InterruptedException {
-                long delay = Toast.this.duration.milliseconds;
-                Thread.sleep(delay);
-                Toast.this.toastFadeOut.play();
-                return delay;
+    private void startTimeout() {
+        Runnable waiter = () -> {
+            try {
+                Thread.sleep(Toast.this.duration.milliseconds);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
+            Platform.runLater(Toast.this.toastFadeOut::play);
         };
 
-        Thread hideTaskThread = new Thread(hideTask);
+        Thread hideTaskThread = new Thread(waiter);
         hideTaskThread.start();
     }
 

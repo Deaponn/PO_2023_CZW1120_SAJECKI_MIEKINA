@@ -2,24 +2,42 @@ package agh.ics.oop.render.renderer;
 
 import agh.ics.oop.entities.Animal;
 import agh.ics.oop.model.Vector2D;
-import agh.ics.oop.render.WorldElementRenderer;
+import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
+import agh.ics.oop.render.image.ImageSampler;
 
-public class AnimalRenderer extends WorldElementRenderer<Animal> {
+public class AnimalRenderer implements UnitRenderer<Animal> {
+    private final ImageSampler blob1;
+    private final ImageSampler bar0;
+    private final ImageSampler bar1;
+    private final ImageSampler bar2;
+    private final ImageSampler bar3;
+    private final ImageSampler bar4;
+
+    public AnimalRenderer(WorldRenderer renderer) {
+        this.blob1 = renderer.imageSamplerMap.getImageSampler("blob1");
+        this.bar0 = renderer.imageSamplerMap.getImageSampler("bar0");
+        this.bar1 = renderer.imageSamplerMap.getImageSampler("bar1");
+        this.bar2 = renderer.imageSamplerMap.getImageSampler("bar2");
+        this.bar3 = renderer.imageSamplerMap.getImageSampler("bar3");
+        this.bar4 = renderer.imageSamplerMap.getImageSampler("bar4");
+    }
+
     @Override
     public void render(WorldRenderer renderer, Animal element) {
         Vector2D position = element.getPosition();
-        renderer.putImage(position, "blob1");
-        renderer.putImage(position, AnimalRenderer.getEnergyBarImageKey(element.getEnergy()));
+        renderer.worldView.putImageAtGrid(position, this.blob1);
+        ImageSampler bar = this.getEnergyBarImageKey(element.getEnergy());
+        renderer.worldView.putImageAtGrid(position, bar);
     }
 
-    private static String getEnergyBarImageKey(int energy) {
+    private ImageSampler getEnergyBarImageKey(int energy) {
         return switch (energy) {
-            case 0 -> "bar0";
-            case 1 -> "bar1";
-            case 2 -> "bar2";
-            case 3 -> "bar3";
-            default -> "bar4";
+            case 0 -> this.bar0;
+            case 1 -> this.bar1;
+            case 2 -> this.bar2;
+            case 3 -> this.bar3;
+            default -> this.bar4;
         };
     }
 }

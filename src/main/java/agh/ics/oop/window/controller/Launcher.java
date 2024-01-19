@@ -3,13 +3,14 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.EquatorialWorldMap;
 import agh.ics.oop.model.WorldMap;
-import agh.ics.oop.render.ImageMap;
+import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.window.Bundle;
 import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
+import agh.ics.oop.windowx.Toast;
 
 public class Launcher extends WindowController {
     private Configuration configuration = new Configuration();
@@ -62,10 +63,7 @@ public class Launcher extends WindowController {
             this.configuration = (Configuration) Resources.deserializeFromXML(
                     Configurator.configurationPath);
         } catch (ResourceNotFoundException e) {
-            this.window.showErrorAlert(
-                    "Error",
-                    "Could not load a configuration.",
-                    "Could not load XML " + e.getMessage()).setDoNothing();
+            this.window.showToast("Running with new configuration", Toast.Duration.MEDIUM);
         }
     }
 

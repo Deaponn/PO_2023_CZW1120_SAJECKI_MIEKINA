@@ -86,6 +86,7 @@ public class Configurator extends WindowController {
         return (observable, previousValue, newValue) -> {
             try {
                 configurationField.set(newValue);
+                this.window.showToast("Saved to disk", Toast.Duration.SHORT);
             } catch (IllegalArgumentException e) {
                 String fieldName = configurationKey.name();
                 property.setValue(previousValue);
@@ -98,9 +99,9 @@ public class Configurator extends WindowController {
             Property<V> valueProperty,
             Configuration.Fields configurationKey,
             Configuration.Field<V> configurationField) {
+        valueProperty.setValue(configurationField.get());
         valueProperty.addListener(this.createConfigurationFieldListener(
                 valueProperty, configurationKey, configurationField));
-        valueProperty.setValue(configurationField.get());
     }
 
     private void addIntegerField(Configuration.Fields key, TextField textField) {

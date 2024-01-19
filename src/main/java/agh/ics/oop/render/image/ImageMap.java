@@ -1,4 +1,4 @@
-package agh.ics.oop.render;
+package agh.ics.oop.render.image;
 
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +49,11 @@ public class ImageMap {
     }
 
     public Image getImage(String imageKey) {
-        return this.imageMap.get(imageKey);
+        Image image = this.imageMap.get(imageKey);
+        if (image == null)
+            throw new NoSuchElementException("ImageMap: key " + imageKey +
+                    " does not exist.");
+        return image;
     }
 
     public Set<String> getImageKeys() {

@@ -125,4 +125,6 @@ bin/
 .vscode/
 
 ### Mac OS ###
-.DS_Store
+.DS_Store!/res/save/save0.xml
+
+/res/save/save0.xml

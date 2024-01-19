@@ -1,131 +1,83 @@
 package agh.ics.oop.render;
 
-import agh.ics.oop.model.*;
-import agh.ics.oop.window.WorldView;
-import javafx.scene.image.Image;
+import agh.ics.oop.model.Boundary;
+import agh.ics.oop.model.Vector2D;
+import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.render.image.ImageAtlasSampler;
+import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.render.image.ImageSampler;
+import agh.ics.oop.render.image.ImageSamplerMap;
+import agh.ics.oop.view.WorldView;
+import javafx.application.Platform;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class WorldRenderer {
-    public final ImageMap imageMap;
-    public final WorldView worldView;
-    private final AssignmentMap assignmentMap;
+    public final ImageSamplerMap imageSamplerMap;
+    public final WorldView<?> worldView;
+    public final List<Overlay> overlayList;
+    private final UnitRendererAssignmentMap unitRendererAssignmentMap;
+    private WorldMap worldMap;
 
-    public WorldRenderer(ImageMap imageMap, WorldView worldView) {
-        this.imageMap = imageMap;
+    public WorldRenderer(ImageMap imageMap, WorldView<?> worldView) {
+        this.imageSamplerMap = new ImageSamplerMap(imageMap);
         this.worldView = worldView;
-        this.assignmentMap = new WorldRenderer.AssignmentMap();
+        this.overlayList = new LinkedList<>();
+        this.unitRendererAssignmentMap = new UnitRendererAssignmentMap();
     }
 
-    public void renderView(WorldMap worldMap) {
-        Boundary bounds = worldMap.getCurrentBounds();
-        this.worldView.setGridBounds(bounds);
-        bounds.mapAllPositions(worldMap::getElements)
-                .forEach(this::tryRenderElementList);
-        this.worldView.presentView();
+    public void setWorldMap(WorldMap worldMap) {
+        this.worldMap = worldMap;
     }
 
-    public void renderElement(WorldElement element) throws IllegalRendererAssignment {
-        this.assignmentMap.renderElement(this, element);
+    public synchronized void renderView() {
+        Platform.runLater(() -> {
+            long startNanoTime = System.nanoTime();
+            Boundary bounds = this.worldMap.getCurrentBounds();
+            this.worldView.setGridBounds(bounds);
+            bounds.mapAllPositions(this.worldMap::getElements)
+                    .forEach(this::tryRender);
+            this.overlayList.forEach(this::tryRender);
+            this.worldView.presentView();
+            long endNanoTime = System.nanoTime();
+            System.out.println("Render execution time: " + (endNanoTime - startNanoTime) / 1_000_000L + "ms");
+            this.overlayList.forEach(overlay -> overlay.updateOnFrame(this));
+        });
     }
 
-    private void tryRenderElementList(List<WorldElement> elementList) {
-        elementList.forEach(this::tryRenderElement);
+    public void renderUnit(Object unit) throws IllegalRendererAssignment {
+        this.unitRendererAssignmentMap.renderUnit(this, unit);
     }
 
-    private void tryRenderElement(WorldElement element) {
+    private <U> void tryRender(List<U> unitList) {
+        unitList.forEach(this::tryRender);
+    }
+
+    private <U> void tryRender(U unit) {
         try {
-            this.renderElement(element);
-            System.out.println("Render element @ " + element.getPosition());
+            this.renderUnit(unit);
         } catch (IllegalRendererAssignment e) {
             System.out.println("WorldRenderer: " + e.getMessage());
         }
     }
 
-    public void putImage(Vector2D position, String imageKey) {
-        try {
-            Image image = this.imageMap.getImage(imageKey);
-            if (image == null)
-                return;
-            this.worldView.put(position, image);
-        } catch (OutOfMapBoundsException e) {
-            System.out.println("Attempted to write outside of bounds: " + e.getMessage());
-        }
+    public void putImageAtGrid(Vector2D position, String samplerKey) {
+        ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
+        this.worldView.putImageAtGrid(position, sampler);
     }
 
-    private static class AssignmentMap {
-        private final Map<Class<?>, WorldElementRenderer<?>> registeredElementRendererMap;
+    public void putImageAtScreenCoords(Vector2D position, String samplerKey, float scale) {
+        ImageSampler sampler = this.imageSamplerMap.getImageSampler(samplerKey);
+        this.worldView.putImageAtScreenCoords(position, sampler, scale);
+    }
 
-        public AssignmentMap() {
-            this.registeredElementRendererMap = new HashMap<>();
-        }
-
-        private Class<? extends WorldElementRenderer<?>> getAssignedRenderer(Class<?> elementClass)
-                throws IllegalRendererAssignment {
-            try {
-                AssignRenderer assignRenderer = elementClass.getAnnotation(AssignRenderer.class);
-                return assignRenderer.renderer();
-            } catch (NullPointerException e) {
-                // assign a renderer to the element class (@AssignRenderer)
-                throw new IllegalRendererAssignment("no assigned renderer found", elementClass);
-            }
-        }
-
-        private <T extends WorldElement> void tryRegisterElementRenderer(T element)
-                throws IllegalRendererAssignment {
-            Class<?> elementClass = element.getClass();
-            Class<? extends WorldElementRenderer<?>> elementRendererClass = this.getAssignedRenderer(elementClass);
-            try {
-                this.registeredElementRendererMap.put(element.getClass(), elementRendererClass
-                        .getConstructor()
-                        .newInstance());
-            } catch (NoSuchMethodException e) {
-                // you need to implement 0-parameter renderer constructor.
-                throw new IllegalRendererAssignment("renderer constructor not found",
-                        elementClass, elementRendererClass);
-            } catch (InvocationTargetException e) {
-                // on exception thrown inside renderer constructor.
-                throw new IllegalRendererAssignment("renderer constructor exception",
-                        elementClass, elementRendererClass);
-            } catch (InstantiationException e) {
-                // render class is an abstract class or an interface.
-                throw new IllegalRendererAssignment("renderer is abstract, cannot be instantiated",
-                        elementClass, elementRendererClass);
-            } catch (IllegalAccessException e) {
-                // renderer constructor is not visible
-                throw new IllegalRendererAssignment("renderer constructor is not public",
-                        elementClass, elementRendererClass);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public <T extends WorldElement> WorldElementRenderer<T> getElementRenderer(T element)
-                throws IllegalRendererAssignment {
-            WorldElementRenderer<?> elementRenderer = this.registeredElementRendererMap.get(element.getClass());
-            if (elementRenderer == null) {
-                this.tryRegisterElementRenderer(element);
-                elementRenderer = this.getElementRenderer(element);
-            }
-            try {
-                return (WorldElementRenderer<T>) elementRenderer;
-            } catch (ClassCastException e) {
-                throw new IllegalRendererAssignment("illegal element class supplied",
-                        element, elementRenderer);
-            }
-        }
-
-        public <T extends WorldElement> void renderElement(WorldRenderer renderer, T element)
-                throws IllegalRendererAssignment {
-            WorldElementRenderer<T> elementRenderer = this.getElementRenderer(element);
-            try {
-                elementRenderer.render(renderer, element);
-            } catch (ClassCastException e) {
-                throw new IllegalRendererAssignment("illegal element class supplied",
-                        element, elementRenderer);
-            }
-        }
+    public void putTextAtScreenCoords(
+            Vector2D position,
+            String samplerKey,
+            float scale,
+            String text) {
+        ImageAtlasSampler sampler = this.imageSamplerMap.getImageAtlasSampler(samplerKey);
+        this.worldView.putTextAtScreenCoords(position, sampler, scale, text);
     }
 }
