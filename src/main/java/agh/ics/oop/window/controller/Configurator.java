@@ -46,7 +46,8 @@ public class Configurator extends WindowController {
     public TextField maxMutationsNumber;
     @FXML
     // default is 0.2, according to Pareto rule
-    public TextField equatorSize;
+    // this is used to compute how many equator/poisonous fields should be generated
+    public TextField specialFieldsFraction;
     @FXML
     // default is 0.8, according to Pareto rule
     public TextField plantGrowAtEquatorChance;
@@ -74,7 +75,7 @@ public class Configurator extends WindowController {
         this.addIntegerField(ENERGY_PASSED, this.energyPassedToChild);
         this.addIntegerField(MIN_MUTATIONS, this.minMutationsNumber);
         this.addIntegerField(MAX_MUTATIONS, this.maxMutationsNumber);
-        this.addFloatField(EQUATOR_SIZE, this.equatorSize);
+        this.addFloatField(SPECIAL_FIELDS_FRACTION, this.specialFieldsFraction);
         this.addFloatField(PLANT_GROW_AT_EQUATOR_CHANCE, this.plantGrowAtEquatorChance);
         this.addBooleanField(SAVE_STEPS, this.saveSteps);
     }

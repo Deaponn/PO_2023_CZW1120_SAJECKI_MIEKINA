@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static agh.ics.oop.Configuration.Fields.*;
 
-public class EquatorialWorldMap implements WorldMap {
+public class PoisonousPlantsWorldMap implements WorldMap {
     private final AnimalFactory animalFactory;
     private final PlantFactory plantFactory;
     private final Map<Vector2D, List<Animal>> animals = new ConcurrentHashMap<>();
@@ -21,16 +21,16 @@ public class EquatorialWorldMap implements WorldMap {
     private final RandomNumber randomRegularFieldIndex;
     private final int mapWidth;
     private final int mapHeight;
-    private final float equatorFieldsFraction;
+    private final float equatorSize;
     private final float plantGrowAtEquatorChance;
     private final int numberOfGrowingPlants;
     private final List<MapChangeListener> subscribers = new LinkedList<>();
     private final UUID mapUUID = UUID.randomUUID();
 
-    public EquatorialWorldMap(Configuration configuration) {
+    public PoisonousPlantsWorldMap(Configuration configuration) {
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
-        this.equatorFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
+        this.equatorSize = configuration.get(SPECIAL_FIELDS_FRACTION);
         this.plantGrowAtEquatorChance = configuration.get(PLANT_GROW_AT_EQUATOR_CHANCE);
         this.numberOfGrowingPlants = configuration.get(NUMBER_OF_GROWING_PLANTS);
 
@@ -52,11 +52,11 @@ public class EquatorialWorldMap implements WorldMap {
     }
 
     private List<List<Vector2D>> buildFields() {
-        boolean[][] isEquator = new boolean[this.mapHeight][this.mapWidth];
+        boolean[][] isPoisoned = new boolean[this.mapHeight][this.mapWidth];
 
         // generating equator
         // it will be at least two rows high, with every row populated randomly
-        final int equatorSize = (int) (this.mapWidth * this.mapHeight * this.equatorFieldsFraction);
+        final int equatorSize = (int) (this.mapWidth * this.mapHeight * this.equatorSize);
         final int middleRow = this.mapHeight / 2;
         int topRowOffset = -1;
         int bottomRowOffset = 0;
@@ -73,8 +73,8 @@ public class EquatorialWorldMap implements WorldMap {
                 topRowOffset--;
                 bottomRowOffset++;
             }
-            isEquator[middleRow + topRowOffset][topRowRandom.next()] = true;
-            isEquator[middleRow + bottomRowOffset][bottomRowRandom.next()] = true;
+            isPoisoned[middleRow + topRowOffset][topRowRandom.next()] = true;
+            isPoisoned[middleRow + bottomRowOffset][bottomRowRandom.next()] = true;
         }
 
         // generate lists of vectors, they will be used to choose position for the plant
@@ -82,7 +82,7 @@ public class EquatorialWorldMap implements WorldMap {
         List<Vector2D> regularField = new ArrayList<>(this.mapWidth * this.mapHeight - equatorSize);
         for (int y = 0; y < this.mapHeight; y++) {
             for (int x = 0; x < this.mapWidth; x++) {
-                if (isEquator[y][x]) equator.add(new Vector2D(x, y));
+                if (isPoisoned[y][x]) equator.add(new Vector2D(x, y));
                 else regularField.add(new Vector2D(x, y));
             }
         }
@@ -296,7 +296,7 @@ public class EquatorialWorldMap implements WorldMap {
         Vector2D offset = direction.moveOffset;
         if ((position.getY() == this.mapHeight - 1 && offset.getY() == 1) ||
                 (position.getY() == 0 && offset.getY() == -1)
-            ) {
+        ) {
             return NextMoveType.POLAR;
         }
         // move would cause X to go out of bounds

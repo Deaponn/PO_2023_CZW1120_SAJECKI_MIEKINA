@@ -37,10 +37,10 @@
                                    GridPane.columnIndex="1"
                                    prefWidth="150.0" fx:id="mapType"/>
                         <Label GridPane.rowIndex="3"
-                               GridPane.columnIndex="0">equator size</Label>
+                               GridPane.columnIndex="0">fraction of special fields</Label>
                         <TextField GridPane.rowIndex="3"
                                    GridPane.columnIndex="1"
-                                   prefWidth="150.0" fx:id="equatorSize"/>
+                                   prefWidth="150.0" fx:id="specialFieldsFraction"/>
                         <Label GridPane.rowIndex="4"
                                GridPane.columnIndex="0">plant at equator chance</Label>
                         <TextField GridPane.rowIndex="4"
