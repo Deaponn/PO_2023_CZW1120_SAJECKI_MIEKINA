@@ -44,7 +44,7 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         BouncingImageOverlay testImageOverlay =
                 new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(10, 10));
+        testImageOverlay.setVelocity(new Vector2D(12, 8));
 
         this.worldRenderer.overlayList.add(testImageOverlay);
 

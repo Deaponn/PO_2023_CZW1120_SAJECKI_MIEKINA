@@ -6,7 +6,11 @@ import agh.ics.oop.render.WorldElementARenderer;
 
 // illegal as fuck
 @AssignRenderer(renderer = WorldElementARenderer.class)
-public class WorldElementB implements WorldElement {
+public class WorldElementB extends WorldElement {
+    public WorldElementB(Vector2D position) {
+        super(position);
+    }
+
     @Override
     public Vector2D getPosition() {
         return null;
