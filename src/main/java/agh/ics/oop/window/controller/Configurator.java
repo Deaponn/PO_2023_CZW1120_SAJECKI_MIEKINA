@@ -4,20 +4,17 @@ import agh.ics.oop.Configuration;
 import agh.ics.oop.model.MapType;
 import agh.ics.oop.window.WindowController;
 import agh.ics.oop.windowx.Toast;
-import javafx.beans.property.Property;
-import javafx.beans.value.ChangeListener;
+import agh.ics.oop.windowx.input.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
-import javafx.util.StringConverter;
-import javafx.util.converter.FloatStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 
 import static agh.ics.oop.Configuration.Fields.*;
 
-public class Configurator extends WindowController {
+public class Configurator
+        extends WindowController
+        implements InputChangeListener<InputEvent<InputField<?, Configuration.Fields>>> {
     @FXML
     public TextField mapWidth;
     @FXML
@@ -53,17 +50,20 @@ public class Configurator extends WindowController {
     @FXML
     public CheckBox saveSteps;
 
-    private Configuration configuration;
+    private ConfigurationDialogMediator dialogMediator;
 
     @Override
     public void start() {
         super.start();
 
-        this.configuration = this.getBundleItem("configuration", Configuration.class).orElseThrow();
+        Configuration configuration = this.getBundleItem("configuration", Configuration.class)
+                .orElseThrow();
+        this.dialogMediator = new ConfigurationDialogMediator(configuration);
+        this.dialogMediator.inputChangeSubscribe(this);
 
         this.addIntegerField(MAP_WIDTH, this.mapWidth);
         this.addIntegerField(MAP_HEIGHT, this.mapHeight);
-        this.addEnumField(MAP_TYPE, this.mapType, MapType.class);
+        this.addEnumField(MAP_TYPE, this.mapType, MapType.STANDARD);
         this.addIntegerField(GENOME_LENGTH, this.genomeLength);
         this.addFloatField(RANDOM_GENOME_CHANGE_CHANCE, this.randomGenomeChangeChance);
         this.addIntegerField(STARTING_PLANTS_NUMBER, this.startingPlantsNumber);
@@ -79,68 +79,37 @@ public class Configurator extends WindowController {
         this.addBooleanField(SAVE_STEPS, this.saveSteps);
     }
 
-    private <V> ChangeListener<V> createConfigurationFieldListener(
-            Property<V> property,
-            Configuration.Fields configurationKey,
-            Configuration.Field<V> configurationField) {
-        return (observable, previousValue, newValue) -> {
-            try {
-                configurationField.set(newValue);
-                this.window.showToast("Saved to disk", Toast.Duration.SHORT);
-            } catch (IllegalArgumentException e) {
-                String fieldName = configurationKey.name();
-                property.setValue(previousValue);
-                this.window.showToast("Incorrect value in " + fieldName, Toast.Duration.LONG);
-            }
-        };
-    }
-
-    private <V> void configureValueProperty(
-            Property<V> valueProperty,
-            Configuration.Fields configurationKey,
-            Configuration.Field<V> configurationField) {
-        valueProperty.setValue(configurationField.get());
-        valueProperty.addListener(this.createConfigurationFieldListener(
-                valueProperty, configurationKey, configurationField));
-    }
-
     private void addIntegerField(Configuration.Fields key, TextField textField) {
-        this.addAnyField(key, textField, new IntegerStringConverter());
+        new IntegerInputField<>(key, textField, 0, this.dialogMediator);
     }
 
     private void addFloatField(Configuration.Fields key, TextField textField) {
-        this.addAnyField(key, textField, new FloatStringConverter());
-    }
-
-    private <V> void addAnyField(
-            Configuration.Fields key, TextField textField, StringConverter<V> stringConverter) {
-        Configuration.Field<V> configurationField = this.configuration.getField(key);
-        TextFormatter<V> formatter = new TextFormatter<>(stringConverter);
-        textField.setTextFormatter(formatter);
-        this.configureValueProperty(formatter.valueProperty(), key, configurationField);
+        new FloatInputField<>(key, textField, 0f, this.dialogMediator);
     }
 
     private <T extends Enum<T>> void addEnumField(
             Configuration.Fields key,
             ChoiceBox<T> choiceBox,
-            Class<T> enumClass) {
-        Configuration.Field<T> configurationField = this.configuration.getField(key);
-        T[] enumValues = enumClass.getEnumConstants();
-        if (enumValues == null) throw new RuntimeException("not an enum");
-        choiceBox.getItems().addAll(enumValues);
-        try {
-            choiceBox.setValue(enumValues[0]);
-        } catch (IndexOutOfBoundsException e) {
-            throw new RuntimeException("empty enum");
-        }
-        this.configureValueProperty(choiceBox.valueProperty(), key, configurationField);
+            T initialValue) {
+        new EnumInputField<>(key, choiceBox, initialValue, this.dialogMediator);
     }
 
     private void addBooleanField(
             Configuration.Fields key, CheckBox checkBox) {
-        Configuration.Field<Boolean> configurationField = this.configuration.getField(key);
-        this.configureValueProperty(checkBox.selectedProperty(), key, configurationField);
+        new BooleanInputField<>(key, checkBox, false, this.dialogMediator);
     }
 
     public static final String configurationPath = "res/save/save0.xml";
+
+    @Override
+    public void inputChanged(InputEvent<InputField<?, Configuration.Fields>> inputEvent) {
+        inputEvent
+                .onPassed(event ->
+                        this.window.showToast("Saved to disk",
+                                Toast.Duration.SHORT))
+                .onInvalid(event ->
+                        this.window.showToast("Incorrect value in " +
+                                        event.getEventSource().getFieldID(),
+                                Toast.Duration.LONG));
+    }
 }

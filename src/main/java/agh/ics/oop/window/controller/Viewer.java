@@ -18,7 +18,6 @@ public class Viewer extends WindowController implements MapChangeListener {
     @FXML
     public Canvas canvas;
     private WorldRenderer worldRenderer;
-    private WorldMap worldMap;
 
     @Override
     public void start() {
@@ -42,7 +41,7 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         BouncingImageOverlay testImageOverlay =
                 new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(10, 10));
+        testImageOverlay.setVelocity(new Vector2D(12, 8));
 
         this.worldRenderer.overlayList.add(testImageOverlay);
 
@@ -50,10 +49,8 @@ public class Viewer extends WindowController implements MapChangeListener {
         TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 2f, testText);
         this.worldRenderer.overlayList.add(testTextOverlay);
 
-        this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
-        this.worldMap.mapChangeSubscribe(this);
-
-        this.worldRenderer.setWorldMap(this.worldMap);
+        WorldMap worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
+        worldMap.mapChangeSubscribe(this);
     }
 
     @Override
