@@ -17,6 +17,7 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
     // animal moves to (2, 3), and then HashMap key (2, 3) is updated,
     // it won't double move already moved Animal
     private boolean wasUpdated = false;
+    private boolean wasMoved = false;
     private boolean isAlive = true;
     private int energy;
     private final AnimalStatistics statistics;
@@ -34,11 +35,14 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
         this.wasUpdated = true;
         this.statistics.addAge();
         this.drainEnergy(1);
-        this.rotateBy(genome.getActiveGene());
+        this.rotateBy(this.genome.getActiveGene());
         this.genome.updateActiveGene();
     }
 
-    public void refreshUpdateStatus() { wasUpdated = false; }
+    public void refreshStatus() {
+        this.wasUpdated = false;
+        this.wasMoved = false;
+    }
 
     public void eat(EnergyHolder energyHolder) {
         this.supplyEnergy(energyHolder, energyHolder.getEnergy());
@@ -81,6 +85,10 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
     public boolean getAlive() { return this.isAlive; }
 
     public Genome getGenome() { return this.genome; }
+
+    public boolean wasMoved() { return this.wasMoved; }
+
+    public void move() { this.wasMoved = true; }
 
     public int compareTo(@NotNull Animal other) {
         return Animal.compare(this, other);

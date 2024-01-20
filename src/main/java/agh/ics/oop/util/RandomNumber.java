@@ -30,7 +30,6 @@ public class RandomNumber implements Iterator<Integer> {
             }
         }
         seenNumbers.add(seenIterator.nextIndex(), randomNumber);
-        System.out.println("next random number is " + randomNumber);
         return randomNumber;
     }
     public void refreshRange() {

@@ -3,6 +3,7 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.entities.Animal;
 import agh.ics.oop.entities.Plant;
 import agh.ics.oop.model.MapChangeListener;
+import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.TextOverlay;
@@ -21,6 +22,7 @@ public class Viewer extends WindowController implements MapChangeListener {
     public Canvas canvas;
     private WorldRenderer worldRenderer;
     private WorldMap worldMap;
+    private Simulation simulation;
 
     @Override
     public void start() {
@@ -57,52 +59,23 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         this.worldRenderer.setWorldMap(this.worldMap);
 
-        // Testing code
-        Thread thread = new Thread(() -> {
-            long frameMillis = 400;
-            try 
-                this.worldMap.placeElement(new Plant(new Vector2D(5, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(8, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(6, 7), 4));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(7, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(4, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(9, 7), 4));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(10, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(2, 5), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(1, 7), 4));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(10, 6), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(3, 3), 5));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Plant(new Vector2D(2, 2), 4));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Animal(new Vector2D(2, 2), 4, 0, 4, null));
-                Thread.sleep(frameMillis);
-                this.worldMap.placeElement(new Animal(new Vector2D(3, 3), 4, 0, 2, null));
+        this.simulation = this.getBundleItem("simulation", Simulation.class).orElseThrow();
 
-                while (!this.window.isClosed()) {
-                    Thread.sleep(frameMillis);
-                    this.worldMap.mapChangeNotify("update");
-                }
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-            }
-        });
-        thread.start();
+        this.window.setStageOnCloseRequest(event -> this.simulation.kill());
     }
 
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         this.worldRenderer.setWorldMap(worldMap);
         this.worldRenderer.renderView();
+    }
+
+    private void onPauseButtonClick() {
+        this.simulation.setIsPaused(!this.simulation.getIsPaused());
+    }
+
+    // set the amount of milliseconds to wait before subsequent step() calls
+    private void onChangeUpdateDelay(int newDelay) {
+        this.simulation.setUpdateDelay(newDelay);
     }
 }

@@ -130,6 +130,7 @@ public class EquatorialWorldMap implements WorldMap {
     }
 
     public void step() {
+        System.out.println("stepping");
         this.removeDead();
         this.moveAnimals();
         this.orderOnFields();
@@ -140,10 +141,12 @@ public class EquatorialWorldMap implements WorldMap {
     }
 
     private void removeDead() {
-        for (List<Animal> animalList : this.animals.values()) {
+        for (Vector2D animalPosition : this.animals.keySet()) {
+            List<Animal> animalList = this.animals.get(animalPosition);
             for (int i = animalList.size() - 1; i >= 0; i--) {
                 if (!animalList.get(i).getAlive()) animalList.remove(i);
             }
+            if (animalList.isEmpty()) this.animals.remove(animalPosition);
         }
     }
 
@@ -151,7 +154,6 @@ public class EquatorialWorldMap implements WorldMap {
         Set<Vector2D> uniqueAnimalsPositions = this.animals.keySet();
         for (Vector2D uniquePosition : uniqueAnimalsPositions) {
             List<Animal> animalList = this.animals.get(uniquePosition);
-            if (animalList.isEmpty()) continue;
             for (int i = animalList.size() - 1; i >= 0; i--) {
                 Animal animal = animalList.get(i);
                 animal.update();
@@ -193,7 +195,7 @@ public class EquatorialWorldMap implements WorldMap {
     private void refreshAnimals() {
         for (List<Animal> animalList : this.animals.values()) {
             for (Animal animal : animalList) {
-                animal.refreshUpdateStatus();
+                animal.refreshStatus();
             }
         }
     }
@@ -220,6 +222,8 @@ public class EquatorialWorldMap implements WorldMap {
 
     @Override
     public void moveAnimal(Animal animal) {
+        if (animal.wasMoved()) return;
+        animal.move();
         Vector2D position = animal.getPosition();
         MapDirection direction = animal.getDirection();
         switch (moveType(position, direction)) {
