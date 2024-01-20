@@ -64,6 +64,11 @@ tasks.test {
 }
 
 jlink {
+    options.set(listOf(
+        "--strip-debug",
+        "--compress", "2",
+        "--no-header-files",
+        "--no-man-pages"))
     launcher {
         name = "PO_2023_CZW1120_SAJECKI_MIEKINA"
     }
