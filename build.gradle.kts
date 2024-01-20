@@ -2,7 +2,7 @@ plugins {
     id("java")
     id("application")
     id("org.openjfx.javafxplugin").version("0.0.13")
-    id("com.github.johnrengelman.shadow").version("8.1.1")
+    id("org.beryx.jlink").version("2.26.0")
 }
 
 group = "agh.ics.oop"
@@ -37,6 +37,7 @@ sourceSets.test {
 }
 
 application {
+    mainModule.set("Project.main")
     mainClass.set("agh.ics.oop.Main")
 }
 
@@ -52,8 +53,18 @@ tasks.build {
         from("res")
         into("build/libs/res")
     }
+    copy {
+        from("res")
+        into("build/image/bin/res")
+    }
 }
 
 tasks.test {
     useJUnit()
+}
+
+jlink {
+    launcher {
+        name = "PO_2023_CZW1120_SAJECKI_MIEKINA"
+    }
 }
