@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,34 +25,33 @@ public abstract class Exporter<T> {
 
     public Exporter<T> exportToOutputStream(OutputStream outputStream) throws IOException {
         this.writeRepresentation(outputStream);
-
         return this;
     }
 
     public Exporter<T> exportToPath(Path path) throws ResourceNotFoundException {
         String filePath = path.toAbsolutePath().toString();
         try (OutputStream outputStream = new FileOutputStream(filePath)) {
-            this.exportToOutputStream(outputStream);
+            return this.exportToOutputStream(outputStream);
         } catch (IOException e) {
             throw new ResourceNotFoundException(filePath);
         }
-
-        return this;
     }
 
     public Exporter<T> exportToURL(URL url) throws ResourceNotFoundException {
         try (OutputStream outputStream = url.openConnection().getOutputStream()) {
-            this.exportToOutputStream(outputStream);
+            return this.exportToOutputStream(outputStream);
         } catch (IOException e) {
             throw new ResourceNotFoundException(url.getFile());
         }
-
-        return this;
     }
 
     public Exporter<T> pushObject(T object) {
         this.objectList.add(object);
+        return this;
+    }
 
+    public Exporter<T> pushObjects(Collection<T> objects) {
+        this.objectList.addAll(objects);
         return this;
     }
 
