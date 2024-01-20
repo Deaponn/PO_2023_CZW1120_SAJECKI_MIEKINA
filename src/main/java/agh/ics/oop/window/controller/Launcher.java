@@ -2,6 +2,8 @@ package agh.ics.oop.window.controller;
 
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.EquatorialWorldMap;
+import agh.ics.oop.model.Simulation;
+import agh.ics.oop.model.SimulationEngine;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.resource.ResourceNotFoundException;
@@ -14,6 +16,7 @@ import agh.ics.oop.windowx.Toast;
 
 public class Launcher extends WindowController {
     private Configuration configuration = new Configuration();
+    private final SimulationEngine simulationEngine = new SimulationEngine();
 
     @Override
     public void start() {
@@ -44,11 +47,13 @@ public class Launcher extends WindowController {
         try {
             WorldMap worldMap = new EquatorialWorldMap(this.configuration);
             ImageMap imageMap = new ImageMap("res/gfx", "png");
+            Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
             Bundle viewerBundle = new Bundle()
                     .send("configuration", this.configuration)
                     .send("world_map", worldMap)
-                    .send("image_map", imageMap);
+                    .send("image_map", imageMap)
+                    .send("simulation", simulation);
 
             viewerWindow.start(viewerBundle);
         } catch (ResourceNotFoundException e) {
