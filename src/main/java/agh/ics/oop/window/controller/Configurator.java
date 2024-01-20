@@ -50,20 +50,21 @@ public class Configurator
     @FXML
     public CheckBox saveSteps;
 
+    private Configuration configuration;
     private ConfigurationDialogMediator dialogMediator;
 
     @Override
     public void start() {
         super.start();
 
-        Configuration configuration = this.getBundleItem("configuration", Configuration.class)
+        this.configuration = this.getBundleItem("configuration", Configuration.class)
                 .orElseThrow();
-        this.dialogMediator = new ConfigurationDialogMediator(configuration);
+        this.dialogMediator = new ConfigurationDialogMediator(this.configuration);
         this.dialogMediator.inputChangeSubscribe(this);
 
         this.addIntegerField(MAP_WIDTH, this.mapWidth);
         this.addIntegerField(MAP_HEIGHT, this.mapHeight);
-        this.addEnumField(MAP_TYPE, this.mapType, MapType.STANDARD);
+        this.addEnumField(MAP_TYPE, this.mapType);
         this.addIntegerField(GENOME_LENGTH, this.genomeLength);
         this.addFloatField(RANDOM_GENOME_CHANGE_CHANCE, this.randomGenomeChangeChance);
         this.addIntegerField(STARTING_PLANTS_NUMBER, this.startingPlantsNumber);
@@ -80,23 +81,26 @@ public class Configurator
     }
 
     private void addIntegerField(Configuration.Fields key, TextField textField) {
-        new IntegerInputField<>(key, textField, 0, this.dialogMediator);
+        new IntegerInputField<>(key, textField,
+                this.configuration.get(key), this.dialogMediator);
     }
 
     private void addFloatField(Configuration.Fields key, TextField textField) {
-        new FloatInputField<>(key, textField, 0f, this.dialogMediator);
+        new FloatInputField<>(key, textField,
+                this.configuration.get(key), this.dialogMediator);
     }
 
     private <T extends Enum<T>> void addEnumField(
             Configuration.Fields key,
-            ChoiceBox<T> choiceBox,
-            T initialValue) {
-        new EnumInputField<>(key, choiceBox, initialValue, this.dialogMediator);
+            ChoiceBox<T> choiceBox) {
+        new EnumInputField<>(key, choiceBox,
+                this.configuration.get(key), this.dialogMediator);
     }
 
     private void addBooleanField(
             Configuration.Fields key, CheckBox checkBox) {
-        new BooleanInputField<>(key, checkBox, false, this.dialogMediator);
+        new BooleanInputField<>(key, checkBox,
+                this.configuration.get(key), this.dialogMediator);
     }
 
     public static final String configurationPath = "res/save/save0.xml";
