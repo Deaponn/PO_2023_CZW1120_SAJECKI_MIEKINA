@@ -5,44 +5,26 @@ import agh.ics.oop.entities.*;
 import agh.ics.oop.util.RandomNumber;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static agh.ics.oop.Configuration.Fields.*;
 
-public class PoisonousPlantsWorldMap implements WorldMap {
-    private final AnimalFactory animalFactory;
-    private final PlantFactory plantFactory;
-    private final Map<Vector2D, List<Animal>> animals = new ConcurrentHashMap<>();
-    private final Map<Vector2D, Plant> plants = new ConcurrentHashMap<>();
+public class PoisonousPlantsWorldMap extends AbstractWorldMap implements WorldMap {
     private final RandomNumber randomFieldIndex;
-    private final int mapWidth;
-    private final int mapHeight;
     private final float poisonousFieldsFraction;
     private Vector2D poisonousFieldStartPosition;
     private Vector2D poisonousFieldEndPosition;
-    private final int numberOfGrowingPlants;
-    private final List<MapChangeListener> subscribers = new LinkedList<>();
-    private final UUID mapUUID = UUID.randomUUID();
 
     public PoisonousPlantsWorldMap(Configuration configuration) {
-        this.mapWidth = configuration.get(MAP_WIDTH);
-        this.mapHeight = configuration.get(MAP_HEIGHT);
-        this.poisonousFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
-        this.numberOfGrowingPlants = configuration.get(NUMBER_OF_GROWING_PLANTS);
-        this.randomFieldIndex = new RandomNumber(0, this.mapHeight * this.mapWidth);
+        super(configuration);
 
-        GenomeFactory genomeFactory = new GenomeFactory(configuration);
-        this.animalFactory = new AnimalFactory(configuration, genomeFactory);
-        this.plantFactory = new PlantFactory(configuration);
+        this.poisonousFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
+        this.randomFieldIndex = new RandomNumber(0, this.mapHeight * this.mapWidth);
 
         this.buildFields();
 
         growPlants(configuration.get(STARTING_PLANTS_NUMBER));
 
-        populateWithAnimals(configuration.get(STARTING_ANIMALS_NUMBER), configuration.get(INITIAL_ANIMAL_ENERGY));
-
-        System.out.println("MAP OBJECT IS BUILT CORRECTLY");
+        System.out.println("MAP OBJECT IS BUILT CORRECTLY POISONOUS PLANTS");
     }
 
     private void buildFields() {
@@ -67,7 +49,7 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         System.out.println("POISONOUS PLANT START " + this.poisonousFieldStartPosition + " END " + this.poisonousFieldEndPosition);
     }
 
-    private void growPlants() { this.growPlants(this.numberOfGrowingPlants); }
+    protected void growPlants() { this.growPlants(this.numberOfGrowingPlants); }
 
     private void growPlants(int numberOfPlants) {
         for (int i = 0; i < numberOfPlants; i++) {
@@ -84,55 +66,7 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         }
     }
 
-    private void populateWithAnimals(int startingAnimalsNumber, int initialAnimalEnergy) {
-        for (int i = 0; i < startingAnimalsNumber; i++) {
-            Vector2D randomPosition = new Vector2D(random.nextInt(this.mapWidth), random.nextInt(this.mapHeight));
-            Animal animal = this.animalFactory.create(randomPosition, initialAnimalEnergy);
-            this.placeElement(animal);
-        }
-    }
-
-    public void step() {
-        System.out.println("stepping");
-        this.removeDead();
-        this.moveAnimals();
-        this.orderOnFields();
-        this.eatPlants();
-        this.breedAnimals();
-        this.growPlants();
-        this.refreshAnimals();
-        this.mapChangeNotify("step");
-    }
-
-    private void removeDead() {
-        for (Vector2D animalPosition : this.animals.keySet()) {
-            List<Animal> animalList = this.animals.get(animalPosition);
-            for (int i = animalList.size() - 1; i >= 0; i--) {
-                if (!animalList.get(i).getAlive()) animalList.remove(i);
-            }
-            if (animalList.isEmpty()) this.animals.remove(animalPosition);
-        }
-    }
-
-    private void moveAnimals() {
-        Set<Vector2D> uniqueAnimalsPositions = this.animals.keySet();
-        for (Vector2D uniquePosition : uniqueAnimalsPositions) {
-            List<Animal> animalList = this.animals.get(uniquePosition);
-            for (int i = animalList.size() - 1; i >= 0; i--) {
-                Animal animal = animalList.get(i);
-                animal.update();
-                moveAnimal(animal);
-            }
-        }
-    }
-
-    private void orderOnFields() {
-        for (List<Animal> animalList : this.animals.values()) {
-            animalList.sort(null);
-        }
-    }
-
-    private void eatPlants() {
+    protected void eatPlants() {
         for (Plant plant : this.plants.values()) {
             Vector2D position = plant.getPosition();
             if (this.animals.containsKey(position) && !this.animals.get(position).isEmpty()) {
@@ -142,44 +76,6 @@ public class PoisonousPlantsWorldMap implements WorldMap {
                 this.randomFieldIndex.restoreNumber(position.getX() + position.getY() * this.mapWidth);
             }
         }
-    }
-
-    private void breedAnimals() {
-        for (List<Animal> animalList : this.animals.values()) {
-            for (int i = 0; i < animalList.size() - 1; i += 2) {
-                if (!this.animalFactory.canBreed(animalList.get(i), animalList.get(i + 1))) break;
-                Animal kid = this.animalFactory.breedAnimals(animalList.get(i), animalList.get(i + 1));
-                this.placeElement(kid);
-            }
-        }
-    }
-
-    private void refreshAnimals() {
-        for (List<Animal> animalList : this.animals.values()) {
-            for (Animal animal : animalList) {
-                animal.refreshStatus();
-            }
-        }
-    }
-
-    // below function assumes that Plant positions are always unique
-    @Override
-    public void placeElement(WorldElement worldElement) {
-        if (worldElement instanceof Plant plant) {
-            plants.put(worldElement.getPosition(), plant);
-        }
-
-        if (worldElement instanceof Animal animal) {
-            if (animals.containsKey(animal.getPosition())) {
-                animals.get(animal.getPosition()).add(animal);
-            } else {
-                List<Animal> list = new CopyOnWriteArrayList<>();
-                list.add(animal);
-                animals.put(animal.getPosition(), list);
-            }
-        }
-
-        this.mapChangeNotify("place");
     }
 
     public void moveAnimal(Animal animal) {
@@ -208,58 +104,6 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         animal.move();
     }
 
-    // is it necessary? there is no scenario when a move could be illegal
-    @Override
-    public boolean isOccupied(Vector2D position) {
-        return false;
-    }
-
-    @Override
-    public List<WorldElement> getElements(Vector2D position) {
-        List<WorldElement> elementList = new LinkedList<>();
-        elementList.add(new Ground(position));
-
-        Plant plant = this.plants.get(position);
-        if (plant != null) elementList.add(plant);
-
-        List<Animal> animalList = this.animals.get(position);
-        if (animalList != null) elementList.addAll(animalList);
-
-        return elementList;
-    }
-
-    @Override
-    public Boundary getCurrentBounds() {
-        return Boundary.fromSize(this.mapWidth, this.mapHeight);
-    }
-
-    @Override
-    public UUID getID() {
-        return mapUUID;
-    }
-
-    @Override
-    public void mapChangeSubscribe(MapChangeListener listener) {
-        subscribers.add(listener);
-    }
-
-    @Override
-    public void mapChangeUnsubscribe(MapChangeListener listener) {
-        subscribers.remove(listener);
-    }
-
-    @Override
-    public void mapChangeNotify(String message) {
-        for (MapChangeListener subscriber : subscribers) {
-            subscriber.mapChanged(this, message);
-        }
-    }
-
-    @Override
-    public boolean mapChangeIsSubscribed(MapChangeListener listener) {
-        return subscribers.contains(listener);
-    }
-
     public NextMoveType moveType(Vector2D position, MapDirection direction, boolean dodgedAlready) {
         // move would cause to eat a poisonous plant
         Vector2D newPosition = position.add(direction.moveOffset);
@@ -269,19 +113,7 @@ public class PoisonousPlantsWorldMap implements WorldMap {
                 newPosition.getY() <= this.poisonousFieldStartPosition.getY());
         if (!dodgedAlready && this.plants.containsKey(newPosition) && !isOnHealthyArea) return NextMoveType.DODGE;
 
-        // move would cause Y to go out of bounds
-        Vector2D offset = direction.moveOffset;
-        if ((position.getY() == this.mapHeight - 1 && offset.getY() == 1) ||
-                (position.getY() == 0 && offset.getY() == -1)
-        ) {
-            return NextMoveType.POLAR;
-        }
-        // move would cause X to go out of bounds
-        if (position.getX() == this.mapWidth - 1 && offset.getX() == 1)
-            return NextMoveType.LEAP_TO_LEFT;
-        if (position.getX() == 0 && offset.getX() == -1)
-            return NextMoveType.LEAP_TO_RIGHT;
-        return NextMoveType.REGULAR;
+        return super.moveType(position, direction);
     }
 
     private final static Random random = new Random();
