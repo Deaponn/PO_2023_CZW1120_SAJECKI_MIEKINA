@@ -32,8 +32,12 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: jlinkZip
+    - name: get release name
+      run: echo "build_sig=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
     - name: Release app image
       uses: ncipollo/release-action@v1
       with:
         artifacts: "build/app-image.zip"
+        tag: ${{ format('build:{0}:{1}', env.build_sig, github.event.head_commit.message) }}
+        commit: ${{ github.sha }}
           
