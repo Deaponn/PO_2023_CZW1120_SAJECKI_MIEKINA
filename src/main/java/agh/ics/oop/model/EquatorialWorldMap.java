@@ -138,6 +138,7 @@ public class EquatorialWorldMap implements WorldMap {
         this.breedAnimals();
         this.growPlants();
         this.refreshAnimals();
+        this.mapChangeNotify("step");
     }
 
     private void removeDead() {
@@ -252,7 +253,8 @@ public class EquatorialWorldMap implements WorldMap {
         if (plant != null) elementList.add(plant);
 
         List<Animal> animalList = this.animals.get(position);
-        if (animalList != null) elementList.addAll(animalList);
+        if (animalList != null && !animalList.isEmpty())
+            elementList.add(animalList.get(0));
 
         return elementList;
     }

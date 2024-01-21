@@ -1,7 +1,5 @@
 package agh.ics.oop.window.controller;
 
-import agh.ics.oop.entities.Animal;
-import agh.ics.oop.entities.Plant;
 import agh.ics.oop.model.MapChangeListener;
 import agh.ics.oop.model.Simulation;
 import agh.ics.oop.model.Vector2D;
@@ -44,9 +42,9 @@ public class Viewer extends WindowController implements MapChangeListener {
                 "font0_atlas",
                 (image) -> new ImageAtlasSampler(image, new Vector2D(10, 16)));
 
-//        BouncingImageOverlay testImageOverlay =
-//                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-//        testImageOverlay.setVelocity(new Vector2D(10, 10));
+        BouncingImageOverlay testImageOverlay =
+                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+        testImageOverlay.setVelocity(new Vector2D(12, 8));
 
 //        this.worldRenderer.overlayList.add(testImageOverlay);
 
@@ -66,8 +64,10 @@ public class Viewer extends WindowController implements MapChangeListener {
 
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
-        this.worldRenderer.setWorldMap(worldMap);
-        this.worldRenderer.renderView();
+        if (message.equals("step")) {
+            this.worldRenderer.setWorldMap(worldMap);
+            this.worldRenderer.renderView();
+        }
     }
 
     private void onPauseButtonClick() {

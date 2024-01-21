@@ -50,6 +50,7 @@ public class Launcher extends WindowController {
             Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
             Bundle viewerBundle = new Bundle()
+                    .send("configuration", this.configuration)
                     .send("world_map", worldMap)
                     .send("image_map", imageMap)
                     .send("simulation", simulation);

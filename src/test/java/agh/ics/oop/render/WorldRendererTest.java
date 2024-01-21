@@ -22,7 +22,7 @@ public class WorldRendererTest {
     @Test
     public void renderInvalidElement() {
         WorldRenderer worldRenderer = this.getWorldRenderer();
-        WorldElementB element = new WorldElementB();
+        WorldElementB element = new WorldElementB(new Vector2D());
         Assert.assertThrows(IllegalRendererAssignment.class, () -> worldRenderer.renderUnit(element));
     }
 
