@@ -64,6 +64,7 @@ tasks.test {
 }
 
 jlink {
+    imageName.set("app-image")
     options.set(listOf(
         "--strip-debug",
         "--compress", "2",
