@@ -35,6 +35,7 @@ jobs:
       with:
         artifacts: out/*/app-image-*.zip
         token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true
         tag: ${{ format('build-{0}', github.run_number) }}
         commit: ${{ github.sha }}
     
