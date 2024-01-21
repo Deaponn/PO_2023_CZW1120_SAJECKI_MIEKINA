@@ -28,13 +28,12 @@ jobs:
       with:
         java-version: '18'
         distribution: 'temurin'
-    - name: Build with Gradle
+    - name: Build app image with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        arguments: build
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.2.0
+        arguments: jlinkZip
+    - name: Release app image
+      uses: ncipollo/release-action@v1
       with:
-        name: app-jar
-        path: build/libs/Project-1.0-SNAPSHOT.jar
+        artifacts: "build/app-image.zip"
           
