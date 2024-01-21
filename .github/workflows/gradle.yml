@@ -39,6 +39,6 @@ jobs:
       with:
         artifacts: "build/app-image.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ format('build:{0}:{1}', env.build_sig, github.event.head_commit.message) }}
+        tag: ${{ format('build/{0}/{1}', env.build_sig, github.ref) }}
         commit: ${{ github.sha }}
           
