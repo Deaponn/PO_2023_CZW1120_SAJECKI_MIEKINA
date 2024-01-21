@@ -28,10 +28,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: out/
+    - name: View artifacts
+      run: ls -R out/
     - name: Release artifacts
       uses: ncipollo/release-action@v1
       with:
-        artifacts: out/*/app-image.zip
+        artifacts: out/*/app-image-*.zip
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ format('build-{0}', github.run_number) }}
         commit: ${{ github.sha }}
@@ -48,15 +50,16 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        job-id: build-linux
         arguments: jlinkZip
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-linux.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: output-artifact-linux
-        path: build/app-image.zip
+        path: build/app-image-linux.zip
 
   build-windows:
 
@@ -70,15 +73,16 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        job-id: build-windows
         arguments: jlinkZip
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-windows.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: output-artifact-windows
-        path: build/app-image.zip
+        path: build/app-image-windows.zip
 
   build-macos:
 
@@ -92,12 +96,13 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        job-id: build-macos
         arguments: jlinkZip
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-macos.zip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: output-artifact-macos
-        path: build/app-image.zip
+        path: build/app-image-macos.zip
