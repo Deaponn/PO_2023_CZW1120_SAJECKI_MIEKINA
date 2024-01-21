@@ -65,14 +65,6 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         );
 
         System.out.println("POISONOUS PLANT START " + this.poisonousFieldStartPosition + " END " + this.poisonousFieldEndPosition);
-
-        for (int i = 0; i < this.mapWidth; i++) {
-            for (int j = 0; j < this.mapHeight; j++) {
-                Vector2D pos = new Vector2D(i, j);
-                System.out.println("vector is " + pos + ", first " + pos.follows(this.poisonousFieldStartPosition)
-                        + ", second " + pos.precedes(this.poisonousFieldEndPosition));
-            }
-        }
     }
 
     private void growPlants() { this.growPlants(this.numberOfGrowingPlants); }
@@ -109,6 +101,7 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         this.breedAnimals();
         this.growPlants();
         this.refreshAnimals();
+        this.mapChangeNotify("step");
     }
 
     private void removeDead() {

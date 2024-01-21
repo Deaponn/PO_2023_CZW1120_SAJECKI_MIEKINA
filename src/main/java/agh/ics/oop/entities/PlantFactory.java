@@ -17,7 +17,6 @@ public class PlantFactory {
     }
 
     public Plant create(Vector2D position, boolean isEdible) {
-        System.out.println((isEdible ? "good plant at " : "bad plant at ") + position);
-        return new Plant(position, (isEdible ? 1 : -100) * this.plantEnergy);
+        return new Plant(position, (isEdible ? 1 : -1) * this.plantEnergy);
     }
 }
