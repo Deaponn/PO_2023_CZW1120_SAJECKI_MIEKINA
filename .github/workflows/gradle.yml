@@ -31,10 +31,7 @@ jobs:
     - name: Release artifacts
       uses: ncipollo/release-action@v1
       with:
-        artifacts: 
-          out/output-artifact-linux, 
-          out/output-artifact-windows, 
-          out/output-artifact-macos
+        artifacts: out/*/app-image.zip
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ format('build-{0}', github.run_number) }}
         commit: ${{ github.sha }}
@@ -51,7 +48,7 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
       with:
         job-id: build-linux
         arguments: jlinkZip
@@ -73,7 +70,7 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
       with:
         job-id: build-windows
         arguments: jlinkZip
@@ -95,7 +92,7 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: burrunan/gradle-cache-action@v1
+      uses: burrunan/gradle-cache-action@a54b6ce2cbbba932e5d142129dddef103e6ad143
       with:
         job-id: build-macos
         arguments: jlinkZip
