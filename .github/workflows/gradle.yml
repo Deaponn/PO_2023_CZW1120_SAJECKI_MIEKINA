@@ -24,19 +24,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Get release number
-      run: echo 'build_sig=$GITHUB_RUN_NUMBER' >> $GITHUB_ENV
     - name: Download artifacts
       uses: actions/download-artifact@v3
       with:
-        pattern: output-artifact-*
         path: out/
     - name: Release artifacts
       uses: ncipollo/release-action@v1
       with:
-        artifacts: out/*
+        artifacts: 
+          out/output-artifact-linux, 
+          out/output-artifact-windows, 
+          out/output-artifact-macos
         token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ format('build-{0}/{1}', env.build_sig, github.sha) }}
+        tag: ${{ format('build-{0}', github.run_number) }}
         commit: ${{ github.sha }}
     
   build-linux:
@@ -51,8 +51,9 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      uses: burrunan/gradle-cache-action@v1
       with:
+        job-id: build-linux
         arguments: jlinkZip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -72,8 +73,9 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      uses: burrunan/gradle-cache-action@v1
       with:
+        job-id: build-windows
         arguments: jlinkZip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
@@ -93,8 +95,9 @@ jobs:
         java-version: '18'
         distribution: 'corretto'
     - name: Build app image with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      uses: burrunan/gradle-cache-action@v1
       with:
+        job-id: build-macos
         arguments: jlinkZip
     - name: Upload artifact
       uses: actions/upload-artifact@v3
