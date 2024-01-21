@@ -25,7 +25,7 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      *
      * @param animal entity to move.
      */
-    void moveAnimal(Animal animal);
+//    void moveAnimal(Animal animal);
 
     /**
      * Return true if given position on the map is occupied. Should not be

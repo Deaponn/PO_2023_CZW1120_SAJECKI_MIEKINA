@@ -44,15 +44,15 @@ public class Viewer extends WindowController implements MapChangeListener {
                 "font0_atlas",
                 (image) -> new ImageAtlasSampler(image, new Vector2D(10, 16)));
 
-        BouncingImageOverlay testImageOverlay =
-                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(10, 10));
+//        BouncingImageOverlay testImageOverlay =
+//                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+//        testImageOverlay.setVelocity(new Vector2D(10, 10));
 
-        this.worldRenderer.overlayList.add(testImageOverlay);
+//        this.worldRenderer.overlayList.add(testImageOverlay);
 
-        String testText = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789_?!-=><;:,.";
-        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 2f, testText);
-        this.worldRenderer.overlayList.add(testTextOverlay);
+//        String testText = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789_?!-=><;:,.";
+//        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 2f, testText);
+//        this.worldRenderer.overlayList.add(testTextOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);

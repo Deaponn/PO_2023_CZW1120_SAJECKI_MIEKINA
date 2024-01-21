@@ -15,14 +15,12 @@ public class PoisonousPlantsWorldMap implements WorldMap {
     private final PlantFactory plantFactory;
     private final Map<Vector2D, List<Animal>> animals = new ConcurrentHashMap<>();
     private final Map<Vector2D, Plant> plants = new ConcurrentHashMap<>();
-    private final List<Vector2D> equator;
-    private final RandomNumber randomEquatorIndex;
-    private final List<Vector2D> regularField;
-    private final RandomNumber randomRegularFieldIndex;
+    private final RandomNumber randomFieldIndex;
     private final int mapWidth;
     private final int mapHeight;
-    private final float equatorSize;
-    private final float plantGrowAtEquatorChance;
+    private final float poisonousFieldsFraction;
+    private Vector2D poisonousFieldStartPosition;
+    private Vector2D poisonousFieldEndPosition;
     private final int numberOfGrowingPlants;
     private final List<MapChangeListener> subscribers = new LinkedList<>();
     private final UUID mapUUID = UUID.randomUUID();
@@ -30,19 +28,15 @@ public class PoisonousPlantsWorldMap implements WorldMap {
     public PoisonousPlantsWorldMap(Configuration configuration) {
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
-        this.equatorSize = configuration.get(SPECIAL_FIELDS_FRACTION);
-        this.plantGrowAtEquatorChance = configuration.get(PLANT_GROW_AT_EQUATOR_CHANCE);
+        this.poisonousFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
         this.numberOfGrowingPlants = configuration.get(NUMBER_OF_GROWING_PLANTS);
+        this.randomFieldIndex = new RandomNumber(0, this.mapHeight * this.mapWidth);
 
         GenomeFactory genomeFactory = new GenomeFactory(configuration);
         this.animalFactory = new AnimalFactory(configuration, genomeFactory);
         this.plantFactory = new PlantFactory(configuration);
 
-        List<List<Vector2D>> fields = buildFields();
-        equator = fields.get(0);
-        regularField = fields.get(1);
-        randomEquatorIndex = new RandomNumber(0, equator.size());
-        randomRegularFieldIndex = new RandomNumber(0, regularField.size());
+        this.buildFields();
 
         growPlants(configuration.get(STARTING_PLANTS_NUMBER));
 
@@ -51,73 +45,50 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         System.out.println("MAP OBJECT IS BUILT CORRECTLY");
     }
 
-    private List<List<Vector2D>> buildFields() {
-        boolean[][] isPoisoned = new boolean[this.mapHeight][this.mapWidth];
+    private void buildFields() {
+        // generating poisonous square
+        // the equation comes from
+        // A - map area, x, y - map dimensions, A = x * y
+        // B - poisonous square area, x' - square side length, B = (x')^2
+        // p - fraction of poisonous plants
+        // B = (x')^2 = p * A = p * x * y
+        // x' = sqrt(p * x * y)
+        final int poisonousFieldsSize = (int) Math.sqrt(this.mapWidth * this.mapHeight * this.poisonousFieldsFraction);
+        // lower left corner
+        this.poisonousFieldStartPosition = new Vector2D(
+                random.nextInt(this.mapWidth - poisonousFieldsSize),
+                random.nextInt(poisonousFieldsSize, this.mapHeight)
+        );
+        // upper right corner
+        this.poisonousFieldEndPosition = this.poisonousFieldStartPosition.add(
+                new Vector2D(poisonousFieldsSize, -poisonousFieldsSize)
+        );
 
-        // generating equator
-        // it will be at least two rows high, with every row populated randomly
-        final int equatorSize = (int) (this.mapWidth * this.mapHeight * this.equatorSize);
-        final int middleRow = this.mapHeight / 2;
-        int topRowOffset = -1;
-        int bottomRowOffset = 0;
+        System.out.println("POISONOUS PLANT START " + this.poisonousFieldStartPosition + " END " + this.poisonousFieldEndPosition);
 
-        // returns numbers in range [a, b) with no duplicates
-        RandomNumber topRowRandom = new RandomNumber(0, this.mapWidth);
-        RandomNumber bottomRowRandom = new RandomNumber(0, this.mapWidth);
-        for (int i = 0; i < equatorSize; i += 2) {
-            // both rows' free spaces for the equator end at the same time
-            // refreshing random numbers, and marching one row further into the map
-            if (!topRowRandom.hasNext()) {
-                topRowRandom.refreshRange();
-                bottomRowRandom.refreshRange();
-                topRowOffset--;
-                bottomRowOffset++;
-            }
-            isPoisoned[middleRow + topRowOffset][topRowRandom.next()] = true;
-            isPoisoned[middleRow + bottomRowOffset][bottomRowRandom.next()] = true;
-        }
-
-        // generate lists of vectors, they will be used to choose position for the plant
-        List<Vector2D> equator = new ArrayList<>(equatorSize);
-        List<Vector2D> regularField = new ArrayList<>(this.mapWidth * this.mapHeight - equatorSize);
-        for (int y = 0; y < this.mapHeight; y++) {
-            for (int x = 0; x < this.mapWidth; x++) {
-                if (isPoisoned[y][x]) equator.add(new Vector2D(x, y));
-                else regularField.add(new Vector2D(x, y));
+        for (int i = 0; i < this.mapWidth; i++) {
+            for (int j = 0; j < this.mapHeight; j++) {
+                Vector2D pos = new Vector2D(i, j);
+                System.out.println("vector is " + pos + ", first " + pos.follows(this.poisonousFieldStartPosition)
+                        + ", second " + pos.precedes(this.poisonousFieldEndPosition));
             }
         }
-
-        // code to test the above solution
-        // TODO: remove when development is finished
-        this.printMapState();
-
-        return List.of(equator, regularField);
-    }
-
-    public void printMapState() {
-        final StringBuilder sb = new StringBuilder("|");
-        for (int y = 0; y < this.mapHeight; y++) {
-            for (int x = 0; x < this.mapWidth; x++) {
-                Vector2D position = new Vector2D(x, y);
-                if (this.animals.containsKey(position) && !this.animals.get(position).isEmpty())
-                    sb.append("|").append(this.animals.get(position).get(0));
-                else if (this.plants.containsKey(position)) sb.append("|*");
-                else sb.append("| ");
-            }
-            sb.append("||\n|");
-        }
-        System.out.println(sb);
     }
 
     private void growPlants() { this.growPlants(this.numberOfGrowingPlants); }
 
     private void growPlants(int numberOfPlants) {
         for (int i = 0; i < numberOfPlants; i++) {
-            Vector2D plantPosition = null;
-            if (random.nextDouble() < this.plantGrowAtEquatorChance && randomEquatorIndex.hasNext())
-                plantPosition = equator.get(randomEquatorIndex.next());
-            else if (randomRegularFieldIndex.hasNext()) plantPosition = regularField.get(randomRegularFieldIndex.next());
-            if (plantPosition != null) this.placeElement(plantFactory.create(plantPosition));
+            if (!this.randomFieldIndex.hasNext()) return;
+            int randomFieldIndex = this.randomFieldIndex.next();
+            Vector2D plantPosition = new Vector2D(
+                    randomFieldIndex % this.mapWidth, randomFieldIndex / this.mapWidth
+            );
+            boolean isOnHealthyArea = !(this.poisonousFieldStartPosition.getX() <= plantPosition.getX() &&
+                    plantPosition.getX() <= this.poisonousFieldEndPosition.getX() &&
+                    this.poisonousFieldEndPosition.getY() <= plantPosition.getY() &&
+                    plantPosition.getY() <= this.poisonousFieldStartPosition.getY());
+            this.placeElement(plantFactory.create(plantPosition, isOnHealthyArea));
         }
     }
 
@@ -175,9 +146,7 @@ public class PoisonousPlantsWorldMap implements WorldMap {
                 Animal animal = this.animals.get(position).get(0);
                 animal.eat(plant);
                 plants.remove(position);
-                int equatorIndex = equator.indexOf(position);
-                if (equatorIndex != -1) randomEquatorIndex.restoreNumber(equatorIndex);
-                else randomRegularFieldIndex.restoreNumber(regularField.indexOf(position));
+                this.randomFieldIndex.restoreNumber(position.getX() + position.getY() * this.mapWidth);
             }
         }
     }
@@ -220,22 +189,30 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         this.mapChangeNotify("place");
     }
 
-    @Override
     public void moveAnimal(Animal animal) {
+        this.moveAnimal(animal, false);
+    }
+
+    public void moveAnimal(Animal animal, boolean dodgedAlready) {
         if (animal.wasMoved()) return;
-        animal.move();
         Vector2D position = animal.getPosition();
         MapDirection direction = animal.getDirection();
-        switch (moveType(position, direction)) {
+        switch (moveType(position, direction, dodgedAlready)) {
             case REGULAR -> animal.setPosition(position.add(direction.moveOffset));
             case POLAR -> animal.rotateBy(MoveDirection.ROTATE_180);
             case LEAP_TO_LEFT -> animal.setPosition(new Vector2D(0, position.getY()));
             case LEAP_TO_RIGHT -> animal.setPosition(new Vector2D(this.mapWidth - 1, position.getY()));
+            case DODGE -> {
+                animal.genomeRotation();
+                this.moveAnimal(animal, true);
+                return;
+            }
         }
         if (position != animal.getPosition()) {
             animals.get(position).remove(animal);
             placeElement(animal);
         }
+        animal.move();
     }
 
     // is it necessary? there is no scenario when a move could be illegal
@@ -290,8 +267,15 @@ public class PoisonousPlantsWorldMap implements WorldMap {
         return subscribers.contains(listener);
     }
 
-    @Override
-    public NextMoveType moveType(Vector2D position, MapDirection direction) {
+    public NextMoveType moveType(Vector2D position, MapDirection direction, boolean dodgedAlready) {
+        // move would cause to eat a poisonous plant
+        Vector2D newPosition = position.add(direction.moveOffset);
+        boolean isOnHealthyArea = !(this.poisonousFieldStartPosition.getX() <= newPosition.getX() &&
+                newPosition.getX() <= this.poisonousFieldEndPosition.getX() &&
+                this.poisonousFieldEndPosition.getY() <= newPosition.getY() &&
+                newPosition.getY() <= this.poisonousFieldStartPosition.getY());
+        if (!dodgedAlready && this.plants.containsKey(newPosition) && !isOnHealthyArea) return NextMoveType.DODGE;
+
         // move would cause Y to go out of bounds
         Vector2D offset = direction.moveOffset;
         if ((position.getY() == this.mapHeight - 1 && offset.getY() == 1) ||

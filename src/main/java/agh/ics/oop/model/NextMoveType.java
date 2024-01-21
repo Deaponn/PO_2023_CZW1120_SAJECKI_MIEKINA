@@ -4,5 +4,6 @@ public enum NextMoveType {
     REGULAR,
     POLAR,
     LEAP_TO_LEFT,
-    LEAP_TO_RIGHT
+    LEAP_TO_RIGHT,
+    DODGE
 }

@@ -13,6 +13,11 @@ public class PlantFactory {
     }
 
     public Plant create(Vector2D position) {
-        return new Plant(position, this.plantEnergy);
+        return this.create(position, true);
+    }
+
+    public Plant create(Vector2D position, boolean isEdible) {
+        System.out.println((isEdible ? "good plant at " : "bad plant at ") + position);
+        return new Plant(position, (isEdible ? 1 : -100) * this.plantEnergy);
     }
 }

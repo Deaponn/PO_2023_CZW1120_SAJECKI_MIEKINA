@@ -220,7 +220,6 @@ public class EquatorialWorldMap implements WorldMap {
         this.mapChangeNotify("place");
     }
 
-    @Override
     public void moveAnimal(Animal animal) {
         if (animal.wasMoved()) return;
         animal.move();
@@ -290,7 +289,6 @@ public class EquatorialWorldMap implements WorldMap {
         return subscribers.contains(listener);
     }
 
-    @Override
     public NextMoveType moveType(Vector2D position, MapDirection direction) {
         // move would cause Y to go out of bounds
         Vector2D offset = direction.moveOffset;

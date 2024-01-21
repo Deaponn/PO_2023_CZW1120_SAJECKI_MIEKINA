@@ -35,6 +35,10 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
         this.wasUpdated = true;
         this.statistics.addAge();
         this.drainEnergy(1);
+        this.genomeRotation();
+    }
+
+    public void genomeRotation() {
         this.rotateBy(this.genome.getActiveGene());
         this.genome.updateActiveGene();
     }

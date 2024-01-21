@@ -1,10 +1,7 @@
 package agh.ics.oop.window.controller;
 
 import agh.ics.oop.Configuration;
-import agh.ics.oop.model.EquatorialWorldMap;
-import agh.ics.oop.model.Simulation;
-import agh.ics.oop.model.SimulationEngine;
-import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.model.*;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
@@ -45,7 +42,10 @@ public class Launcher extends WindowController {
         );
 
         try {
-            WorldMap worldMap = new EquatorialWorldMap(this.configuration);
+            WorldMap worldMap;
+            if (configuration.get(Configuration.Fields.MAP_TYPE) == MapType.STANDARD)
+                worldMap = new EquatorialWorldMap(this.configuration);
+            else worldMap = new PoisonousPlantsWorldMap((this.configuration));
             ImageMap imageMap = new ImageMap("res/gfx", "png");
             Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
