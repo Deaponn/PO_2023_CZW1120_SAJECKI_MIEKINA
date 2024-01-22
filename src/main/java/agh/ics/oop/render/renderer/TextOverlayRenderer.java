@@ -11,8 +11,8 @@ public class TextOverlayRenderer implements UnitRenderer<TextOverlay> {
     public void render(WorldRenderer renderer, TextOverlay overlay) {
         renderer.putTextAtScreenCoords(
                 overlay.screenPosition,
-                overlay.samplerKey,
-                overlay.fontScale,
-                overlay.text);
+                overlay.samplerKey.getValue(),
+                overlay.fontScale.getValue(),
+                overlay.text.getValue());
     }
 }

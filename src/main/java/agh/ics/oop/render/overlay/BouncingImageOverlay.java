@@ -20,19 +20,22 @@ public class BouncingImageOverlay extends ImageOverlay {
     @Override
     public void updateOnFrame(WorldRenderer renderer) {
         Vector2D viewSize = renderer.worldView.getViewSize();
+        String samplerKey = this.samplerKey.getValue();
+        float scale = this.scale.getValue();
+
         int viewWidth = viewSize.getX();
         int viewHeight = viewSize.getY();
-        ImageSampler sampler = renderer.imageSamplerMap.getImageSampler(this.samplerKey);
+        ImageSampler sampler = renderer.imageSamplerMap.getImageSampler(samplerKey);
         int samplerWidth = sampler.getWidth();
         int samplerHeight = sampler.getHeight();
 
         int x = this.screenPosition.getX();
         int y = this.screenPosition.getY();
 
-        if (x > viewWidth - samplerWidth * this.scale || x < 0) {
+        if (x > viewWidth - samplerWidth * scale || x < 0) {
             this.velocity = this.velocity.multiply(new Vector2D(-1, 1));
         }
-        if (y > viewHeight - samplerHeight * this.scale || y < 0) {
+        if (y > viewHeight - samplerHeight * scale || y < 0) {
             this.velocity = this.velocity.multiply(new Vector2D(1, -1));
         }
 

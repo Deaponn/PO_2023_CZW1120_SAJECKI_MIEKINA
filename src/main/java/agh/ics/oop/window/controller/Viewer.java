@@ -6,9 +6,8 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
-import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
-import agh.ics.oop.render.overlay.BouncingImageOverlay;
+import agh.ics.oop.render.overlay.StaticImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
@@ -37,20 +36,27 @@ public class Viewer extends WindowController implements MapChangeListener {
                 worldView
         );
 
-        this.worldRenderer.imageSamplerMap.addImageAtlasSampler(
+        this.worldRenderer.imageSamplerMap.addFontAtlasSampler(
                 "font0",
                 "font0_atlas",
-                (image) -> new ImageAtlasSampler(image, new Vector2D(10, 16)));
+                new Vector2D(10, 16));
 
-        BouncingImageOverlay testImageOverlay =
-                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(12, 8));
+//        BouncingImageOverlay testImageOverlay =
+//                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+//        testImageOverlay.setVelocity(new Vector2D(12, 8));
+//        this.worldRenderer.overlayList.add(testImageOverlay);
 
-        this.worldRenderer.overlayList.add(testImageOverlay);
+        StaticImageOverlay playControlOverlay =
+                new StaticImageOverlay(new Vector2D(16, 16), "btnpause", 2f);
+        this.worldRenderer.overlayList.add(playControlOverlay);
 
-        String testText = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789_?!-=><;:,.";
-        TextOverlay testTextOverlay = new StaticTextOverlay(new Vector2D(10, 10), "font0_atlas", 2f, testText);
-        this.worldRenderer.overlayList.add(testTextOverlay);
+        TextOverlay frameTimeOverlay =
+                new StaticTextOverlay(new Vector2D(64, 16), "font0_atlas", 1f, "");
+        this.worldRenderer.overlayList.add(frameTimeOverlay);
+
+        frameTimeOverlay.text.bindTo(
+                this.worldRenderer.frameRenderTime,
+                (time) -> "frame_T [ms]: " + time / 1_000_000L);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);

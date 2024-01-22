@@ -7,6 +7,7 @@ import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.image.ImageSampler;
 import agh.ics.oop.render.image.ImageSamplerMap;
+import agh.ics.oop.util.Reactive;
 import agh.ics.oop.view.WorldView;
 import javafx.application.Platform;
 
@@ -20,11 +21,15 @@ public class WorldRenderer {
     private final UnitRendererAssignmentMap unitRendererAssignmentMap;
     private WorldMap worldMap;
 
+    public final Reactive<Long> frameRenderTime;
+
     public WorldRenderer(ImageMap imageMap, WorldView<?> worldView) {
         this.imageSamplerMap = new ImageSamplerMap(imageMap);
         this.worldView = worldView;
         this.overlayList = new LinkedList<>();
         this.unitRendererAssignmentMap = new UnitRendererAssignmentMap();
+
+        this.frameRenderTime = new Reactive<>(0L);
     }
 
     public void setWorldMap(WorldMap worldMap) {
@@ -41,7 +46,7 @@ public class WorldRenderer {
             this.overlayList.forEach(this::tryRender);
             this.worldView.presentView();
             long endNanoTime = System.nanoTime();
-            System.out.println("Render execution time: " + (endNanoTime - startNanoTime) / 1_000_000L + "ms");
+            this.frameRenderTime.setValue(endNanoTime - startNanoTime);
             this.overlayList.forEach(overlay -> overlay.updateOnFrame(this));
         });
     }

@@ -1,5 +1,6 @@
 package agh.ics.oop.render.image;
 
+import agh.ics.oop.model.Vector2D;
 import javafx.scene.image.Image;
 
 import java.util.HashMap;
@@ -46,6 +47,14 @@ public class ImageSamplerMap {
             throw new IllegalArgumentException("ImageSamplerMap: key " + samplerKey +
                     " already exists.");
         this.imageAtlasSamplerMap.put(samplerKey, samplerFunction.apply(image));
+    }
+
+    public void addFontAtlasSampler(
+            String imageKey,
+            String samplerKey,
+            Vector2D glyphSize) {
+        this.addImageAtlasSampler(imageKey, samplerKey,
+                (image) -> new ImageAtlasSampler(image, glyphSize));
     }
 
     public ImageSampler getImageSampler(String samplerKey) {
