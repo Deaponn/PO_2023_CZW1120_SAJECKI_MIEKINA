@@ -15,6 +15,7 @@ public class WindowController {
         this.window = window;
     }
 
+    @Deprecated
     public Optional<Object> getBundleItem(String key) {
         return this.bundle.getItem(key);
     }

@@ -34,6 +34,8 @@ public class Configurator
     @FXML
     public TextField startingAnimalsNumber;
     @FXML
+    public TextField initialAnimalEnergy;
+    @FXML
     public TextField requiredReproductionEnergy;
     @FXML
     public TextField energyPassedToChild;
@@ -65,13 +67,14 @@ public class Configurator
 
         this.addIntegerField(MAP_WIDTH, this.mapWidth);
         this.addIntegerField(MAP_HEIGHT, this.mapHeight);
-        this.addEnumField(MAP_TYPE, this.mapType);
+        this.addEnumField(MAP_TYPE, MapType.class, this.mapType);
         this.addIntegerField(GENOME_LENGTH, this.genomeLength);
         this.addFloatField(RANDOM_GENOME_CHANGE_CHANCE, this.randomGenomeChangeChance);
         this.addIntegerField(STARTING_PLANTS_NUMBER, this.startingPlantsNumber);
         this.addIntegerField(PLANT_ENERGY, this.plantEnergy);
         this.addIntegerField(NUMBER_OF_GROWING_PLANTS, this.numberOfGrowingPlants);
         this.addIntegerField(STARTING_ANIMALS_NUMBER, this.startingAnimalsNumber);
+        this.addIntegerField(INITIAL_ANIMAL_ENERGY, this.initialAnimalEnergy);
         this.addIntegerField(MIN_REPRODUCE_ENERGY, this.requiredReproductionEnergy);
         this.addIntegerField(ENERGY_PASSED, this.energyPassedToChild);
         this.addIntegerField(MIN_MUTATIONS, this.minMutationsNumber);
@@ -93,8 +96,9 @@ public class Configurator
 
     private <T extends Enum<T>> void addEnumField(
             Configuration.Fields key,
+            Class<T> enumClass,
             ChoiceBox<T> choiceBox) {
-        new EnumInputField<>(key, choiceBox,
+        new EnumInputField<>(key, choiceBox, enumClass,
                 this.configuration.get(key), this.dialogMediator);
     }
 
