@@ -3,9 +3,10 @@ package agh.ics.oop.entities;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.Genome;
 import agh.ics.oop.model.GenomeFactory;
+import agh.ics.oop.model.MoveDirection;
 import agh.ics.oop.model.Vector2D;
 
-import java.util.Random;
+import java.util.List;
 
 import static agh.ics.oop.Configuration.Fields.*;
 
@@ -53,5 +54,7 @@ public class AnimalFactory {
         return kid;
     }
 
-    private static final Random random = new Random();
+    public static Animal defaultAnimal() {
+        return new Animal(new Vector2D(), 0, new Genome(0, List.of(MoveDirection.ROTATE_0)));
+    }
 }

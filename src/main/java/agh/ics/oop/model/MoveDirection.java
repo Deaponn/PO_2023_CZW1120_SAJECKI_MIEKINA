@@ -21,4 +21,8 @@ public enum MoveDirection {
         MoveDirection[] moveDirections = MoveDirection.values();
         return moveDirections[random.nextInt(moveDirections.length)];
     }
+
+    public String toString() {
+        return Integer.toString(this.ordinal());
+    }
 }

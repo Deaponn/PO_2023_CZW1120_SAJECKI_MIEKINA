@@ -10,7 +10,7 @@ public class SimulationEngine {
     }
 
     public Simulation runSimulation(WorldMap map) {
-        return this.runSimulation(map, 1000);
+        return this.runSimulation(map, 250);
     }
 
     public Simulation runSimulation(WorldMap map, int updateDelay) {

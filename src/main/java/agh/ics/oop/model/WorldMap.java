@@ -1,8 +1,10 @@
 package agh.ics.oop.model;
 
 import agh.ics.oop.entities.Animal;
+import agh.ics.oop.entities.Plant;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -58,4 +60,8 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      * @return unique ID.
      */
     UUID getID();
+
+    Map<Vector2D, List<Animal>> getAnimals();
+
+    Map<Vector2D, Plant> getPlants();
 }

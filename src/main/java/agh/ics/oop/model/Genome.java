@@ -21,12 +21,20 @@ public class Genome {
         return this.geneList.get(this.activeGene);
     }
 
+    public int getActiveGeneIndex() {
+        return this.activeGene;
+    }
+
     public void updateActiveGene() {
         if (Genome.random.nextDouble() < this.randomGenomeChangeChance) {
             this.activeGene = Genome.random.nextInt(this.geneList.size());
         } else {
             this.activeGene = (this.activeGene + 1) % this.geneList.size();
         }
+    }
+
+    public String toString() {
+        return this.geneList.toString();
     }
 
     private static final Random random = new Random();

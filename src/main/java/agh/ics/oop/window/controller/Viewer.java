@@ -1,9 +1,6 @@
 package agh.ics.oop.window.controller;
 
-import agh.ics.oop.model.MapChangeListener;
-import agh.ics.oop.model.Simulation;
-import agh.ics.oop.model.Vector2D;
-import agh.ics.oop.model.WorldMap;
+import agh.ics.oop.model.*;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageAtlasSampler;
@@ -54,6 +51,7 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
         this.worldMap.mapChangeSubscribe(this);
+        this.worldMap.mapChangeSubscribe(new StatisticsCollector());
 
         this.worldRenderer.setWorldMap(this.worldMap);
 

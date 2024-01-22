@@ -5,10 +5,7 @@ import agh.ics.oop.render.AssignRenderer;
 import agh.ics.oop.render.renderer.AnimalRenderer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 @AssignRenderer(renderer = AnimalRenderer.class)
 public class Animal extends WorldEntity implements EnergyHolder, Comparable<Animal> {
@@ -46,6 +43,7 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
     public void refreshStatus() {
         this.wasUpdated = false;
         this.wasMoved = false;
+        if (this.energy == 0) this.isAlive = false;
     }
 
     public void eat(EnergyHolder energyHolder) {
@@ -57,7 +55,6 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
     public int drainEnergy(int energy) {
         int drainedEnergy = Math.min(energy, this.energy);
         this.energy -= drainedEnergy;
-        if (this.energy == 0) this.isAlive = false;
         return drainedEnergy;
     }
 
@@ -85,6 +82,8 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
     }
 
     public int getAge() { return this.statistics.age; }
+
+    public int getPlantsEaten() { return this.statistics.eatenCount; }
 
     public boolean getAlive() { return this.isAlive; }
 

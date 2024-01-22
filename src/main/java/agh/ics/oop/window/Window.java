@@ -116,7 +116,7 @@ public class Window<T extends WindowController> {
 
     // for me, the above setOnClose wasn't working when closing the window with upper right X mark
     public void setStageOnCloseRequest(EventHandler<WindowEvent> eventHandler) {
-        this.stage.setOnCloseRequest(eventHandler);
+        this.stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, eventHandler);
     }
 
     public ErrorAlert showErrorAlert(String title, String headerText, String contentText) {

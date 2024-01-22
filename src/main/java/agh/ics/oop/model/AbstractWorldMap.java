@@ -60,7 +60,10 @@ public abstract class AbstractWorldMap implements WorldMap {
         for (Vector2D animalPosition : this.animals.keySet()) {
             List<Animal> animalList = this.animals.get(animalPosition);
             for (int i = animalList.size() - 1; i >= 0; i--) {
-                if (!animalList.get(i).getAlive()) animalList.remove(i);
+                if (!animalList.get(i).getAlive()) {
+                    Animal deadBody = animalList.remove(i);
+                    this.mapChangeNotify("animal died " + deadBody.getAge());
+                }
             }
             if (animalList.isEmpty()) this.animals.remove(animalPosition);
         }
@@ -158,6 +161,14 @@ public abstract class AbstractWorldMap implements WorldMap {
         if (animalList != null) elementList.addAll(animalList);
 
         return elementList;
+    }
+
+    public Map<Vector2D, List<Animal>> getAnimals() {
+        return this.animals;
+    }
+
+    public Map<Vector2D, Plant> getPlants() {
+        return this.plants;
     }
 
     @Override
