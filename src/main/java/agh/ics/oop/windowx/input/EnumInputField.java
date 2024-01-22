@@ -8,10 +8,12 @@ public class EnumInputField<E extends Enum<E>, I> extends InputField<E, I> {
 
     public EnumInputField(I fieldID,
                           ChoiceBox<E> choiceBox,
+                          Class<E> enumClass,
                           E initialValue,
                           DialogMediator<I> fieldMediator) {
         super(fieldID, fieldMediator);
         this.choiceBox = choiceBox;
+        this.choiceBox.getItems().addAll(enumClass.getEnumConstants());
         this.setValue(initialValue);
         this.createEmitter();
     }

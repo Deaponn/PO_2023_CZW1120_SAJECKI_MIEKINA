@@ -115,23 +115,28 @@
                                    GridPane.columnIndex="1"
                                    prefWidth="150.0" fx:id="startingAnimalsNumber"/>
                         <Label GridPane.rowIndex="1"
-                               GridPane.columnIndex="0">required reproduction energy</Label>
+                               GridPane.columnIndex="0">initial animal energy</Label>
                         <TextField GridPane.rowIndex="1"
                                    GridPane.columnIndex="1"
-                                   prefWidth="150.0" fx:id="requiredReproductionEnergy"/>
+                                   prefWidth="150.0" fx:id="initialAnimalEnergy"/>
                         <Label GridPane.rowIndex="2"
-                               GridPane.columnIndex="0">energy passed to child</Label>
+                               GridPane.columnIndex="0">required reproduction energy</Label>
                         <TextField GridPane.rowIndex="2"
                                    GridPane.columnIndex="1"
-                                   prefWidth="150.0" fx:id="energyPassedToChild"/>
+                                   prefWidth="150.0" fx:id="requiredReproductionEnergy"/>
                         <Label GridPane.rowIndex="3"
-                               GridPane.columnIndex="0">min mutations</Label>
+                               GridPane.columnIndex="0">energy passed to child</Label>
                         <TextField GridPane.rowIndex="3"
                                    GridPane.columnIndex="1"
-                                   prefWidth="150.0" fx:id="minMutationsNumber"/>
+                                   prefWidth="150.0" fx:id="energyPassedToChild"/>
                         <Label GridPane.rowIndex="4"
-                               GridPane.columnIndex="0">max mutations</Label>
+                               GridPane.columnIndex="0">min mutations</Label>
                         <TextField GridPane.rowIndex="4"
+                                   GridPane.columnIndex="1"
+                                   prefWidth="150.0" fx:id="minMutationsNumber"/>
+                        <Label GridPane.rowIndex="5"
+                               GridPane.columnIndex="0">max mutations</Label>
+                        <TextField GridPane.rowIndex="5"
                                    GridPane.columnIndex="1"
                                    prefWidth="150.0" fx:id="maxMutationsNumber"/>
                     </GridPane>
