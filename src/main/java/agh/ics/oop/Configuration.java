@@ -60,7 +60,7 @@ public class Configuration implements Serializable {
                             Fields.MAX_MUTATIONS,
                             Field.of(3, Integer.class, Field::zeroPositiveInteger)),
                     Map.entry(
-                            Fields.EQUATOR_SIZE,
+                            Fields.SPECIAL_FIELDS_FRACTION,
                             Field.of(0.2f, Float.class, Field::normalizedFloat)),
                     Map.entry(
                             Fields.PLANT_GROW_AT_EQUATOR_CHANCE,
@@ -158,14 +158,12 @@ public class Configuration implements Serializable {
         STARTING_ANIMALS_NUMBER,
         INITIAL_ANIMAL_ENERGY,
         MIN_REPRODUCE_ENERGY,
-        // TODO: percentage or integer amount?
-        //      if percentage, should the max be 200%?
-        //      (for both parents to give out all the energy)
         ENERGY_PASSED,
         MIN_MUTATIONS,
         MAX_MUTATIONS,
         // default is 0.2, according to Pareto rule
-        EQUATOR_SIZE,
+        // this is used to compute how many equator/poisonous fields should be generated
+        SPECIAL_FIELDS_FRACTION,
         // default is 0.8, according to Pareto rule
         PLANT_GROW_AT_EQUATOR_CHANCE,
         // saving to external file

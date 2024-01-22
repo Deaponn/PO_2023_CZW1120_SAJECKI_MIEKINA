@@ -13,6 +13,10 @@ public class PlantFactory {
     }
 
     public Plant create(Vector2D position) {
-        return new Plant(position, this.plantEnergy);
+        return this.create(position, true);
+    }
+
+    public Plant create(Vector2D position, boolean isEdible) {
+        return new Plant(position, (isEdible ? 1 : -1) * this.plantEnergy);
     }
 }

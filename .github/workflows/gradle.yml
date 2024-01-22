@@ -17,7 +17,29 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  create-release:
+    needs: [build-linux, build-windows, build-macos]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: out/
+    - name: View artifacts
+      run: ls -R out/
+    - name: Release artifacts
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: out/*/app-image-*.zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generateReleaseNotes: true
+        tag: ${{ format('build-{0}', github.run_number) }}
+        commit: ${{ github.sha }}
+    
+  build-linux:
 
     runs-on: ubuntu-latest
 
@@ -32,13 +54,56 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: jlinkZip
-    - name: Get release number
-      run: echo "build_sig=$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
-    - name: Release app image
-      uses: ncipollo/release-action@v1
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-linux.zip
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
       with:
-        artifacts: "build/app-image.zip"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ format('build-{0}/{1}', env.build_sig, github.ref) }}
-        commit: ${{ github.sha }}
-          
+        name: output-artifact-linux
+        path: build/app-image-linux.zip
+
+  build-windows:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 18
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'corretto'
+    - name: Build app image with Gradle
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      with:
+        arguments: jlinkZip
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-windows.zip
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: output-artifact-windows
+        path: build/app-image-windows.zip
+
+  build-macos:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 18
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'corretto'
+    - name: Build app image with Gradle
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      with:
+        arguments: jlinkZip
+    - name: Move artifact
+      run: mv build/app-image.zip build/app-image-macos.zip
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: output-artifact-macos
+        path: build/app-image-macos.zip
