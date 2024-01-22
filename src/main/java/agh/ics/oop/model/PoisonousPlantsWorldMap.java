@@ -58,11 +58,7 @@ public class PoisonousPlantsWorldMap extends AbstractWorldMap implements WorldMa
             Vector2D plantPosition = new Vector2D(
                     randomFieldIndex % this.mapWidth, randomFieldIndex / this.mapWidth
             );
-            boolean isOnHealthyArea = !(this.poisonousFieldStartPosition.getX() <= plantPosition.getX() &&
-                    plantPosition.getX() <= this.poisonousFieldEndPosition.getX() &&
-                    this.poisonousFieldEndPosition.getY() <= plantPosition.getY() &&
-                    plantPosition.getY() <= this.poisonousFieldStartPosition.getY());
-            this.placeElement(plantFactory.create(plantPosition, isOnHealthyArea));
+            this.placeElement(plantFactory.create(plantPosition, !isPoisoned(plantPosition)));
         }
     }
 
@@ -107,13 +103,22 @@ public class PoisonousPlantsWorldMap extends AbstractWorldMap implements WorldMa
     public NextMoveType moveType(Vector2D position, MapDirection direction, boolean dodgedAlready) {
         // move would cause to eat a poisonous plant
         Vector2D newPosition = position.add(direction.moveOffset);
-        boolean isOnHealthyArea = !(this.poisonousFieldStartPosition.getX() <= newPosition.getX() &&
-                newPosition.getX() <= this.poisonousFieldEndPosition.getX() &&
-                this.poisonousFieldEndPosition.getY() <= newPosition.getY() &&
-                newPosition.getY() <= this.poisonousFieldStartPosition.getY());
-        if (!dodgedAlready && this.plants.containsKey(newPosition) && !isOnHealthyArea) return NextMoveType.DODGE;
+        if (!dodgedAlready && this.plants.containsKey(newPosition) && isPoisoned(newPosition))
+            return NextMoveType.DODGE;
 
         return super.moveType(position, direction);
+    }
+
+    private boolean isPoisoned(Vector2D position) {
+        return this.poisonousFieldStartPosition.getX() <= position.getX() &&
+                position.getX() <= this.poisonousFieldEndPosition.getX() &&
+                this.poisonousFieldEndPosition.getY() <= position.getY() &&
+                position.getY() <= this.poisonousFieldStartPosition.getY();
+    }
+
+    @Override
+    protected Ground groundAtPosition(Vector2D position) {
+        return new Ground(position, this.isPoisoned(position));
     }
 
     private final static Random random = new Random();

@@ -7,7 +7,7 @@ import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageSampler;
 
 public class AnimalRenderer implements UnitRenderer<Animal> {
-    private final ImageSampler blob1;
+    private final ImageSampler[] frog;
     private final ImageSampler bar0;
     private final ImageSampler bar1;
     private final ImageSampler bar2;
@@ -15,7 +15,16 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
     private final ImageSampler bar4;
 
     public AnimalRenderer(WorldRenderer renderer) {
-        this.blob1 = renderer.imageSamplerMap.getImageSampler("blob1");
+        this.frog = new ImageSampler[]{
+                renderer.imageSamplerMap.getImageSampler("frog4"),
+                renderer.imageSamplerMap.getImageSampler("frog3"),
+                renderer.imageSamplerMap.getImageSampler("frog2"),
+                renderer.imageSamplerMap.getImageSampler("frog1"),
+                renderer.imageSamplerMap.getImageSampler("frog0"),
+                renderer.imageSamplerMap.getImageSampler("frog7"),
+                renderer.imageSamplerMap.getImageSampler("frog6"),
+                renderer.imageSamplerMap.getImageSampler("frog5")
+        };
         this.bar0 = renderer.imageSamplerMap.getImageSampler("bar0");
         this.bar1 = renderer.imageSamplerMap.getImageSampler("bar1");
         this.bar2 = renderer.imageSamplerMap.getImageSampler("bar2");
@@ -26,7 +35,7 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
     @Override
     public void render(WorldRenderer renderer, Animal element) {
         Vector2D position = element.getPosition();
-        renderer.worldView.putImageAtGrid(position, this.blob1);
+        renderer.worldView.putImageAtGrid(position, this.frog[element.getDirection().ordinal()]);
         ImageSampler bar = this.getEnergyBarImageKey(element.getEnergy());
         renderer.worldView.putImageAtGrid(position, bar);
     }

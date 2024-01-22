@@ -77,8 +77,8 @@ public abstract class AbstractWorldMap implements WorldMap {
             List<Animal> animalList = this.animals.get(uniquePosition);
             for (int i = animalList.size() - 1; i >= 0; i--) {
                 Animal animal = animalList.get(i);
-                animal.update();
                 moveAnimal(animal);
+                animal.update();
             }
         }
     }
@@ -149,10 +149,14 @@ public abstract class AbstractWorldMap implements WorldMap {
         return false;
     }
 
+    protected Ground groundAtPosition(Vector2D position) {
+        return new Ground(position);
+    }
+
     @Override
     public List<WorldElement> getElements(Vector2D position) {
         List<WorldElement> elementList = new LinkedList<>();
-        elementList.add(new Ground(position));
+        elementList.add(this.groundAtPosition(position));
 
         Plant plant = this.plants.get(position);
         if (plant != null) elementList.add(plant);

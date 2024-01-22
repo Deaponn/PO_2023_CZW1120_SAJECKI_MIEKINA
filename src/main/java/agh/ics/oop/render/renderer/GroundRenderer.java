@@ -11,7 +11,9 @@ import java.util.Random;
 public class GroundRenderer implements UnitRenderer<Ground> {
     private final Random random = new Random();
 
-    private final ImageSampler[] frameSamplerArray;
+    private final ImageSampler[] healthyFrameSamplerArray;
+
+    private final ImageSampler[] poisonedFrameSamplerArray;
 
     public GroundRenderer(WorldRenderer renderer) {
         ImageSampler sand1 = renderer.imageSamplerMap.getImageSampler("sand1");
@@ -19,11 +21,23 @@ public class GroundRenderer implements UnitRenderer<Ground> {
         ImageSampler sand3 = renderer.imageSamplerMap.getImageSampler("sand3");
         ImageSampler sand4 = renderer.imageSamplerMap.getImageSampler("sand4");
 
-        this.frameSamplerArray = new ImageSampler[]{
+        ImageSampler poisonedSand1 = renderer.imageSamplerMap.getImageSampler("poisoned_sand1");
+        ImageSampler poisonedSand2 = renderer.imageSamplerMap.getImageSampler("poisoned_sand2");
+        ImageSampler poisonedSand3 = renderer.imageSamplerMap.getImageSampler("poisoned_sand3");
+        ImageSampler poisonedSand4 = renderer.imageSamplerMap.getImageSampler("poisoned_sand4");
+
+        this.healthyFrameSamplerArray = new ImageSampler[]{
                 sand4, sand4, sand4, sand4,
                 sand1, sand1, sand1, sand1,
                 sand3, sand3, sand2, sand2,
                 sand2, sand2, sand2, sand2
+        };
+
+        this.poisonedFrameSamplerArray = new ImageSampler[]{
+                poisonedSand4, poisonedSand4, poisonedSand4, poisonedSand4,
+                poisonedSand1, poisonedSand1, poisonedSand1, poisonedSand1,
+                poisonedSand3, poisonedSand3, poisonedSand2, poisonedSand2,
+                poisonedSand2, poisonedSand2, poisonedSand2, poisonedSand2
         };
     }
 
@@ -31,7 +45,10 @@ public class GroundRenderer implements UnitRenderer<Ground> {
     public void render(WorldRenderer renderer, Ground element) {
         Vector2D position = element.getPosition();
         int frame = this.getFrame(position);
-        renderer.worldView.putImageAtGrid(position, this.frameSamplerArray[frame]);
+        if (!element.getIsPoisoned())
+            renderer.worldView.putImageAtGrid(position, this.healthyFrameSamplerArray[frame]);
+        else
+            renderer.worldView.putImageAtGrid(position, this.poisonedFrameSamplerArray[frame]);
     }
 
     private int getFrame(Vector2D position) {
