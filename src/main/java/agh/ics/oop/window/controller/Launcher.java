@@ -73,6 +73,10 @@ public class Launcher extends WindowController {
         }
     }
 
+    public void cleanupOnClose() {
+        this.simulationEngine.kill();
+    }
+
     private void saveConfiguration() {
         try {
             Resources.serializeToXML(

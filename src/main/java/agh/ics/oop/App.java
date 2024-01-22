@@ -18,6 +18,7 @@ public class App extends Application {
                 LayoutPath.LAUNCHER.path
         );
 
+        launcherWindow.setStageOnCloseRequest(event -> launcherWindow.getController().cleanupOnClose());
         launcherWindow.start();
     }
 }

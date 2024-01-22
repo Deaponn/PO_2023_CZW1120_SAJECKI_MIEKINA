@@ -18,4 +18,8 @@ public class SimulationEngine {
         executorService.submit(simulation);
         return simulation;
     }
+
+    public void kill() {
+        this.executorService.shutdownNow();
+    }
 }
