@@ -42,7 +42,7 @@ public class GenomeFactory {
 
         int mutations = random.nextInt(minMutations, maxMutations + 1);
         randomNoRepeats.refreshRange();
-        for (int i = 0; i < mutations; i++) {
+        for (int i = 0; i < Math.min(mutations, this.genomeLength); i++) {
             geneList.set(randomNoRepeats.next(), MoveDirection.randomDirection());
         }
 
