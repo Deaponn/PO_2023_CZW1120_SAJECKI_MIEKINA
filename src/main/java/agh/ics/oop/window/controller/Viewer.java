@@ -1,18 +1,16 @@
 package agh.ics.oop.window.controller;
 
 import agh.ics.oop.model.*;
-import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.BouncingImageOverlay;
-import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 
-public class Viewer extends WindowController implements MapChangeListener {
+public class Viewer extends WindowController implements ObjectEventListener<WorldMap> {
     @FXML
     public Canvas canvas;
     private WorldRenderer worldRenderer;
@@ -50,18 +48,23 @@ public class Viewer extends WindowController implements MapChangeListener {
 //        this.worldRenderer.overlayList.add(testTextOverlay);
 
         this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
-        this.worldMap.mapChangeSubscribe(this);
-        this.worldMap.mapChangeSubscribe(new StatisticsCollector());
+        this.worldMap.addEventSubscriber(this);
 
         this.worldRenderer.setWorldMap(this.worldMap);
 
         this.simulation = this.getBundleItem("simulation", Simulation.class).orElseThrow();
 
+        StatisticsCollector collector = new StatisticsCollector();
+        StatisticsExporter exporter = new StatisticsExporter(this.worldMap.getTitle());
+        collector.subscribeTo(this.worldMap);
+        collector.addEventSubscriber(exporter);
+
         this.window.setStageOnCloseRequest(event -> this.simulation.kill());
+        this.window.setStageOnCloseRequest(event -> exporter.saveToFile());
     }
 
     @Override
-    public void mapChanged(WorldMap worldMap, String message) {
+    public void sendEventData(WorldMap worldMap, String message) {
         if (message.equals("step")) {
             this.worldRenderer.setWorldMap(worldMap);
             this.worldRenderer.renderView();

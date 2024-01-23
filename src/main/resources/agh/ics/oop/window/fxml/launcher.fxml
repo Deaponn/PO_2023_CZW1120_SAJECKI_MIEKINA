@@ -4,24 +4,35 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.TextField?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="agh.ics.oop.window.controller.Launcher"
-            minWidth="250.0" minHeight="100.0">
+            minWidth="450.0" minHeight="200.0">
     <center>
         <GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
             <Label GridPane.rowIndex="0"
                    GridPane.columnIndex="0"
                    GridPane.columnSpan="2"
-                    GridPane.halignment="CENTER">
+                   GridPane.halignment="CENTER">
                 <font>
                     <Font name="Liberation Sans" size="24"/>
                 </font>
                 Project Launcher</Label>
-            <Button GridPane.rowIndex="1"
+            <Label GridPane.rowIndex="1"
+                   GridPane.columnIndex="0"
+                   GridPane.columnSpan="2"
+                   GridPane.halignment="CENTER">
+                Nazwa symulacji
+            </Label>
+            <TextField GridPane.rowIndex="2"
+                       GridPane.columnIndex="0"
+                       GridPane.columnSpan="2"
+                       prefWidth="150.0" fx:id="simulationTitle"/>
+            <Button GridPane.rowIndex="3"
                     GridPane.columnIndex="0"
                     onAction="#launchConfigurator">edit configuration</Button>
-            <Button GridPane.rowIndex="1"
+            <Button GridPane.rowIndex="3"
                     GridPane.columnIndex="1"
                     onAction="#launchViewer">launch simulation</Button>
         </GridPane>

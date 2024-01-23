@@ -47,6 +47,7 @@ public abstract class Exporter<T> {
 
     public Exporter<T> pushObject(T object) {
         this.objectList.add(object);
+        System.out.println("object list size " + this.objectList.size());
         return this;
     }
 

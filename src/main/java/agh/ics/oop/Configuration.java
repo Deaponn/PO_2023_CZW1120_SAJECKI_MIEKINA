@@ -18,6 +18,9 @@ public class Configuration implements Serializable {
         this.fieldMap = new EnumMap<>(
             Map.ofEntries(
                     Map.entry(
+                            Fields.SIMULATION_TITLE,
+                            Field.of("", String.class)),
+                    Map.entry(
                             Fields.MAP_WIDTH,
                             Field.of(13, Integer.class, Field::positiveInteger)),
                     Map.entry(
@@ -144,6 +147,7 @@ public class Configuration implements Serializable {
     }
 
     public enum Fields {
+        SIMULATION_TITLE,
         MAP_WIDTH,
         MAP_HEIGHT,
         // type of the map, project requirement F

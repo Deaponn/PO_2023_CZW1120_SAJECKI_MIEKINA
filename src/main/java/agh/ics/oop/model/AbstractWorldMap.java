@@ -17,13 +17,14 @@ public abstract class AbstractWorldMap implements WorldMap {
     protected final int mapWidth;
     protected final int mapHeight;
     protected final int numberOfGrowingPlants;
-    protected final List<MapChangeListener> subscribers = new LinkedList<>();
-    protected final UUID mapUUID = UUID.randomUUID();
+    protected final List<ObjectEventListener<WorldMap>> subscribers = new LinkedList<>();
+    protected final String mapTitle;
 
-    public AbstractWorldMap(Configuration configuration) {
+    public AbstractWorldMap(String mapTitle, Configuration configuration) {
         this.mapWidth = configuration.get(MAP_WIDTH);
         this.mapHeight = configuration.get(MAP_HEIGHT);
         this.numberOfGrowingPlants = configuration.get(NUMBER_OF_GROWING_PLANTS);
+        this.mapTitle = !mapTitle.isEmpty() ? mapTitle : UUID.randomUUID().toString();
 
         GenomeFactory genomeFactory = new GenomeFactory(configuration);
         this.animalFactory = new AnimalFactory(configuration, genomeFactory);
@@ -53,7 +54,7 @@ public abstract class AbstractWorldMap implements WorldMap {
         this.breedAnimals();
         this.growPlants();
         this.refreshAnimals();
-        this.mapChangeNotify("step");
+        this.notifySubscribers("step");
     }
 
     private void removeDead() {
@@ -62,7 +63,7 @@ public abstract class AbstractWorldMap implements WorldMap {
             for (int i = animalList.size() - 1; i >= 0; i--) {
                 if (!animalList.get(i).getAlive()) {
                     Animal deadBody = animalList.remove(i);
-                    this.mapChangeNotify("animal died " + deadBody.getAge());
+                    this.notifySubscribers("animal died " + deadBody.getAge());
                 }
             }
             if (animalList.isEmpty()) this.animals.remove(animalPosition);
@@ -140,7 +141,7 @@ public abstract class AbstractWorldMap implements WorldMap {
             }
         }
 
-        this.mapChangeNotify("place");
+        this.notifySubscribers("place");
     }
 
     // is it necessary? there is no scenario when a move could be illegal
@@ -181,29 +182,29 @@ public abstract class AbstractWorldMap implements WorldMap {
     }
 
     @Override
-    public UUID getID() {
-        return mapUUID;
+    public String getTitle() {
+        return this.mapTitle;
     }
 
     @Override
-    public void mapChangeSubscribe(MapChangeListener listener) {
+    public void addEventSubscriber(ObjectEventListener<WorldMap> listener) {
         subscribers.add(listener);
     }
 
     @Override
-    public void mapChangeUnsubscribe(MapChangeListener listener) {
+    public void removeEventSubscriber(ObjectEventListener<WorldMap> listener) {
         subscribers.remove(listener);
     }
 
     @Override
-    public void mapChangeNotify(String message) {
-        for (MapChangeListener subscriber : subscribers) {
-            subscriber.mapChanged(this, message);
+    public void notifySubscribers(String message) {
+        for (ObjectEventListener<WorldMap> subscriber : subscribers) {
+            subscriber.sendEventData(this, message);
         }
     }
 
     @Override
-    public boolean mapChangeIsSubscribed(MapChangeListener listener) {
+    public boolean isListenerSubscribed(ObjectEventListener<WorldMap> listener) {
         return subscribers.contains(listener);
     }
 

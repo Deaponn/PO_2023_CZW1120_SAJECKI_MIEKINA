@@ -10,8 +10,16 @@ import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
 import agh.ics.oop.windowx.Toast;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Launcher extends WindowController {
+    @FXML
+    public TextField simulationTitle;
     private Configuration configuration = new Configuration();
     private final SimulationEngine simulationEngine = new SimulationEngine();
 
@@ -37,15 +45,16 @@ public class Launcher extends WindowController {
 
     public void launchViewer() {
         Window<Viewer> viewerWindow = new Window<>(
-                "Viewer",
+                this.simulationTitle.getCharacters().toString(),
                 LayoutPath.VIEWER.path
         );
 
         try {
             WorldMap worldMap;
             if (configuration.get(Configuration.Fields.MAP_TYPE) == MapType.STANDARD)
-                worldMap = new EquatorialWorldMap(this.configuration);
-            else worldMap = new PoisonousPlantsWorldMap((this.configuration));
+                worldMap = new EquatorialWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
+            else
+                worldMap = new PoisonousPlantsWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
             ImageMap imageMap = new ImageMap("res/gfx", "png");
             Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
@@ -78,6 +87,10 @@ public class Launcher extends WindowController {
     }
 
     private void saveConfiguration() {
+        Path folderPath = Path.of("res/save");
+        if (!Files.exists(folderPath.toAbsolutePath()))
+            new File("res/save").mkdirs();
+
         try {
             Resources.serializeToXML(
                     Configurator.configurationPath,

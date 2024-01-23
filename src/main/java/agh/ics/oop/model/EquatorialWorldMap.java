@@ -16,8 +16,8 @@ public class EquatorialWorldMap extends AbstractWorldMap implements WorldMap {
     private final float equatorFieldsFraction;
     private final float plantGrowAtEquatorChance;
 
-    public EquatorialWorldMap(Configuration configuration) {
-        super(configuration);
+    public EquatorialWorldMap(String mapTitle, Configuration configuration) {
+        super(mapTitle, configuration);
 
         this.equatorFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
         this.plantGrowAtEquatorChance = configuration.get(PLANT_GROW_AT_EQUATOR_CHANCE);

@@ -13,7 +13,7 @@ import java.util.UUID;
  *
  * @author apohllo, idzik, szym-mie
  */
-public interface WorldMap extends MoveValidator, MapChangeEmitter {
+public interface WorldMap extends MoveValidator, ObjectEventEmitter<WorldMap> {
 
     /**
      * Place an animal on the map.
@@ -59,7 +59,7 @@ public interface WorldMap extends MoveValidator, MapChangeEmitter {
      * Get a unique ID of this map.
      * @return unique ID.
      */
-    UUID getID();
+    String getTitle();
 
     Map<Vector2D, List<Animal>> getAnimals();
 

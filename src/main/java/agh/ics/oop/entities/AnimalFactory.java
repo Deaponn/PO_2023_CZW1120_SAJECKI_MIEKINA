@@ -55,6 +55,6 @@ public class AnimalFactory {
     }
 
     public static Animal defaultAnimal() {
-        return new Animal(new Vector2D(), 0, new Genome(0, List.of(MoveDirection.ROTATE_0)));
+        return new Animal(new Vector2D(), 0, GenomeFactory.defaultGenome());
     }
 }

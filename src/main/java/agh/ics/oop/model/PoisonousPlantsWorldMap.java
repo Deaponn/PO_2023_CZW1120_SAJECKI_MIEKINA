@@ -14,8 +14,8 @@ public class PoisonousPlantsWorldMap extends AbstractWorldMap implements WorldMa
     private Vector2D poisonousFieldStartPosition;
     private Vector2D poisonousFieldEndPosition;
 
-    public PoisonousPlantsWorldMap(Configuration configuration) {
-        super(configuration);
+    public PoisonousPlantsWorldMap(String mapTitle, Configuration configuration) {
+        super(mapTitle, configuration);
 
         this.poisonousFieldsFraction = configuration.get(SPECIAL_FIELDS_FRACTION);
         this.randomFieldIndex = new RandomNumber(0, this.mapHeight * this.mapWidth);

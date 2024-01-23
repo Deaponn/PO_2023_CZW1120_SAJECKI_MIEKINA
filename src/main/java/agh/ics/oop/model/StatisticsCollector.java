@@ -3,65 +3,60 @@ package agh.ics.oop.model;
 import agh.ics.oop.entities.Animal;
 import agh.ics.oop.entities.AnimalFactory;
 import agh.ics.oop.entities.Plant;
-import agh.ics.oop.resource.Exported;
 
 import java.util.*;
 
-public class StatisticsCollector implements MapChangeListener {
-    @Exported
+public class StatisticsCollector implements ObjectEventListener<WorldMap>, ObjectEventEmitter<Statistics> {
     private int animalsCount;
-    @Exported
     private int plantsCount;
-    @Exported
     private int freeSquaresCount;
-    @Exported
     private Genome mostPopularGenome;
-    @Exported
     private float averageEnergy;
-    @Exported
     private float averageDaysLived;
-    @Exported
     private float averageKidsCount;
     private int deadAnimalsCount;
     private int deadAnimalsDaysLivedSum;
     private Animal focusedAnimal = null;
-    @Exported
     private Genome focusedAnimalGenome;
-    @Exported
     private int focusedAnimalEnergy;
-    @Exported
     private int focusedAnimalPlantsEaten;
-    @Exported
     private int focusedAnimalKidsCount;
-    @Exported
     private int focusedAnimalAncestorsCount;
-    @Exported
     private int focusedAnimalAge;
     private Map<Vector2D, List<Animal>> animals;
     private Map<Vector2D, Plant> plants;
     private int mapWidth;
     private int mapHeight;
+    private final List<ObjectEventListener<Statistics>> subscribers = new LinkedList<>();
 
-    public void mapChanged(WorldMap map, String message) {
+    public Statistics createSnapshot() {
+        return new Statistics(this);
+    }
+
+    public void subscribeTo(WorldMap map) {
+        this.animals = map.getAnimals();
+        this.plants = map.getPlants();
+        Boundary mapBoundary = map.getCurrentBounds();
+        this.mapWidth = mapBoundary.upperRight().getX() + 1;
+        this.mapHeight = mapBoundary.upperRight().getY() + 1;
+        map.addEventSubscriber(this);
+    }
+
+    public void setFocusedAnimal(Animal animal) {
+        this.focusedAnimal = animal;
+    }
+
+    public void sendEventData(WorldMap map, String message) {
         if (message.equals("step")) {
-            this.animals = map.getAnimals();
-            this.plants = map.getPlants();
-            Boundary mapBoundary = map.getCurrentBounds();
-            this.mapWidth = mapBoundary.upperRight().getX() + 1;
-            this.mapHeight = mapBoundary.upperRight().getY() + 1;
             this.collectSimulationStatistics();
             this.collectAnimalStatistics();
-            this.printStatistics();
+            notifySubscribers("statistics updated");
         }
         // this message is of form "animal died %d" where %d is any integer, signaling its age
         if (message.contains("animal died")) {
             this.deadAnimalsCount++;
             this.deadAnimalsDaysLivedSum += Integer.parseInt(message.replaceAll("[^0-9]", ""));
         }
-    }
-
-    public void setFocusedAnimal(Animal animal) {
-        this.focusedAnimal = animal;
     }
 
     private void collectSimulationStatistics() {
@@ -82,25 +77,6 @@ public class StatisticsCollector implements MapChangeListener {
         this.focusedAnimalKidsCount = this.focusedAnimal.kidsCount();
         this.focusedAnimalAncestorsCount = this.focusedAnimal.ancestorsCount();
         this.focusedAnimalAge = this.focusedAnimal.getAge();
-    }
-
-    private void printStatistics() {
-        System.out.printf("""
-                        Animals count: %d, plants count: %d, free squares: %d,
-                        most popular genome: %s,
-                        average energy: %.2f, average days lived: %.2f, average kids count: %.2f
-                        %n""", this.animalsCount, this.plantsCount, this.freeSquaresCount, this.mostPopularGenome,
-                this.averageEnergy, this.averageDaysLived, this.averageKidsCount);
-        if (this.focusedAnimal != null)
-            System.out.printf("""
-                        Current animal genome: %s,
-                        active genome idx: %d, energy: %d,
-                        plants eaten: %d, kids count: %d
-                        ancestors count: %d, days %s
-                        %n""", this.focusedAnimalGenome, this.focusedAnimalGenome.getActiveGeneIndex(),
-                this.focusedAnimalEnergy, this.focusedAnimalPlantsEaten, this.focusedAnimalKidsCount,
-                this.focusedAnimalAncestorsCount,
-                (this.focusedAnimal.getAlive() ? "alive: " : "lived: ") + this.focusedAnimalAge);
     }
 
     private void collectAnimalsCount() {
@@ -128,7 +104,7 @@ public class StatisticsCollector implements MapChangeListener {
         }
         this.mostPopularGenome = strongestAnimal.getGenome();
         // TODO: SUPER IMPORTANT TO REMOVE, THIS IS ONLY TO TEST FOCUSED ANIMAL TRACKING
-        this.focusedAnimal = strongestAnimal;
+        setFocusedAnimal(strongestAnimal);
     }
 
     private void collectAverageEnergy() {
@@ -149,5 +125,85 @@ public class StatisticsCollector implements MapChangeListener {
             for (Animal animal : animalsList) kidsCountSum += animal.kidsCount();
         }
         this.averageKidsCount = (float) kidsCountSum / this.animalsCount;
+    }
+
+    @Override
+    public boolean isListenerSubscribed(ObjectEventListener<Statistics> listener) {
+        return this.subscribers.contains(listener);
+    }
+
+    @Override
+    public void notifySubscribers(String message) {
+        Statistics statistics = this.createSnapshot();
+        for (ObjectEventListener<Statistics> subscriber : this.subscribers) {
+            subscriber.sendEventData(statistics, message);
+        }
+    }
+
+    @Override
+    public void addEventSubscriber(ObjectEventListener<Statistics> listener) {
+        if (this.isListenerSubscribed(listener)) return;
+        this.subscribers.add(listener);
+    }
+
+    @Override
+    public void removeEventSubscriber(ObjectEventListener<Statistics> listener) {
+        if (this.isListenerSubscribed(listener)) this.subscribers.remove(listener);
+    }
+
+    public int getAnimalsCount() {
+        return animalsCount;
+    }
+
+    public int getPlantsCount() {
+        return plantsCount;
+    }
+
+    public int getFreeSquaresCount() {
+        return freeSquaresCount;
+    }
+
+    public Genome getMostPopularGenome() {
+        return mostPopularGenome;
+    }
+
+    public float getAverageEnergy() {
+        return averageEnergy;
+    }
+
+    public float getAverageDaysLived() {
+        return averageDaysLived;
+    }
+
+    public float getAverageKidsCount() {
+        return averageKidsCount;
+    }
+
+    public Animal getFocusedAnimal() {
+        return focusedAnimal;
+    }
+
+    public Genome getFocusedAnimalGenome() {
+        return focusedAnimalGenome;
+    }
+
+    public int getFocusedAnimalEnergy() {
+        return focusedAnimalEnergy;
+    }
+
+    public int getFocusedAnimalPlantsEaten() {
+        return focusedAnimalPlantsEaten;
+    }
+
+    public int getFocusedAnimalKidsCount() {
+        return focusedAnimalKidsCount;
+    }
+
+    public int getFocusedAnimalAncestorsCount() {
+        return focusedAnimalAncestorsCount;
+    }
+
+    public int getFocusedAnimalAge() {
+        return focusedAnimalAge;
     }
 }

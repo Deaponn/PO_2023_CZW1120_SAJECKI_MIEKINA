@@ -57,5 +57,9 @@ public class GenomeFactory {
         return new Genome(this.randomGenomeChangeChance, geneList);
     }
 
+    public static Genome defaultGenome() {
+        return new Genome(0, List.of(MoveDirection.ROTATE_0));
+    }
+
     private static final Random random = new Random();
 }
