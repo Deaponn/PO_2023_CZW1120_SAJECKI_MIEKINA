@@ -112,6 +112,19 @@ public class CanvasWorldView implements WorldView<Canvas> {
         }
     }
 
+    @Override
+    public Vector2D getGridIndex(Vector2D position) {
+        float offsetX = this.gridOffsetX[0];
+        float offsetY = this.gridOffsetY[0];
+
+        int x = position.getX();
+        int y = position.getY();
+        int ix = (int) ((x - offsetX) / this.gridImageSize);
+        int iy = (int) ((y - offsetY) / this.gridImageSize);
+
+        return new Vector2D(ix, iy);
+    }
+
     /**
      * double-buffer draw view (VSYNC)
      */

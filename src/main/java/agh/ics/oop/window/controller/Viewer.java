@@ -7,9 +7,11 @@ import agh.ics.oop.model.WorldMap;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.view.CanvasWorldView;
+import agh.ics.oop.view.WorldViewInput;
 import agh.ics.oop.window.WindowController;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -26,6 +28,9 @@ public class Viewer extends WindowController implements MapChangeListener {
         super.start();
 
         CanvasWorldView worldView = new CanvasWorldView(this.canvas);
+        WorldViewInput worldViewInput = new WorldViewInput();
+        worldViewInput.attach(worldView);
+
         worldView.getRoot().widthProperty()
                 .bind(this.window.getRoot().widthProperty());
         worldView.getRoot().heightProperty()
@@ -45,6 +50,15 @@ public class Viewer extends WindowController implements MapChangeListener {
 //                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
 //        testImageOverlay.setVelocity(new Vector2D(12, 8));
 //        this.worldRenderer.overlayList.add(testImageOverlay);
+
+        GridImageOverlay selectOverlay =
+                new GridImageOverlay(new Vector2D(), "dvd0");
+
+        selectOverlay.gridPosition.bindTo(
+                worldViewInput.mousePosition,
+                worldView::getGridIndex);
+
+        worldRenderer.overlayList.add(selectOverlay);
 
         StaticImageOverlay playControlOverlay =
                 new StaticImageOverlay(new Vector2D(16, 16), "btnpause", 2f);

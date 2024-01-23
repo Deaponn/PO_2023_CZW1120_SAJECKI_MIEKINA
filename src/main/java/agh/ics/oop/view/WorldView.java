@@ -14,6 +14,7 @@ public interface WorldView<N extends Node> {
     void putImageAtGrid(Vector2D position, ImageSampler sampler);
     void putImageAtScreenCoords(Vector2D screenPosition, ImageSampler sampler, float scale);
     void putTextAtScreenCoords(Vector2D position, ImageAtlasSampler sampler, float scale, String text);
+    Vector2D getGridIndex(Vector2D position);
 
     void presentView();
     N getRoot();

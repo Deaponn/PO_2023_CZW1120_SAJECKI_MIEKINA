@@ -12,6 +12,7 @@ module Project.main {
     opens agh.ics.oop.model;
 
     exports agh.ics.oop;
+    exports agh.ics.oop.util;
     exports agh.ics.oop.model;
     exports agh.ics.oop.entities;
     exports agh.ics.oop.resource;
