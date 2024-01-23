@@ -13,7 +13,7 @@ public class WorldRendererTest {
         WorldRenderer worldRenderer = this.getWorldRenderer();
         WorldElementA element = new WorldElementA(new Vector2D());
         try {
-            worldRenderer.renderUnit(element);
+            worldRenderer.renderUnit(worldRenderer.worldViewLayer, element);
         } catch (IllegalRendererAssignment e) {
             Assert.fail("Renderer assignment failed: " + e);
         }
@@ -23,7 +23,9 @@ public class WorldRendererTest {
     public void renderInvalidElement() {
         WorldRenderer worldRenderer = this.getWorldRenderer();
         WorldElementB element = new WorldElementB(new Vector2D());
-        Assert.assertThrows(IllegalRendererAssignment.class, () -> worldRenderer.renderUnit(element));
+        Assert.assertThrows(
+                IllegalRendererAssignment.class,
+                () -> worldRenderer.renderUnit(worldRenderer.worldViewLayer, element));
     }
 
     private WorldRenderer getWorldRenderer() {

@@ -10,8 +10,8 @@ import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
-import agh.ics.oop.view.CanvasWorldView;
-import agh.ics.oop.view.WorldViewInput;
+import agh.ics.oop.view.CanvasView;
+import agh.ics.oop.view.ViewInput;
 import agh.ics.oop.window.WindowController;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -27,9 +27,9 @@ public class Viewer extends WindowController implements MapChangeListener {
     public void start() {
         super.start();
 
-        CanvasWorldView worldView = new CanvasWorldView(this.canvas);
-        WorldViewInput worldViewInput = new WorldViewInput();
-        worldViewInput.attach(worldView);
+        CanvasView worldView = new CanvasView(this.canvas);
+        ViewInput viewInput = new ViewInput();
+        viewInput.attach(worldView);
 
         worldView.getRoot().widthProperty()
                 .bind(this.window.getRoot().widthProperty());
@@ -52,13 +52,18 @@ public class Viewer extends WindowController implements MapChangeListener {
 //        this.worldRenderer.overlayList.add(testImageOverlay);
 
         GridImageOverlay selectOverlay =
-                new GridImageOverlay(new Vector2D(), "dvd0");
+                new GridImageOverlay(new Vector2D(), "sel0");
 
         selectOverlay.gridPosition.bindTo(
-                worldViewInput.mousePosition,
+                viewInput.mousePosition,
                 worldView::getGridIndex);
 
-        worldRenderer.overlayList.add(selectOverlay);
+        selectOverlay.gridPosition.addOnChange(position -> {
+                this.worldRenderer.renderOverlayViewLayer();
+                System.out.println(position);
+        });
+
+        this.worldRenderer.overlayList.add(selectOverlay);
 
         StaticImageOverlay playControlOverlay =
                 new StaticImageOverlay(new Vector2D(16, 16), "btnpause", 2f);
@@ -86,7 +91,7 @@ public class Viewer extends WindowController implements MapChangeListener {
     public void mapChanged(WorldMap worldMap, String message) {
         if (message.equals("step")) {
             this.worldRenderer.setWorldMap(worldMap);
-            this.worldRenderer.renderView();
+            this.worldRenderer.renderWorldViewLayer();
         }
     }
 

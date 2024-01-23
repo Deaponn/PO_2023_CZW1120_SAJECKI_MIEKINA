@@ -19,7 +19,7 @@ public class BouncingImageOverlay extends ImageOverlay {
 
     @Override
     public void updateOnFrame(WorldRenderer renderer) {
-        Vector2D viewSize = renderer.worldView.getViewSize();
+        Vector2D viewSize = renderer.view.getViewSize();
         String samplerKey = this.samplerKey.getValue();
         float scale = this.scale.getValue();
 

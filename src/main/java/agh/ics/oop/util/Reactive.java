@@ -40,8 +40,10 @@ public class Reactive<V> {
     }
 
     public void setValue(V value) {
-        this.value = value;
-        this.sendOut();
+        if (!this.value.equals(value)) {
+            this.value = value;
+            this.sendOut();
+        }
     }
 
     public V getValue() {
@@ -49,8 +51,11 @@ public class Reactive<V> {
     }
 
     private void sendOut() {
-        // don't use setValue here, unless you want to have infinite cycles
         this.reactiveBindSet.forEach(bind -> bind.apply(this.value));
+        this.emitChange();
+    }
+
+    private void emitChange() {
         this.changeConsumerSet.forEach(consumer -> consumer.accept(this.value));
     }
 
@@ -64,7 +69,9 @@ public class Reactive<V> {
         }
 
         public void apply(S sourceValue) {
-            this.receiver.value = this.mapper.apply(sourceValue);
+            // don't use setValue here, unless you want to have infinite cycles
+            this.receiver.setValue(this.mapper.apply(sourceValue));
+//            this.receiver.value = this.mapper.apply(sourceValue);
         }
 
         @Override

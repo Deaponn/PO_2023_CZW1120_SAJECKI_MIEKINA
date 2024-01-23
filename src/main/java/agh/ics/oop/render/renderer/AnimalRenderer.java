@@ -6,6 +6,7 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageSampler;
+import agh.ics.oop.view.ViewLayer;
 
 public class AnimalRenderer implements UnitRenderer<Animal> {
     private final ImageSampler blob1;
@@ -44,13 +45,13 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
     }
 
     @Override
-    public void render(WorldRenderer renderer, Animal element) {
+    public void render(WorldRenderer renderer, ViewLayer viewLayer, Animal element) {
         Vector2D position = element.getPosition();
-        renderer.worldView.putImageAtGrid(position, this.blob1);
+        renderer.view.putImageAtGrid(position, this.blob1, viewLayer);
         ImageSampler bar = this.getEnergyBarImageSampler(element.getEnergy());
-        renderer.worldView.putImageAtGrid(position, bar);
+        renderer.view.putImageAtGrid(position, bar, viewLayer);
         ImageSampler arrow = this.getArrowImageSampler(element.getDirection());
-        renderer.worldView.putImageAtGrid(position, arrow);
+        renderer.view.putImageAtGrid(position, arrow, viewLayer);
     }
 
     private ImageSampler getEnergyBarImageSampler(int energy) {

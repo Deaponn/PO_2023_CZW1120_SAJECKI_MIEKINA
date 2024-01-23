@@ -5,20 +5,20 @@ import agh.ics.oop.util.Reactive;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 
-public class WorldViewInput {
+public class ViewInput {
     public Reactive<Boolean> isLeftMousePressed;
     public Reactive<Boolean> isRightMousePressed;
     public Reactive<Boolean> isInsideView;
     public Reactive<Vector2D> mousePosition;
 
-    public WorldViewInput() {
+    public ViewInput() {
         this.isLeftMousePressed = new Reactive<>(false);
         this.isRightMousePressed = new Reactive<>(false);
         this.isInsideView = new Reactive<>(false);
         this.mousePosition = new Reactive<>(new Vector2D());
     }
 
-    public void attach(WorldView<?> view) {
+    public void attach(View<?> view) {
         Node node = view.getRoot();
         node.setOnMouseMoved(this::updatePosition);
         node.setOnMousePressed(this::updateButtons);
@@ -26,7 +26,7 @@ public class WorldViewInput {
         node.setOnMouseExited(this::updateMoveOut);
     }
 
-    public void detach(WorldView<?> view) {
+    public void detach(View<?> view) {
         Node node = view.getRoot();
         node.setOnMouseMoved(null);
         node.setOnMousePressed(null);
