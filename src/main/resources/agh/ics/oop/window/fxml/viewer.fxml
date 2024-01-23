@@ -2,11 +2,30 @@
 
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Label?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="agh.ics.oop.window.controller.Viewer"
             minHeight="400.0" minWidth="600.0">
-    <center>
-        <Canvas fx:id="canvas" width="600.0" height="400.0"/>
-    </center>
+    <Canvas fx:id="canvas" width="600.0" height="400.0"/>
+    <bottom>
+        <GridPane hgap="5.0" vgap="5.0" style="-fx-padding: 10">
+            <Button
+                    GridPane.columnIndex="0"
+                    onAction="#handlePauseButtonClick"
+            >PAUSE/PLAY</Button>
+            <Label
+                    GridPane.columnIndex="1"
+            >Predkosc animacji:</Label>
+            <Slider
+                    GridPane.columnIndex="2"
+                    min="100"
+                    max="2100"
+                    fx:id="delaySlider"
+            />
+        </GridPane>
+    </bottom>
 </BorderPane>

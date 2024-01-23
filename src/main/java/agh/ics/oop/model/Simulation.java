@@ -15,12 +15,15 @@ public class Simulation implements Runnable {
         if (isKilled) return;
         // TODO: important to check if the paused program won't cause the
         //      computer to become helicopter since run() will call itself back to back
-        if (!isPaused) try {
-            Thread.sleep(updateDelay);
+        if (!isPaused)
             map.step();
+
+        try {
+            Thread.sleep(isPaused ? 50 : updateDelay);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         this.run();
     }
 

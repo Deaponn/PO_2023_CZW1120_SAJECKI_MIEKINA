@@ -9,10 +9,13 @@ import agh.ics.oop.view.CanvasWorldView;
 import agh.ics.oop.window.WindowController;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Slider;
 
 public class Viewer extends WindowController implements ObjectEventListener<WorldMap> {
     @FXML
     public Canvas canvas;
+    @FXML
+    public Slider delaySlider;
     private WorldRenderer worldRenderer;
     private WorldMap worldMap;
     private Simulation simulation;
@@ -25,7 +28,11 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         worldView.getRoot().widthProperty()
                 .bind(this.window.getRoot().widthProperty());
         worldView.getRoot().heightProperty()
-                .bind(this.window.getRoot().heightProperty());
+                .bind(this.window.getRoot().heightProperty().subtract(50));
+
+        this.delaySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            this.handleDelayUpdate(newValue.intValue());
+        });
 
         this.worldRenderer = new WorldRenderer(
                 this.getBundleItem("image_map", ImageMap.class).orElseThrow(),
@@ -71,12 +78,14 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         }
     }
 
-    private void onPauseButtonClick() {
+    @FXML
+    private void handlePauseButtonClick() {
         this.simulation.setIsPaused(!this.simulation.getIsPaused());
     }
 
     // set the amount of milliseconds to wait before subsequent step() calls
-    private void onChangeUpdateDelay(int newDelay) {
+    @FXML
+    private void handleDelayUpdate(int newDelay) {
         this.simulation.setUpdateDelay(newDelay);
     }
 }
