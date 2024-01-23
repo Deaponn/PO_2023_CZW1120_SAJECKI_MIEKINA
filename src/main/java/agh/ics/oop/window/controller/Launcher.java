@@ -45,7 +45,8 @@ public class Launcher extends WindowController {
 
     public void launchViewer() {
         Window<Viewer> viewerWindow = new Window<>(
-                this.simulationTitle.getCharacters().toString(),
+                !this.simulationTitle.getCharacters().isEmpty() ? this.simulationTitle.getCharacters().toString()
+                        : "No simulation name",
                 LayoutPath.VIEWER.path
         );
 
