@@ -3,6 +3,7 @@ package agh.ics.oop.loop;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
     private final Lock pauseLock;
@@ -11,16 +12,19 @@ public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
     private long timeElapsed;
     private long timeDelay;
 
-    public FixedDelayLoop(Consumer<Long> action, long milliseconds) {
-        super(action, milliseconds);
+    public FixedDelayLoop(Consumer<Long> action,
+                          Supplier<Thread> threadSupplier,
+                          long milliseconds) {
+        super(action, threadSupplier, milliseconds);
         this.pauseLock = new ReentrantLock();
         this.isPaused = false;
         this.isStopped = false;
         this.timeElapsed = 0L;
     }
 
-    public FixedDelayLoop(long milliseconds) {
-        this(null, milliseconds);
+    public FixedDelayLoop(Consumer<Long> action,
+                          long milliseconds) {
+        this(action, Thread::currentThread, milliseconds);
     }
 
     @Override

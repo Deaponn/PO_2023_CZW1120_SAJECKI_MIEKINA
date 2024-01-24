@@ -65,10 +65,10 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 worldView::getGridIndex,
                 ReactivePropagate.LISTENER_ONLY);
 
-        selectOverlay.gridPosition.addOnChange(position -> {
-                this.worldRenderer.renderOverlayViewLayer();
-                System.out.println(position);
-        });
+//        selectOverlay.gridPosition.addOnChange(position -> {
+//                this.worldRenderer.renderOverlayViewLayer();
+//                System.out.println(position);
+//        });
 
         this.worldRenderer.overlayList.add(selectOverlay);
 
