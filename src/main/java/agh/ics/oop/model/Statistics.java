@@ -33,7 +33,7 @@ public class Statistics {
     @Exported
     public final int focusedAnimalAge;
     private final boolean isAnimalFocused;
-    private boolean isFocusedAnimalAlive;
+    private final boolean isFocusedAnimalAlive;
 
     public Statistics(StatisticsCollector collector) {
         this.animalsCount = collector.getAnimalsCount();
@@ -44,17 +44,17 @@ public class Statistics {
         this.averageDaysLived = collector.getAverageDaysLived();
         this.averageKidsCount = collector.getAverageKidsCount();
 
-        Animal focusedAnimal = collector.getFocusedAnimal();
-        if (focusedAnimal != null) {
+        boolean isAnimalFocused = collector.getIsAnimalFocused();
+        if (isAnimalFocused) {
             this.isAnimalFocused = true;
-            this.isFocusedAnimalAlive = focusedAnimal.getAlive();
             this.focusedAnimalGenome = collector.getFocusedAnimalGenome().toOrdinalString();
-            this.focusedAnimalActiveGene = collector.getFocusedAnimalGenome().getActiveGeneIndex();
+            this.focusedAnimalActiveGene = collector.getFocusedAnimalActiveGene();
             this.focusedAnimalEnergy = collector.getFocusedAnimalEnergy();
             this.focusedAnimalPlantsEaten = collector.getFocusedAnimalPlantsEaten();
             this.focusedAnimalKidsCount = collector.getFocusedAnimalKidsCount();
             this.focusedAnimalAncestorsCount = collector.getFocusedAnimalAncestorsCount();
             this.focusedAnimalAge = collector.getFocusedAnimalAge();
+            this.isFocusedAnimalAlive = collector.getFocusedAnimalIsAlive();
         } else {
             this.isAnimalFocused = false;
             this.focusedAnimalGenome = null;
@@ -64,6 +64,7 @@ public class Statistics {
             this.focusedAnimalKidsCount = 0;
             this.focusedAnimalAncestorsCount = 0;
             this.focusedAnimalAge = 0;
+            this.isFocusedAnimalAlive = false;
         }
     }
 

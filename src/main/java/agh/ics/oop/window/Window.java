@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -26,6 +27,7 @@ public class Window<T extends WindowController> {
 
     public Window(Stage stage, String title, String layoutPath) {
         this.stage = stage;
+        stage.getIcons().add(new Image("file:res/gfx/frogs/green_frog1.png"));
         this.title = title;
         this.layoutPath = layoutPath;
         this.isInit = false;
