@@ -1,6 +1,5 @@
 package agh.ics.oop.model;
 
-import agh.ics.oop.entities.Animal;
 import agh.ics.oop.resource.Exported;
 
 public class Statistics {
@@ -70,21 +69,29 @@ public class Statistics {
 
     public String toString() {
         String mapData = String.format("""
-                        Animals count: %d, plants count: %d, free squares: %d,
-                        most popular genome: %s,
-                        average energy: %.2f, average days lived: %.2f, average kids count: %.2f""",
+                        animals: %d
+                        plants: %d
+                        free squares: %d
+                        pop genome: \n%s
+                        avg energy: %.2f
+                        avg days lived: %.2f
+                        avg kids: %.2f""",
                 this.animalsCount, this.plantsCount, this.freeSquaresCount, this.mostPopularGenome,
                 this.averageEnergy, this.averageDaysLived, this.averageKidsCount);
         String animalData = this.isAnimalFocused ? String.format("""
-                        %nCurrent animal genome: %s,
-                        active gene idx: %d, energy: %d,
-                        plants eaten: %d, kids count: %d
-                        ancestors count: %d, days %s""",
+                        \n========
+                        animal genome: \n%s
+                        act gene idx: %d
+                        energy: %d
+                        plants eaten: %d
+                        kids: %d
+                        ancestors: %d
+                        days %s""",
                 this.focusedAnimalGenome, this.focusedAnimalActiveGene,
                 this.focusedAnimalEnergy, this.focusedAnimalPlantsEaten, this.focusedAnimalKidsCount,
                 this.focusedAnimalAncestorsCount,
                 (this.isFocusedAnimalAlive ? "alive: " : "lived: ") + this.focusedAnimalAge)
-                : "No animal is focused right now";
+                : "\n========\nNO ANIMAL SELECTED";
         return mapData + animalData + "\n";
     }
 }

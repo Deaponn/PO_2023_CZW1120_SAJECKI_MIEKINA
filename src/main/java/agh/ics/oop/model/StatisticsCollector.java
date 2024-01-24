@@ -49,11 +49,13 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
     public void setFocusedAnimal(Animal animal) {
         this.focusedAnimal = animal;
         this.isAnimalFocused.setValue(true);
+        notifySubscribers("animal set");
     }
 
     public void unsetFocusedAnimal() {
         this.focusedAnimal = null;
         this.isAnimalFocused.setValue(false);
+        notifySubscribers("animal unset");
     }
 
     public void sendEventData(WorldMap map, String message) {
@@ -119,8 +121,6 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
             }
         }
         this.mostPopularGenome.setValue(strongestAnimal.getGenome());
-        // TODO: SUPER IMPORTANT TO REMOVE, THIS IS ONLY TO TEST FOCUSED ANIMAL TRACKING
-        setFocusedAnimal(strongestAnimal);
     }
 
     private void collectAverageEnergy() {

@@ -8,8 +8,11 @@ import agh.ics.oop.render.image.ImageSampler;
 public class BouncingImageOverlay extends ImageOverlay {
     private Vector2D velocity;
 
-    public BouncingImageOverlay(Vector2D screenPosition, String samplerKey, float scale) {
-        super(screenPosition, samplerKey, scale);
+    public BouncingImageOverlay(Vector2D screenPosition,
+                                int depthIndex,
+                                String samplerKey,
+                                float scale) {
+        super(screenPosition, depthIndex, samplerKey, scale);
         this.velocity = new Vector2D();
     }
 

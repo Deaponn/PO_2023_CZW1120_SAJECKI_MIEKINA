@@ -9,8 +9,11 @@ public abstract class ImageOverlay extends Overlay {
     public Reactive<String> samplerKey;
     public Reactive<Float> scale;
 
-    public ImageOverlay(Vector2D screenPosition, String samplerKey, float scale) {
-        super(screenPosition);
+    public ImageOverlay(Vector2D screenPosition,
+                        int depthIndex,
+                        String samplerKey,
+                        float scale) {
+        super(screenPosition, depthIndex);
         this.samplerKey = new Reactive<>(samplerKey);
         this.scale = new Reactive<>(scale);
     }

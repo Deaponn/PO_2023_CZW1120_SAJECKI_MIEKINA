@@ -1,5 +1,6 @@
 package agh.ics.oop.window.controller;
 
+import agh.ics.oop.entities.Animal;
 import agh.ics.oop.loop.Loop;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.TextOverlay;
@@ -16,6 +17,8 @@ import agh.ics.oop.window.WindowController;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Slider;
+
+import java.util.List;
 
 public class Viewer extends WindowController implements ObjectEventListener<WorldMap> {
     @FXML
@@ -69,12 +72,12 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
 
     private void initOverlays() {
         BouncingImageOverlay bouncyDVD =
-                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
+                new BouncingImageOverlay(new Vector2D(50, 50), 4, "dvd0", 4f);
         bouncyDVD.setVelocity(new Vector2D(12, 8));
         this.worldRenderer.addOverlay("dvd", bouncyDVD);
 
         GridImageOverlay selectOverlay =
-                new GridImageOverlay(new Vector2D(), "sel0");
+                new GridImageOverlay(new Vector2D(), 2, "sel0");
         this.worldRenderer.addOverlay("selector", selectOverlay);
 
         selectOverlay.gridPosition.bindTo(
@@ -83,7 +86,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 ReactivePropagate.LISTENER_ONLY);
 
         TextOverlay frameTimeOverlay =
-                new StaticTextOverlay(new Vector2D(0, 0), "font0_atlas", 1f, "");
+                new StaticTextOverlay(new Vector2D(0, 0), 1, "font0_atlas", 1f, "");
         this.worldRenderer.addOverlay("frame_time", frameTimeOverlay);
 
         frameTimeOverlay.text.bindTo(
@@ -91,7 +94,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 (time) -> "frame_T [ms]: " + time / 1_000_000L);
 
         TextOverlay mapStatisticsOverlay =
-                new StaticTextOverlay(new Vector2D(0, 16), "font0_atlas", 1f, "");
+                new StaticTextOverlay(new Vector2D(0, 32), 1, "font0_atlas", 1f, "");
         this.worldRenderer.addOverlay("map_statistics", mapStatisticsOverlay);
     }
 
@@ -119,7 +122,28 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         collector.subscribeTo(this.worldMap);
         collector.addEventSubscriber(exporter);
 
-        TextOverlay mapStatisticsOverlay = (TextOverlay) this.worldRenderer.getOverlay("map_stat");
+        TextOverlay mapStatisticsOverlay = (TextOverlay) this.worldRenderer.getOverlay("map_statistics");
+        collector.addEventSubscriber((statistics, message) ->
+                mapStatisticsOverlay.text.setValue(statistics.toString()));
+
+        GridImageOverlay selectOverlay = (GridImageOverlay) this.worldRenderer.getOverlay("selector");
+
+        this.viewInput.isLeftMousePressed.addOnChange(isPressed -> {
+            if (isPressed) {
+                List<WorldElement> worldElementList =
+                        this.worldMap.getElements(selectOverlay.gridPosition.getValue());
+                Animal animal = (Animal) worldElementList.stream()
+                        .filter(element -> element instanceof Animal)
+                        .sorted()
+                        .findFirst()
+                        .orElse(null);
+                if (animal != null) {
+                    collector.setFocusedAnimal(animal);
+                } else {
+                    collector.unsetFocusedAnimal();
+                }
+            }
+        });
 
         this.window.setStageOnCloseRequest(event -> {
             this.simulation.kill();

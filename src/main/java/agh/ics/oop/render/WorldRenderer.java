@@ -66,8 +66,9 @@ public class WorldRenderer {
     public synchronized void renderOverlayViewLayer() {
         Platform.runLater(() -> {
             this.overlayViewLayer.createBuffer();
-            this.overlayMap
-                    .forEach((key, overlay) -> this.tryRender(this.overlayViewLayer, overlay));
+            this.overlayMap.values().stream()
+                    .sorted()
+                    .forEach(overlay -> this.tryRender(this.overlayViewLayer, overlay));
             this.view.presentView();
         });
     }

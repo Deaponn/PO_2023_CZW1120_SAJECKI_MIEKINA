@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CSVExporter<T> extends Exporter<T> {
@@ -30,6 +31,7 @@ public class CSVExporter<T> extends Exporter<T> {
 
     private String formatRow(Stream<?> elementStream) {
         List<String> elementStringList = elementStream
+                .filter(Objects::nonNull)
                 .map(Object::toString)
                 .toList();
 
