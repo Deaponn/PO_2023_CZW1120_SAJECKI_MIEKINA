@@ -15,15 +15,21 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
     private final ImageSampler bar4;
 
     public AnimalRenderer(WorldRenderer renderer) {
+        String[] colors = new String[]{"blue", "cyan", "green", "orange", "purple", "red", "yellow"};
+
+        int choice = 3;
+
+        String color = colors[choice];
+
         this.frog = new ImageSampler[]{
-                renderer.imageSamplerMap.getImageSampler("frog4"),
-                renderer.imageSamplerMap.getImageSampler("frog3"),
-                renderer.imageSamplerMap.getImageSampler("frog2"),
-                renderer.imageSamplerMap.getImageSampler("frog1"),
-                renderer.imageSamplerMap.getImageSampler("frog0"),
-                renderer.imageSamplerMap.getImageSampler("frog7"),
-                renderer.imageSamplerMap.getImageSampler("frog6"),
-                renderer.imageSamplerMap.getImageSampler("frog5")
+                renderer.imageSamplerMap.getImageSampler(color + "_frog4"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog3"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog2"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog1"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog0"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog7"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog6"),
+                renderer.imageSamplerMap.getImageSampler(color + "_frog5")
         };
         this.bar0 = renderer.imageSamplerMap.getImageSampler("bar0");
         this.bar1 = renderer.imageSamplerMap.getImageSampler("bar1");

@@ -20,19 +20,22 @@ public class ImageMap {
         this.imageMap = new HashMap<>();
     }
 
-    public ImageMap(String searchPath, String extension) throws ResourceNotFoundException {
+    public ImageMap(String[] searchPaths, String extension) throws ResourceNotFoundException {
         this();
         String extensionPattern = "." + extension;
-        Stream<Map.Entry<String, InputStream>> namedInputStreamStream = Resources.listFilesAtPathAsNamedStream(
-                searchPath,
-                file -> file.getName().contains(extensionPattern),
-                ImageMap::getImageKeyFromFile
-        );
+        for (String searchPath : searchPaths) {
+            Stream<Map.Entry<String, InputStream>> namedInputStreamStream = Resources.listFilesAtPathAsNamedStream(
+                    searchPath,
+                    file -> file.getName().contains(extensionPattern),
+                    ImageMap::getImageKeyFromFile
+            );
 
-        Map<String, InputStream> imageStreamMap = namedInputStreamStream.collect(
-                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
-        );
-        this.loadImages(imageStreamMap);
+            Map<String, InputStream> imageStreamMap = namedInputStreamStream.collect(
+                    Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+            );
+            
+            this.loadImages(imageStreamMap);
+        }
     }
 
     public void loadImage(String imageKey, Image image) {

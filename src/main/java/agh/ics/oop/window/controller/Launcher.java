@@ -56,7 +56,7 @@ public class Launcher extends WindowController {
                 worldMap = new EquatorialWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
             else
                 worldMap = new PoisonousPlantsWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
-            ImageMap imageMap = new ImageMap("res/gfx", "png");
+            ImageMap imageMap = new ImageMap(new String[]{"res/gfx", "res/gfx/frogs"}, "png");
             Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
             Bundle viewerBundle = new Bundle()
