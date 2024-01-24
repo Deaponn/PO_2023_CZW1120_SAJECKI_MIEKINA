@@ -22,8 +22,12 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     public Canvas canvas;
     @FXML
     public Slider delaySlider;
+
+    private CanvasView canvasView;
+    private ViewInput viewInput;
     private WorldRenderer worldRenderer;
     private RendererEngine rendererEngine;
+    private WorldMap worldMap;
     private Loop rendererLoop;
     private Simulation simulation;
 
@@ -31,48 +35,52 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     public void start() {
         super.start();
 
-        CanvasView worldView = new CanvasView(this.canvas);
-        ViewInput viewInput = new ViewInput();
-        viewInput.attach(worldView);
+        this.delaySlider.valueProperty()
+                .addListener((observable, oldValue, newValue) ->
+                        this.handleDelayUpdate(newValue.intValue()));
 
-        worldView.getRoot().widthProperty()
+        this.initRenderer();
+        this.initOverlays();
+        this.startRenderer();
+        this.initWorldMap();
+        this.setupSimulation();
+    }
+
+    private void initRenderer() {
+        this.canvasView = new CanvasView(this.canvas);
+        this.viewInput = new ViewInput();
+        this.viewInput.attach(this.canvasView);
+
+        this.canvasView.getRoot().widthProperty()
                 .bind(this.window.getRoot().widthProperty());
-        worldView.getRoot().heightProperty()
+        this.canvasView.getRoot().heightProperty()
                 .bind(this.window.getRoot().heightProperty().subtract(50));
-
-        this.delaySlider.valueProperty().addListener((observable, oldValue, newValue) -> this.handleDelayUpdate(newValue.intValue()));
 
         this.worldRenderer = new WorldRenderer(
                 this.getBundleItem("image_map", ImageMap.class).orElseThrow(),
-                worldView
+                this.canvasView
         );
 
         this.worldRenderer.imageSamplerMap.addFontAtlasSampler(
                 "font0",
                 "font0_atlas",
                 new Vector2D(10, 16));
+    }
 
-        this.rendererEngine = this.getBundleItem("renderer_engine", RendererEngine.class)
-                .orElseThrow();
-
-        BouncingImageOverlay testImageOverlay =
+    private void initOverlays() {
+        BouncingImageOverlay bouncyDVD =
                 new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(12, 8));
-        this.worldRenderer.overlayList.add(testImageOverlay);
+        bouncyDVD.setVelocity(new Vector2D(12, 8));
+        this.worldRenderer.overlayList.add(bouncyDVD);
 
         GridImageOverlay selectOverlay =
                 new GridImageOverlay(new Vector2D(), "sel0");
-
-        selectOverlay.gridPosition.bindTo(
-                viewInput.mousePosition,
-                worldView::getGridIndex,
-                ReactivePropagate.LISTENER_ONLY);
-
         this.worldRenderer.overlayList.add(selectOverlay);
 
-//        StaticImageOverlay playControlOverlay =
-//                new StaticImageOverlay(new Vector2D(16, 16), "btnpause", 2f);
-//        this.worldRenderer.overlayList.add(playControlOverlay);
+        selectOverlay.gridPosition.bindTo(
+                this.viewInput.mousePosition,
+                this.canvasView::getGridIndex,
+                ReactivePropagate.LISTENER_ONLY);
 
         TextOverlay frameTimeOverlay =
                 new StaticTextOverlay(new Vector2D(64, 16), "font0_atlas", 1f, "");
@@ -81,25 +89,36 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         frameTimeOverlay.text.bindTo(
                 this.worldRenderer.frameRenderTime,
                 (time) -> "frame_T [ms]: " + time / 1_000_000L);
+    }
+
+    private void startRenderer() {
+        this.rendererEngine = this.getBundleItem("renderer_engine", RendererEngine.class)
+                .orElseThrow();
 
         this.rendererLoop = this.rendererEngine.addRenderer(this.worldRenderer);
+    }
 
-        WorldMap worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
-        worldMap.addEventSubscriber(this);
+    private void initWorldMap() {
+        this.worldMap = this.getBundleItem("world_map", WorldMap.class)
+                .orElseThrow();
+        this.worldMap.addEventSubscriber(this);
 
-        this.worldRenderer.setWorldMap(worldMap);
+        this.worldRenderer.setWorldMap(this.worldMap);
+    }
 
-        this.simulation = this.getBundleItem("simulation", Simulation.class).orElseThrow();
+    private void setupSimulation() {
+        this.simulation = this.getBundleItem("simulation", Simulation.class)
+                .orElseThrow();
 
         StatisticsCollector collector = new StatisticsCollector();
-        StatisticsExporter exporter = new StatisticsExporter(worldMap.getTitle());
-        collector.subscribeTo(worldMap);
+        StatisticsExporter exporter = new StatisticsExporter(this.worldMap.getTitle());
+        collector.subscribeTo(this.worldMap);
         collector.addEventSubscriber(exporter);
 
         this.window.setStageOnCloseRequest(event -> {
             this.simulation.kill();
             this.rendererEngine.getLoopControl()
-                    .removeLoop(rendererLoop);
+                    .removeLoop(this.rendererLoop);
             exporter.saveToFile();
         });
     }
