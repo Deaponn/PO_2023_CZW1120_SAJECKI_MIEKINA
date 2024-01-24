@@ -5,6 +5,7 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageSampler;
+import agh.ics.oop.view.ViewLayer;
 
 import java.util.Random;
 
@@ -42,13 +43,13 @@ public class GroundRenderer implements UnitRenderer<Ground> {
     }
 
     @Override
-    public void render(WorldRenderer renderer, Ground element) {
+    public void render(WorldRenderer renderer, ViewLayer viewLayer, Ground element) {
         Vector2D position = element.getPosition();
         int frame = this.getFrame(position);
         if (!element.getIsPoisoned())
-            renderer.worldView.putImageAtGrid(position, this.healthyFrameSamplerArray[frame]);
+            renderer.view.putImageAtGrid(position, this.healthyFrameSamplerArray[frame], viewLayer);
         else
-            renderer.worldView.putImageAtGrid(position, this.poisonedFrameSamplerArray[frame]);
+            renderer.view.putImageAtGrid(position, this.poisonedFrameSamplerArray[frame], viewLayer);
     }
 
     private int getFrame(Vector2D position) {
