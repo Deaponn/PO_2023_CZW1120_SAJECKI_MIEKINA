@@ -9,7 +9,7 @@ import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
-import agh.ics.oop.render.renderer.RendererEngine;
+import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.util.ReactivePropagate;
 import agh.ics.oop.view.CanvasView;
 import agh.ics.oop.view.ViewInput;

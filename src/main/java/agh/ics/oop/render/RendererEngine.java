@@ -1,9 +1,8 @@
-package agh.ics.oop.render.renderer;
+package agh.ics.oop.render;
 
 import agh.ics.oop.loop.FixedDelayLoop;
 import agh.ics.oop.loop.Loop;
 import agh.ics.oop.loop.LoopControl;
-import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.util.ThreadManager;
 
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,7 @@ public class RendererEngine implements ThreadManager {
     public Loop addRenderer(WorldRenderer worldRenderer) {
         Loop overlayLoop = new FixedDelayLoop(
                 time -> this.renderOverlay(worldRenderer),
-                100L);
+                50L);
         this.loopControl.addLoop(overlayLoop);
         return overlayLoop;
     }

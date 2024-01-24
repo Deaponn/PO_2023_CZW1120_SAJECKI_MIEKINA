@@ -3,7 +3,7 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.image.ImageMap;
-import agh.ics.oop.render.renderer.RendererEngine;
+import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.window.Bundle;
