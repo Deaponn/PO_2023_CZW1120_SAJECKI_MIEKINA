@@ -1,10 +1,12 @@
 package agh.ics.oop.render.renderer;
 
 import agh.ics.oop.entities.Animal;
+import agh.ics.oop.model.MapDirection;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.render.UnitRenderer;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageSampler;
+import agh.ics.oop.view.ViewLayer;
 
 public class AnimalRenderer implements UnitRenderer<Animal> {
     private final ImageSampler[] frog;
@@ -31,6 +33,7 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
                 renderer.imageSamplerMap.getImageSampler(color + "_frog6"),
                 renderer.imageSamplerMap.getImageSampler(color + "_frog5")
         };
+
         this.bar0 = renderer.imageSamplerMap.getImageSampler("bar0");
         this.bar1 = renderer.imageSamplerMap.getImageSampler("bar1");
         this.bar2 = renderer.imageSamplerMap.getImageSampler("bar2");
@@ -39,14 +42,14 @@ public class AnimalRenderer implements UnitRenderer<Animal> {
     }
 
     @Override
-    public void render(WorldRenderer renderer, Animal element) {
+    public void render(WorldRenderer renderer, ViewLayer viewLayer, Animal element) {
         Vector2D position = element.getPosition();
-        renderer.worldView.putImageAtGrid(position, this.frog[element.getDirection().ordinal()]);
-        ImageSampler bar = this.getEnergyBarImageKey(element.getEnergy());
-        renderer.worldView.putImageAtGrid(position, bar);
+        renderer.view.putImageAtGrid(position, this.frog[element.getDirection().ordinal()], viewLayer);
+        ImageSampler bar = this.getEnergyBarImageSampler(element.getEnergy());
+        renderer.view.putImageAtGrid(position, bar, viewLayer);
     }
 
-    private ImageSampler getEnergyBarImageKey(int energy) {
+    private ImageSampler getEnergyBarImageSampler(int energy) {
         return switch (energy) {
             case 0 -> this.bar0;
             case 1 -> this.bar1;
