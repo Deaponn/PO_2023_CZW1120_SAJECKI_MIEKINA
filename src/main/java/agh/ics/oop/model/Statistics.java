@@ -11,7 +11,7 @@ public class Statistics {
     @Exported
     public final int freeSquaresCount;
     @Exported
-    public final Genome mostPopularGenome;
+    public final String mostPopularGenome;
     @Exported
     public final float averageEnergy;
     @Exported
@@ -19,7 +19,9 @@ public class Statistics {
     @Exported
     public final float averageKidsCount;
     @Exported
-    public final Genome focusedAnimalGenome;
+    public final String focusedAnimalGenome;
+    @Exported
+    public final int focusedAnimalActiveGene;
     @Exported
     public final int focusedAnimalEnergy;
     @Exported
@@ -37,7 +39,7 @@ public class Statistics {
         this.animalsCount = collector.getAnimalsCount();
         this.plantsCount = collector.getPlantsCount();
         this.freeSquaresCount = collector.getFreeSquaresCount();
-        this.mostPopularGenome = collector.getMostPopularGenome();
+        this.mostPopularGenome = collector.getMostPopularGenome().toOrdinalString();
         this.averageEnergy = collector.getAverageEnergy();
         this.averageDaysLived = collector.getAverageDaysLived();
         this.averageKidsCount = collector.getAverageKidsCount();
@@ -46,7 +48,8 @@ public class Statistics {
         if (focusedAnimal != null) {
             this.isAnimalFocused = true;
             this.isFocusedAnimalAlive = focusedAnimal.getAlive();
-            this.focusedAnimalGenome = collector.getFocusedAnimalGenome();
+            this.focusedAnimalGenome = collector.getFocusedAnimalGenome().toOrdinalString();
+            this.focusedAnimalActiveGene = collector.getFocusedAnimalGenome().getActiveGeneIndex();
             this.focusedAnimalEnergy = collector.getFocusedAnimalEnergy();
             this.focusedAnimalPlantsEaten = collector.getFocusedAnimalPlantsEaten();
             this.focusedAnimalKidsCount = collector.getFocusedAnimalKidsCount();
@@ -54,7 +57,8 @@ public class Statistics {
             this.focusedAnimalAge = collector.getFocusedAnimalAge();
         } else {
             this.isAnimalFocused = false;
-            this.focusedAnimalGenome = GenomeFactory.defaultGenome();
+            this.focusedAnimalGenome = null;
+            this.focusedAnimalActiveGene = 0;
             this.focusedAnimalEnergy = 0;
             this.focusedAnimalPlantsEaten = 0;
             this.focusedAnimalKidsCount = 0;
@@ -75,7 +79,7 @@ public class Statistics {
                         active gene idx: %d, energy: %d,
                         plants eaten: %d, kids count: %d
                         ancestors count: %d, days %s""",
-                this.focusedAnimalGenome, this.focusedAnimalGenome.getActiveGeneIndex(),
+                this.focusedAnimalGenome, this.focusedAnimalActiveGene,
                 this.focusedAnimalEnergy, this.focusedAnimalPlantsEaten, this.focusedAnimalKidsCount,
                 this.focusedAnimalAncestorsCount,
                 (this.isFocusedAnimalAlive ? "alive: " : "lived: ") + this.focusedAnimalAge)

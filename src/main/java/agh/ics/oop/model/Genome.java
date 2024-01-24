@@ -2,6 +2,7 @@ package agh.ics.oop.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Genome {
     // TODO
@@ -35,6 +36,10 @@ public class Genome {
 
     public String toString() {
         return this.geneList.toString();
+    }
+
+    public String toOrdinalString() {
+        return this.geneList.stream().map(Enum::ordinal).toList().toString();
     }
 
     private static final Random random = new Random();

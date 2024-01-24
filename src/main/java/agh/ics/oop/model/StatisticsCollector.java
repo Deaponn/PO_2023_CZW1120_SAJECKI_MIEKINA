@@ -94,6 +94,10 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
     }
 
     private void collectMostPopularGenome() {
+        if (this.animals.isEmpty()) {
+            this.mostPopularGenome = null;
+            return;
+        }
         // no clue how to determine which genome is most popular, as every single one is most often unique
         // thus, displaying the strongest animal's genome
         Animal strongestAnimal = AnimalFactory.defaultAnimal();

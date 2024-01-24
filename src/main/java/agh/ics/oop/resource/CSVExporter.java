@@ -33,6 +33,6 @@ public class CSVExporter<T> extends Exporter<T> {
                 .map(Object::toString)
                 .toList();
 
-        return String.join(",", elementStringList) + "\n";
+        return String.join(";", elementStringList) + "\n";
     }
 }
