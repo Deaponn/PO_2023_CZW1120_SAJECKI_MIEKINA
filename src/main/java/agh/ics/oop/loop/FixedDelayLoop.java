@@ -1,42 +1,47 @@
 package agh.ics.oop.loop;
 
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
     private final Lock pauseLock;
+    private final Condition pauseCondition;
     private boolean isPaused;
     private boolean isStopped;
     private long timeElapsed;
     private long timeDelay;
 
     public FixedDelayLoop(Consumer<Long> action,
-                          Supplier<Thread> threadSupplier,
                           long milliseconds) {
-        super(action, threadSupplier, milliseconds);
+        super(action, milliseconds);
         this.pauseLock = new ReentrantLock();
+        this.pauseCondition = this.pauseLock.newCondition();
         this.isPaused = false;
         this.isStopped = false;
         this.timeElapsed = 0L;
     }
 
-    public FixedDelayLoop(Consumer<Long> action,
-                          long milliseconds) {
-        this(action, Thread::currentThread, milliseconds);
-    }
-
     @Override
     public void resume() {
-        this.isPaused = false;
-        this.pauseLock.unlock();
+        this.pauseLock.lock();
+        try {
+            this.isPaused = false;
+            this.pauseCondition.signalAll();
+        } finally {
+            this.pauseLock.unlock();
+        }
     }
 
     @Override
     public void pause() {
-        this.isPaused = true;
         this.pauseLock.lock();
+        try {
+            this.isPaused = true;
+        } finally {
+            this.pauseLock.unlock();
+        }
     }
 
     @Override
@@ -44,16 +49,25 @@ public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
         return this.isPaused;
     }
 
-    @SuppressWarnings("BusyWait")
     @Override
-    public void start() {
+    public void run() {
         while (!this.isStopped) {
             this.pauseLock.lock();
-            this.runAction(this.timeElapsed);
-            this.pauseLock.unlock();
+            try {
+                while (this.isPaused) {
+                    this.pauseCondition.await();
+                }
+                this.runAction(this.timeElapsed);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                this.pauseLock.unlock();
+            }
 
             try {
-                Thread.sleep(this.timeDelay);
+                synchronized (this) {
+                    this.wait(this.timeDelay);
+                }
                 this.timeElapsed += this.timeDelay;
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

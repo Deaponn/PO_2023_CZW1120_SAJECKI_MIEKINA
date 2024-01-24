@@ -1,6 +1,5 @@
 package agh.ics.oop.render;
 
-import agh.ics.oop.loop.FixedDelayLoop;
 import agh.ics.oop.model.Boundary;
 import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldMap;
@@ -27,7 +26,6 @@ public class WorldRenderer {
     public final ViewLayer overlayViewLayer;
 
     public final Reactive<Long> frameRenderTime;
-//    public final FixedDelayLoop overlayRenderLoop;
 
     public WorldRenderer(ImageMap imageMap, View<?> view) {
         this.imageSamplerMap = new ImageSamplerMap(imageMap);
@@ -41,12 +39,6 @@ public class WorldRenderer {
         this.view.withViewLayers(List.of(this.worldViewLayer, this.overlayViewLayer));
 
         this.frameRenderTime = new Reactive<>(0L);
-
-        Thread overlayThread = new Thread(() -> new FixedDelayLoop(
-                time -> this.renderOverlayViewLayer(),
-                Thread::new,
-                100L).start());
-        overlayThread.start();
     }
 
     public void setWorldMap(WorldMap worldMap) {

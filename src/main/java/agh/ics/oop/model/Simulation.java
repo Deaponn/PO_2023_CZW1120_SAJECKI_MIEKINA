@@ -10,7 +10,7 @@ public class Simulation implements Runnable {
     }
 
     public void run() {
-        this.loop.start();
+        this.loop.run();
     }
 
     public void setUpdateDelay(long milliseconds) {
