@@ -22,4 +22,22 @@ public class CSVExporterTest {
         System.out.flush();
         Assert.assertTrue(true);
     }
+
+    @Test
+    public void exportTestReactives() {
+        Exporter<ReactiveTestObject> exporter = new CSVExporter<>(ReactiveTestObject.class);
+        exporter
+                .pushObject(new ReactiveTestObject(0, "abc"))
+                .pushObject(new ReactiveTestObject(3, "lkj"))
+                .pushObject(new ReactiveTestObject(2, "vwu"));
+
+        try {
+            exporter.exportToOutputStream(System.out);
+        } catch (IOException e) {
+            Assert.fail("could not export: " + e.getMessage());
+        }
+
+        System.out.flush();
+        Assert.assertTrue(true);
+    }
 }

@@ -1,5 +1,7 @@
 package agh.ics.oop.render;
 
+import agh.ics.oop.view.ViewLayer;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,11 +75,11 @@ public class UnitRendererAssignmentMap {
         }
     }
 
-    public <U> void renderUnit(WorldRenderer renderer, U unit)
+    public <U> void renderUnit(WorldRenderer renderer, ViewLayer viewLayer, U unit)
             throws IllegalRendererAssignment {
         UnitRenderer<U> unitRenderer = this.getUnitRenderer(renderer, unit);
         try {
-            unitRenderer.render(renderer, unit);
+            unitRenderer.render(renderer, viewLayer, unit);
         } catch (ClassCastException e) {
             throw new IllegalRendererAssignment("illegal unit class supplied",
                     unit, unitRenderer);
