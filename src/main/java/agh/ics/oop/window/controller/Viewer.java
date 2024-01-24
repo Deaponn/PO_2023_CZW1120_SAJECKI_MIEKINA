@@ -71,11 +71,11 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         BouncingImageOverlay bouncyDVD =
                 new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
         bouncyDVD.setVelocity(new Vector2D(12, 8));
-        this.worldRenderer.overlayList.add(bouncyDVD);
+        this.worldRenderer.addOverlay("dvd", bouncyDVD);
 
         GridImageOverlay selectOverlay =
                 new GridImageOverlay(new Vector2D(), "sel0");
-        this.worldRenderer.overlayList.add(selectOverlay);
+        this.worldRenderer.addOverlay("selector", selectOverlay);
 
         selectOverlay.gridPosition.bindTo(
                 this.viewInput.mousePosition,
@@ -83,12 +83,16 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 ReactivePropagate.LISTENER_ONLY);
 
         TextOverlay frameTimeOverlay =
-                new StaticTextOverlay(new Vector2D(64, 16), "font0_atlas", 1f, "");
-        this.worldRenderer.overlayList.add(frameTimeOverlay);
+                new StaticTextOverlay(new Vector2D(0, 0), "font0_atlas", 1f, "");
+        this.worldRenderer.addOverlay("frame_time", frameTimeOverlay);
 
         frameTimeOverlay.text.bindTo(
                 this.worldRenderer.frameRenderTime,
                 (time) -> "frame_T [ms]: " + time / 1_000_000L);
+
+        TextOverlay mapStatisticsOverlay =
+                new StaticTextOverlay(new Vector2D(0, 16), "font0_atlas", 1f, "");
+        this.worldRenderer.addOverlay("map_statistics", mapStatisticsOverlay);
     }
 
     private void startRenderer() {
@@ -114,6 +118,8 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         StatisticsExporter exporter = new StatisticsExporter(this.worldMap.getTitle());
         collector.subscribeTo(this.worldMap);
         collector.addEventSubscriber(exporter);
+
+        TextOverlay mapStatisticsOverlay = (TextOverlay) this.worldRenderer.getOverlay("map_stat");
 
         this.window.setStageOnCloseRequest(event -> {
             this.simulation.kill();
