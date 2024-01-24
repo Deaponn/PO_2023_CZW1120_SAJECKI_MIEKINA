@@ -110,7 +110,10 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
 
     @FXML
     private void handlePauseButtonClick() {
-        this.simulation.setIsPaused(!this.simulation.getIsPaused());
+        if (this.simulation.isPaused())
+            this.simulation.resume();
+        else
+            this.simulation.pause();
     }
 
     // set the amount of milliseconds to wait before subsequent step() calls

@@ -1,5 +1,7 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.loop.FixedDelayLoop;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,7 +16,8 @@ public class SimulationEngine {
     }
 
     public Simulation runSimulation(WorldMap map, int updateDelay) {
-        Simulation simulation = new Simulation(map, updateDelay);
+        FixedDelayLoop loop = new FixedDelayLoop(updateDelay);
+        Simulation simulation = new Simulation(map, loop);
         executorService.submit(simulation);
         return simulation;
     }
