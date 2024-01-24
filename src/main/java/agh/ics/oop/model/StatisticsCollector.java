@@ -3,26 +3,30 @@ package agh.ics.oop.model;
 import agh.ics.oop.entities.Animal;
 import agh.ics.oop.entities.AnimalFactory;
 import agh.ics.oop.entities.Plant;
+import agh.ics.oop.util.Reactive;
 
 import java.util.*;
 
 public class StatisticsCollector implements ObjectEventListener<WorldMap>, ObjectEventEmitter<Statistics> {
-    private int animalsCount;
-    private int plantsCount;
-    private int freeSquaresCount;
-    private Genome mostPopularGenome;
-    private float averageEnergy;
-    private float averageDaysLived;
-    private float averageKidsCount;
+    private final Reactive<Integer> animalsCount = new Reactive<>(0);
+    private final Reactive<Integer> plantsCount = new Reactive<>(0);
+    private final Reactive<Integer> freeSquaresCount = new Reactive<>(0);
+    private final Reactive<Genome> mostPopularGenome = new Reactive<>(GenomeFactory.defaultGenome());
+    private final Reactive<Float> averageEnergy = new Reactive<>(0f);
+    private final Reactive<Float> averageDaysLived = new Reactive<>(0f);
+    private final Reactive<Float> averageKidsCount = new Reactive<>(0f);
     private int deadAnimalsCount;
     private int deadAnimalsDaysLivedSum;
     private Animal focusedAnimal = null;
-    private Genome focusedAnimalGenome;
-    private int focusedAnimalEnergy;
-    private int focusedAnimalPlantsEaten;
-    private int focusedAnimalKidsCount;
-    private int focusedAnimalAncestorsCount;
-    private int focusedAnimalAge;
+    private final Reactive<Boolean> isAnimalFocused = new Reactive<>(false);
+    private final Reactive<Genome> focusedAnimalGenome = new Reactive<>(GenomeFactory.defaultGenome());
+    private final Reactive<Integer> focusedAnimalActiveGene = new Reactive<>(0);
+    private final Reactive<Integer> focusedAnimalEnergy = new Reactive<>(0);
+    private final Reactive<Integer> focusedAnimalPlantsEaten = new Reactive<>(0);
+    private final Reactive<Integer> focusedAnimalKidsCount = new Reactive<>(0);
+    private final Reactive<Integer> focusedAnimalAncestorsCount = new Reactive<>(0);
+    private final Reactive<Integer> focusedAnimalAge = new Reactive<>(0);
+    private final Reactive<Boolean> focusedAnimalIsAlive = new Reactive<>(false);
     private Map<Vector2D, List<Animal>> animals;
     private Map<Vector2D, Plant> plants;
     private int mapWidth;
@@ -44,6 +48,12 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
 
     public void setFocusedAnimal(Animal animal) {
         this.focusedAnimal = animal;
+        this.isAnimalFocused.setValue(true);
+    }
+
+    public void unsetFocusedAnimal() {
+        this.focusedAnimal = null;
+        this.isAnimalFocused.setValue(false);
     }
 
     public void sendEventData(WorldMap map, String message) {
@@ -71,31 +81,33 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
 
     private void collectAnimalStatistics() {
         if (this.focusedAnimal == null || !this.focusedAnimal.getAlive()) return;
-        this.focusedAnimalGenome = this.focusedAnimal.getGenome();
-        this.focusedAnimalEnergy = this.focusedAnimal.getEnergy();
-        this.focusedAnimalPlantsEaten = this.focusedAnimal.getPlantsEaten();
-        this.focusedAnimalKidsCount = this.focusedAnimal.kidsCount();
-        this.focusedAnimalAncestorsCount = this.focusedAnimal.ancestorsCount();
-        this.focusedAnimalAge = this.focusedAnimal.getAge();
+        this.focusedAnimalGenome.setValue(this.focusedAnimal.getGenome());
+        this.focusedAnimalActiveGene.setValue(this.focusedAnimal.getGenome().getActiveGeneIndex());
+        this.focusedAnimalEnergy.setValue(this.focusedAnimal.getEnergy());
+        this.focusedAnimalPlantsEaten.setValue(this.focusedAnimal.getPlantsEaten());
+        this.focusedAnimalKidsCount.setValue(this.focusedAnimal.kidsCount());
+        this.focusedAnimalAncestorsCount.setValue(this.focusedAnimal.ancestorsCount());
+        this.focusedAnimalAge.setValue(this.focusedAnimal.getAge());
+        this.focusedAnimalIsAlive.setValue(this.focusedAnimal.getAlive());
     }
 
     private void collectAnimalsCount() {
-        this.animalsCount = this.animals.values().stream().mapToInt(List::size).sum();
+        this.animalsCount.setValue(this.animals.values().stream().mapToInt(List::size).sum());
     }
 
     private void collectPlantsCount() {
-        this.plantsCount = this.plants.values().size();
+        this.plantsCount.setValue(this.plants.values().size());
     }
 
     private void collectFreeSquaresCount() {
         Set<Vector2D> takenFields = new HashSet<>(this.animals.keySet());
         takenFields.addAll(this.plants.keySet());
-        this.freeSquaresCount = this.mapWidth * this.mapHeight - takenFields.size();
+        this.freeSquaresCount.setValue(this.mapWidth * this.mapHeight - takenFields.size());
     }
 
     private void collectMostPopularGenome() {
         if (this.animals.isEmpty()) {
-            this.mostPopularGenome = null;
+            this.mostPopularGenome.setValue(null);
             return;
         }
         // no clue how to determine which genome is most popular, as every single one is most often unique
@@ -106,7 +118,7 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
                 if (Animal.compare(animal, strongestAnimal) > 0) strongestAnimal = animal;
             }
         }
-        this.mostPopularGenome = strongestAnimal.getGenome();
+        this.mostPopularGenome.setValue(strongestAnimal.getGenome());
         // TODO: SUPER IMPORTANT TO REMOVE, THIS IS ONLY TO TEST FOCUSED ANIMAL TRACKING
         setFocusedAnimal(strongestAnimal);
     }
@@ -116,11 +128,11 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
         for (List<Animal> animalsList : this.animals.values()) {
             for (Animal animal : animalsList) energySum += animal.getEnergy();
         }
-        this.averageEnergy = (float) energySum / this.animalsCount;
+        this.averageEnergy.setValue((float) energySum / this.animalsCount.getValue());
     }
 
     private void collectAverageDaysLived() {
-        this.averageDaysLived = (float) this.deadAnimalsDaysLivedSum / this.deadAnimalsCount;
+        this.averageDaysLived.setValue((float) this.deadAnimalsDaysLivedSum / this.deadAnimalsCount);
     }
 
     private void collectAverageKidsCount() {
@@ -128,7 +140,7 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
         for (List<Animal> animalsList : this.animals.values()) {
             for (Animal animal : animalsList) kidsCountSum += animal.kidsCount();
         }
-        this.averageKidsCount = (float) kidsCountSum / this.animalsCount;
+        this.averageKidsCount.setValue((float) kidsCountSum / this.animalsCount.getValue());
     }
 
     @Override
@@ -156,58 +168,66 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
     }
 
     public int getAnimalsCount() {
-        return animalsCount;
+        return animalsCount.getValue();
     }
 
     public int getPlantsCount() {
-        return plantsCount;
+        return plantsCount.getValue();
     }
 
     public int getFreeSquaresCount() {
-        return freeSquaresCount;
+        return freeSquaresCount.getValue();
     }
 
     public Genome getMostPopularGenome() {
-        return mostPopularGenome;
+        return mostPopularGenome.getValue();
     }
 
     public float getAverageEnergy() {
-        return averageEnergy;
+        return averageEnergy.getValue();
     }
 
     public float getAverageDaysLived() {
-        return averageDaysLived;
+        return averageDaysLived.getValue();
     }
 
     public float getAverageKidsCount() {
-        return averageKidsCount;
+        return averageKidsCount.getValue();
     }
 
-    public Animal getFocusedAnimal() {
-        return focusedAnimal;
+    public boolean getIsAnimalFocused() {
+        return this.isAnimalFocused.getValue();
     }
 
     public Genome getFocusedAnimalGenome() {
-        return focusedAnimalGenome;
+        return focusedAnimalGenome.getValue();
+    }
+
+    public int getFocusedAnimalActiveGene() {
+        return this.focusedAnimalActiveGene.getValue();
     }
 
     public int getFocusedAnimalEnergy() {
-        return focusedAnimalEnergy;
+        return focusedAnimalEnergy.getValue();
     }
 
     public int getFocusedAnimalPlantsEaten() {
-        return focusedAnimalPlantsEaten;
+        return focusedAnimalPlantsEaten.getValue();
     }
 
     public int getFocusedAnimalKidsCount() {
-        return focusedAnimalKidsCount;
+        return focusedAnimalKidsCount.getValue();
     }
 
     public int getFocusedAnimalAncestorsCount() {
-        return focusedAnimalAncestorsCount;
+        return focusedAnimalAncestorsCount.getValue();
     }
 
     public int getFocusedAnimalAge() {
-        return focusedAnimalAge;
+        return focusedAnimalAge.getValue();
+    }
+
+    public boolean getFocusedAnimalIsAlive() {
+        return this.focusedAnimalIsAlive.getValue();
     }
 }
