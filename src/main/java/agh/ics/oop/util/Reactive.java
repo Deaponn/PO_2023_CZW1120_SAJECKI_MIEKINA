@@ -25,8 +25,13 @@ public class Reactive<V> {
         reactive.reactiveBindSet.add(identityBind);
     }
 
-    public <S> void bindTo(Reactive<S> reactive, Function<S, V> converter) {
-        Reactive.Bind<S, V> mappedBind = new Reactive.Bind<>(this, converter);
+    public <S> void bindTo(Reactive<S> reactive, Function<S, V> mapper) {
+        Reactive.Bind<S, V> mappedBind = new Reactive.Bind<>(this, mapper);
+        reactive.reactiveBindSet.add(mappedBind);
+    }
+
+    public <S> void bindTo(Reactive<S> reactive, Function<S, V> mapper, ReactivePropagate propagate) {
+        Reactive.Bind<S, V> mappedBind = new Reactive.Bind<>(this, mapper, propagate);
         reactive.reactiveBindSet.add(mappedBind);
     }
 
@@ -40,38 +45,62 @@ public class Reactive<V> {
     }
 
     public void setValue(V value) {
+        this.acceptNewValue(value);
+        this.emitValueToAll();
+    }
+
+    private void acceptNewValue(V value) {
         if (!this.value.equals(value)) {
             this.value = value;
-            this.sendOut();
         }
+    }
+
+    private void emitValueToReactives() {
+        this.reactiveBindSet.forEach(bind -> bind.apply(this.value));
+    }
+
+    private void emitValueToListeners() {
+        this.changeConsumerSet.forEach(consumer -> consumer.accept(this.value));
+    }
+
+    private void emitValueToAll() {
+        this.emitValueToReactives();
+        this.emitValueToListeners();
     }
 
     public V getValue() {
         return this.value;
     }
 
-    private void sendOut() {
-        this.reactiveBindSet.forEach(bind -> bind.apply(this.value));
-        this.emitChange();
-    }
-
-    private void emitChange() {
-        this.changeConsumerSet.forEach(consumer -> consumer.accept(this.value));
+    @Override
+    public String toString() {
+        return this.value.toString();
     }
 
     private static final class Bind<S, T> implements Comparable<Bind<?, ?>> {
         private final Reactive<T> receiver;
+        private final ReactivePropagate propagate;
         private final Function<S, T> mapper;
 
-        public Bind(Reactive<T> receiver, Function<S, T> mapper) {
+        public Bind(Reactive<T> receiver, Function<S, T> mapper, ReactivePropagate propagate) {
             this.receiver = receiver;
+            this.propagate = propagate;
             this.mapper = mapper;
+        }
+
+        public Bind(Reactive<T> receiver, Function<S, T> mapper) {
+            this(receiver, mapper, ReactivePropagate.NONE);
         }
 
         public void apply(S sourceValue) {
             // don't use setValue here, unless you want to have infinite cycles
-            this.receiver.setValue(this.mapper.apply(sourceValue));
-//            this.receiver.value = this.mapper.apply(sourceValue);
+            T targetValue = this.mapper.apply(sourceValue);
+            this.receiver.acceptNewValue(targetValue);
+            switch (this.propagate) {
+                case REACTIVE_ONLY -> this.receiver.emitValueToReactives();
+                case LISTENER_ONLY -> this.receiver.emitValueToListeners();
+                case ALL -> this.receiver.emitValueToAll();
+            }
         }
 
         @Override

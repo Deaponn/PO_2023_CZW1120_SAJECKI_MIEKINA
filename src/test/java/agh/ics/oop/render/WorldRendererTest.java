@@ -4,6 +4,8 @@ import agh.ics.oop.model.Vector2D;
 import agh.ics.oop.model.WorldElementA;
 import agh.ics.oop.model.WorldElementB;
 import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.view.CanvasView;
+import javafx.scene.canvas.Canvas;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,6 +32,7 @@ public class WorldRendererTest {
 
     private WorldRenderer getWorldRenderer() {
         ImageMap emptyImageMap = new ImageMap();
-        return new WorldRenderer(emptyImageMap, null);
+        CanvasView canvasView = new CanvasView(new Canvas(100, 100));
+        return new WorldRenderer(emptyImageMap, canvasView);
     }
 }

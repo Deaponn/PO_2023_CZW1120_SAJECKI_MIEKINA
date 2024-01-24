@@ -10,6 +10,7 @@ import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
+import agh.ics.oop.util.ReactivePropagate;
 import agh.ics.oop.view.CanvasView;
 import agh.ics.oop.view.ViewInput;
 import agh.ics.oop.window.WindowController;
@@ -56,7 +57,8 @@ public class Viewer extends WindowController implements MapChangeListener {
 
         selectOverlay.gridPosition.bindTo(
                 viewInput.mousePosition,
-                worldView::getGridIndex);
+                worldView::getGridIndex,
+                ReactivePropagate.LISTENER_ONLY);
 
         selectOverlay.gridPosition.addOnChange(position -> {
                 this.worldRenderer.renderOverlayViewLayer();
