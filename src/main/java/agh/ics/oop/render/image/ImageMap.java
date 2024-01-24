@@ -6,10 +6,7 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,7 +17,7 @@ public class ImageMap {
         this.imageMap = new HashMap<>();
     }
 
-    public ImageMap(String[] searchPaths, String extension) throws ResourceNotFoundException {
+    public ImageMap(List<String> searchPaths, String extension) throws ResourceNotFoundException {
         this();
         String extensionPattern = "." + extension;
         for (String searchPath : searchPaths) {
