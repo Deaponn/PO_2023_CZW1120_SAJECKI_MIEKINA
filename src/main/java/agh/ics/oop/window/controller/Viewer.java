@@ -1,5 +1,6 @@
 package agh.ics.oop.window.controller;
 
+import agh.ics.oop.loop.Loop;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
@@ -23,7 +24,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     public Slider delaySlider;
     private WorldRenderer worldRenderer;
     private RendererEngine rendererEngine;
-    private WorldMap worldMap;
+    private Loop rendererLoop;
     private Simulation simulation;
 
     @Override
@@ -81,22 +82,26 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 this.worldRenderer.frameRenderTime,
                 (time) -> "frame_T [ms]: " + time / 1_000_000L);
 
-        this.rendererEngine.addRenderer(this.worldRenderer);
+        this.rendererLoop = this.rendererEngine.addRenderer(this.worldRenderer);
 
-        this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
-        this.worldMap.addEventSubscriber(this);
+        WorldMap worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
+        worldMap.addEventSubscriber(this);
 
-        this.worldRenderer.setWorldMap(this.worldMap);
+        this.worldRenderer.setWorldMap(worldMap);
 
         this.simulation = this.getBundleItem("simulation", Simulation.class).orElseThrow();
 
         StatisticsCollector collector = new StatisticsCollector();
-        StatisticsExporter exporter = new StatisticsExporter(this.worldMap.getTitle());
-        collector.subscribeTo(this.worldMap);
+        StatisticsExporter exporter = new StatisticsExporter(worldMap.getTitle());
+        collector.subscribeTo(worldMap);
         collector.addEventSubscriber(exporter);
 
-        this.window.setStageOnCloseRequest(event -> this.simulation.kill());
-        this.window.setStageOnCloseRequest(event -> exporter.saveToFile());
+        this.window.setStageOnCloseRequest(event -> {
+            this.simulation.kill();
+            this.rendererEngine.getLoopControl()
+                    .removeLoop(rendererLoop);
+            exporter.saveToFile();
+        });
     }
 
     @Override

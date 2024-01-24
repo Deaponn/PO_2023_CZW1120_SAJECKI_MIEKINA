@@ -26,11 +26,16 @@ public class RendererEngine implements ThreadManager {
         this.executorService.submit(worldRenderer::renderWorldViewLayer);
     }
 
-    public void addRenderer(WorldRenderer worldRenderer) {
+    public Loop addRenderer(WorldRenderer worldRenderer) {
         Loop overlayLoop = new FixedDelayLoop(
                 time -> this.renderOverlay(worldRenderer),
                 100L);
         this.loopControl.addLoop(overlayLoop);
+        return overlayLoop;
+    }
+
+    public LoopControl getLoopControl() {
+        return this.loopControl;
     }
 
     public void kill() {

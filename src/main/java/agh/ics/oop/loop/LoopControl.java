@@ -21,6 +21,11 @@ public class LoopControl implements ThreadManager {
         this.executorService.submit(loop);
     }
 
+    public void removeLoop(Loop loop) {
+        loop.stop();
+        this.loopList.remove(loop);
+    }
+
     public void kill() {
         this.loopList.forEach(Loop::stop);
         this.executorService.shutdown();
