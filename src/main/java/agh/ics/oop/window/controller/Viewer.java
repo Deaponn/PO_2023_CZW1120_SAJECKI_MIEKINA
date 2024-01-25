@@ -71,10 +71,10 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     }
 
     private void initOverlays() {
-        BouncingImageOverlay bouncyDVD =
-                new BouncingImageOverlay(new Vector2D(50, 50), 4, "dvd0", 4f);
-        bouncyDVD.setVelocity(new Vector2D(12, 8));
-        this.worldRenderer.addOverlay("dvd", bouncyDVD);
+//        BouncingImageOverlay bouncyDVD =
+//                new BouncingImageOverlay(new Vector2D(50, 50), 4, "dvd0", 4f);
+//        bouncyDVD.setVelocity(new Vector2D(12, 8));
+//        this.worldRenderer.addOverlay("dvd", bouncyDVD);
 
         GridImageOverlay selectOverlay =
                 new GridImageOverlay(new Vector2D(), 2, "sel0");
