@@ -78,7 +78,7 @@ public class Launcher extends WindowController implements InputChangeListener<In
             }
 
             ImageMap imageMap = new ImageMap(List.of("res/gfx", "res/gfx/frogs"), "png");
-            Simulation simulation = this.simulationEngine.runSimulation(worldMap);
+            Simulation simulation = this.simulationEngine.run(worldMap);
 
             Bundle viewerBundle = new Bundle()
                     .send("configuration", this.configuration)
