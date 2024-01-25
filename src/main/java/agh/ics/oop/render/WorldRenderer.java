@@ -12,13 +12,14 @@ import agh.ics.oop.view.View;
 import agh.ics.oop.view.ViewLayer;
 import javafx.application.Platform;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorldRenderer {
     public final ImageSamplerMap imageSamplerMap;
     public final View<?> view;
-    public final List<Overlay> overlayList;
+    public final Map<String, Overlay> overlayMap;
     private final UnitRendererAssignmentMap unitRendererAssignmentMap;
     private WorldMap worldMap;
 
@@ -30,7 +31,7 @@ public class WorldRenderer {
     public WorldRenderer(ImageMap imageMap, View<?> view) {
         this.imageSamplerMap = new ImageSamplerMap(imageMap);
         this.view = view;
-        this.overlayList = new LinkedList<>();
+        this.overlayMap = new HashMap<>();
         this.unitRendererAssignmentMap = new UnitRendererAssignmentMap();
 
         this.worldViewLayer = new ViewLayer();
@@ -58,14 +59,15 @@ public class WorldRenderer {
             long endNanoTime = System.nanoTime();
 
             this.frameRenderTime.setValue(endNanoTime - startNanoTime);
-            this.overlayList.forEach(overlay -> overlay.updateOnFrame(this));
+            this.overlayMap.forEach((key, overlay) -> overlay.updateOnFrame(this));
         });
     }
 
     public synchronized void renderOverlayViewLayer() {
         Platform.runLater(() -> {
             this.overlayViewLayer.createBuffer();
-            this.overlayList
+            this.overlayMap.values().stream()
+                    .sorted()
                     .forEach(overlay -> this.tryRender(this.overlayViewLayer, overlay));
             this.view.presentView();
         });
@@ -112,5 +114,17 @@ public class WorldRenderer {
             String text) {
         ImageAtlasSampler sampler = this.imageSamplerMap.getImageAtlasSampler(samplerKey);
         this.view.putTextAtScreenCoords(position, sampler, viewLayer, scale, text);
+    }
+
+    public void addOverlay(String key, Overlay overlay) {
+        this.overlayMap.put(key, overlay);
+    }
+
+    public Overlay getOverlay(String key) {
+        return this.overlayMap.get(key);
+    }
+
+    public void removeOverlay(String key) {
+        this.overlayMap.remove(key);
     }
 }

@@ -1,12 +1,14 @@
 package agh.ics.oop.window.controller;
 
+import agh.ics.oop.entities.Animal;
+import agh.ics.oop.loop.DelayLoop;
 import agh.ics.oop.model.*;
+import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.render.overlay.GridImageOverlay;
-import agh.ics.oop.render.overlay.StaticImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.util.ReactivePropagate;
 import agh.ics.oop.view.CanvasView;
@@ -16,101 +18,153 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Slider;
 
+import java.util.List;
+
 public class Viewer extends WindowController implements ObjectEventListener<WorldMap> {
     @FXML
     public Canvas canvas;
     @FXML
     public Slider delaySlider;
+
+    private CanvasView canvasView;
+    private ViewInput viewInput;
     private WorldRenderer worldRenderer;
+    private RendererEngine rendererEngine;
     private WorldMap worldMap;
+    private DelayLoop rendererLoop;
     private Simulation simulation;
 
     @Override
     public void start() {
         super.start();
 
-        CanvasView worldView = new CanvasView(this.canvas);
-        ViewInput viewInput = new ViewInput();
-        viewInput.attach(worldView);
+        this.delaySlider.valueProperty()
+                .addListener((observable, oldValue, newValue) ->
+                        this.handleDelayUpdate(newValue.intValue()));
 
-        worldView.getRoot().widthProperty()
+        this.initRenderer();
+        this.initOverlays();
+        this.startRenderer();
+        this.initWorldMap();
+        this.setupSimulation();
+    }
+
+    private void initRenderer() {
+        this.canvasView = new CanvasView(this.canvas);
+        this.viewInput = new ViewInput();
+        this.viewInput.attach(this.canvasView);
+
+        this.canvasView.getRoot().widthProperty()
                 .bind(this.window.getRoot().widthProperty());
-        worldView.getRoot().heightProperty()
+        this.canvasView.getRoot().heightProperty()
                 .bind(this.window.getRoot().heightProperty().subtract(50));
-
-        this.delaySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            this.handleDelayUpdate(newValue.intValue());
-        });
 
         this.worldRenderer = new WorldRenderer(
                 this.getBundleItem("image_map", ImageMap.class).orElseThrow(),
-                worldView
+                this.canvasView
         );
 
         this.worldRenderer.imageSamplerMap.addFontAtlasSampler(
                 "font0",
                 "font0_atlas",
                 new Vector2D(10, 16));
+    }
 
-        BouncingImageOverlay testImageOverlay =
-                new BouncingImageOverlay(new Vector2D(50, 50), "dvd0", 4f);
-        testImageOverlay.setVelocity(new Vector2D(12, 8));
-        this.worldRenderer.overlayList.add(testImageOverlay);
+    private void initOverlays() {
+        BouncingImageOverlay bouncyDVD =
+                new BouncingImageOverlay(new Vector2D(50, 50), 4, "dvd0", 4f);
+        bouncyDVD.setVelocity(new Vector2D(12, 8));
+        this.worldRenderer.addOverlay("dvd", bouncyDVD);
 
         GridImageOverlay selectOverlay =
-                new GridImageOverlay(new Vector2D(), "sel0");
+                new GridImageOverlay(new Vector2D(), 2, "sel0");
+        this.worldRenderer.addOverlay("selector", selectOverlay);
 
         selectOverlay.gridPosition.bindTo(
-                viewInput.mousePosition,
-                worldView::getGridIndex,
+                this.viewInput.mousePosition,
+                this.canvasView::getGridIndex,
                 ReactivePropagate.LISTENER_ONLY);
 
-        selectOverlay.gridPosition.addOnChange(position -> {
-                this.worldRenderer.renderOverlayViewLayer();
-                System.out.println(position);
-        });
-
-        this.worldRenderer.overlayList.add(selectOverlay);
-
-        StaticImageOverlay playControlOverlay =
-                new StaticImageOverlay(new Vector2D(16, 16), "btnpause", 2f);
-        this.worldRenderer.overlayList.add(playControlOverlay);
-
         TextOverlay frameTimeOverlay =
-                new StaticTextOverlay(new Vector2D(64, 16), "font0_atlas", 1f, "");
-        this.worldRenderer.overlayList.add(frameTimeOverlay);
+                new StaticTextOverlay(new Vector2D(0, 0), 1, "font0_atlas", 1f, "");
+        this.worldRenderer.addOverlay("frame_time", frameTimeOverlay);
 
         frameTimeOverlay.text.bindTo(
                 this.worldRenderer.frameRenderTime,
                 (time) -> "frame_T [ms]: " + time / 1_000_000L);
 
-        this.worldMap = this.getBundleItem("world_map", WorldMap.class).orElseThrow();
+        TextOverlay mapStatisticsOverlay =
+                new StaticTextOverlay(new Vector2D(0, 32), 1, "font0_atlas", 1f, "");
+        this.worldRenderer.addOverlay("map_statistics", mapStatisticsOverlay);
+    }
+
+    private void startRenderer() {
+        this.rendererEngine = this.getBundleItem("renderer_engine", RendererEngine.class)
+                .orElseThrow();
+
+        this.rendererLoop = this.rendererEngine.runRenderer(this.worldRenderer);
+    }
+
+    private void initWorldMap() {
+        this.worldMap = this.getBundleItem("world_map", WorldMap.class)
+                .orElseThrow();
         this.worldMap.addEventSubscriber(this);
 
         this.worldRenderer.setWorldMap(this.worldMap);
+    }
 
-        this.simulation = this.getBundleItem("simulation", Simulation.class).orElseThrow();
+    private void setupSimulation() {
+        this.simulation = this.getBundleItem("simulation", Simulation.class)
+                .orElseThrow();
 
         StatisticsCollector collector = new StatisticsCollector();
         StatisticsExporter exporter = new StatisticsExporter(this.worldMap.getTitle());
         collector.subscribeTo(this.worldMap);
         collector.addEventSubscriber(exporter);
 
-        this.window.setStageOnCloseRequest(event -> this.simulation.kill());
-        this.window.setStageOnCloseRequest(event -> exporter.saveToFile());
+        TextOverlay mapStatisticsOverlay = (TextOverlay) this.worldRenderer.getOverlay("map_statistics");
+        collector.addEventSubscriber((statistics, message) ->
+                mapStatisticsOverlay.text.setValue(statistics.toString()));
+
+        GridImageOverlay selectOverlay = (GridImageOverlay) this.worldRenderer.getOverlay("selector");
+
+        this.viewInput.isLeftMousePressed.addOnChange(isPressed -> {
+            if (isPressed) {
+                List<WorldElement> worldElementList =
+                        this.worldMap.getElements(selectOverlay.gridPosition.getValue());
+                Animal animal = (Animal) worldElementList.stream()
+                        .filter(element -> element instanceof Animal)
+                        .sorted()
+                        .findFirst()
+                        .orElse(null);
+                if (animal != null) {
+                    collector.setFocusedAnimal(animal);
+                } else {
+                    collector.unsetFocusedAnimal();
+                }
+            }
+        });
+
+        this.window.setStageOnCloseRequest(event -> {
+            this.simulation.kill();
+            exporter.saveToFile();
+        });
     }
 
     @Override
     public void sendEventData(WorldMap worldMap, String message) {
         if (message.equals("step")) {
             this.worldRenderer.setWorldMap(worldMap);
-            this.worldRenderer.renderWorldViewLayer();
+            rendererEngine.renderWorld(worldRenderer);
         }
     }
 
     @FXML
     private void handlePauseButtonClick() {
-        this.simulation.setIsPaused(!this.simulation.getIsPaused());
+        if (this.simulation.isPaused())
+            this.simulation.resume();
+        else
+            this.simulation.pause();
     }
 
     // set the amount of milliseconds to wait before subsequent step() calls

@@ -11,8 +11,10 @@ import agh.ics.oop.util.Reactive;
 public class GridImageOverlay extends ImageOverlay {
     public Reactive<Vector2D> gridPosition;
 
-    public GridImageOverlay(Vector2D gridPosition, String imageKey) {
-        super(new Vector2D(), imageKey, 1f);
+    public GridImageOverlay(Vector2D gridPosition,
+                            int depthIndex,
+                            String imageKey) {
+        super(new Vector2D(), depthIndex, imageKey, 1f);
         this.gridPosition = new Reactive<>(gridPosition);
     }
 

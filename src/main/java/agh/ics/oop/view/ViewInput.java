@@ -22,6 +22,7 @@ public class ViewInput {
         Node node = view.getRoot();
         node.setOnMouseMoved(this::updatePosition);
         node.setOnMousePressed(this::updateButtons);
+        node.setOnMouseReleased(this::updateButtons);
         node.setOnMouseEntered(this::updateMoveIn);
         node.setOnMouseExited(this::updateMoveOut);
     }
@@ -30,6 +31,7 @@ public class ViewInput {
         Node node = view.getRoot();
         node.setOnMouseMoved(null);
         node.setOnMousePressed(null);
+        node.setOnMouseReleased(null);
         node.setOnMouseEntered(null);
         node.setOnMouseExited(null);
     }

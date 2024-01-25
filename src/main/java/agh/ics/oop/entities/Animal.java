@@ -118,12 +118,12 @@ public class Animal extends WorldEntity implements EnergyHolder, Comparable<Anim
 
     // returns true if Animal first is stronger, false otherwise
     static public int compare(Animal first, Animal second) {
-        if (first.energy > second.energy) return 1;
-        if (first.energy < second.energy) return -1;
-        if (first.getAge() > second.getAge()) return 1;
-        if (first.getAge() < second.getAge()) return -1;
-        if (first.kidsCount() > second.kidsCount()) return 1;
-        if (first.kidsCount() < second.kidsCount()) return -1;
+        if (first.energy > second.energy) return -1;
+        if (first.energy < second.energy) return 1;
+        if (first.getAge() > second.getAge()) return -1;
+        if (first.getAge() < second.getAge()) return 1;
+        if (first.kidsCount() > second.kidsCount()) return -1;
+        if (first.kidsCount() < second.kidsCount()) return 1;
         // randomly choose between first and second
         return random.nextInt(2);
     }

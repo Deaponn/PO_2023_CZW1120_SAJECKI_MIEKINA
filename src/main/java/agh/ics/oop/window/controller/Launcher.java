@@ -3,6 +3,7 @@ package agh.ics.oop.window.controller;
 import agh.ics.oop.Configuration;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.resource.ResourceNotFoundException;
 import agh.ics.oop.resource.Resources;
 import agh.ics.oop.window.Bundle;
@@ -27,6 +28,7 @@ public class Launcher extends WindowController implements InputChangeListener<In
     private Map<String, String> simulationParams;
     private Configuration configuration = new Configuration();
     private final SimulationEngine simulationEngine = new SimulationEngine();
+    private final RendererEngine rendererEngine = new RendererEngine();
 
     @Override
     public void start() {
@@ -82,7 +84,8 @@ public class Launcher extends WindowController implements InputChangeListener<In
                     .send("configuration", this.configuration)
                     .send("world_map", worldMap)
                     .send("image_map", imageMap)
-                    .send("simulation", simulation);
+                    .send("simulation", simulation)
+                    .send("renderer_engine", this.rendererEngine);
 
             viewerWindow.start(viewerBundle);
         } catch (ResourceNotFoundException e) {
@@ -104,6 +107,7 @@ public class Launcher extends WindowController implements InputChangeListener<In
 
     public void cleanupOnClose() {
         this.simulationEngine.kill();
+        this.rendererEngine.kill();
     }
 
     private void saveConfiguration() {

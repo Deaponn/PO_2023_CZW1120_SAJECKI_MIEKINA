@@ -1,37 +1,37 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.loop.FixedDelayLoop;
+
 public class Simulation implements Runnable {
     private final WorldMap map;
-    private int updateDelay;
-    private boolean isPaused = false;
-    private boolean isKilled = false;
+    private final FixedDelayLoop loop;
 
-    public Simulation(WorldMap map, int updateDelay) {
+    public Simulation(WorldMap map, FixedDelayLoop loop) {
         this.map = map;
-        this.updateDelay = updateDelay;
+        this.loop = loop;
     }
 
     public void run() {
-        if (isKilled) return;
-        // TODO: important to check if the paused program won't cause the
-        //      computer to become helicopter since run() will call itself back to back
-        if (!isPaused)
-            map.step();
-
-        try {
-            Thread.sleep(isPaused ? 50 : updateDelay);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        this.run();
+        this.map.step();
     }
 
-    public void setUpdateDelay(int newDelay) { this.updateDelay = newDelay; }
+    public void setUpdateDelay(long milliseconds) {
+        this.loop.setDelay(milliseconds * 1000L);
+    }
 
-    public boolean getIsPaused() { return this.isPaused; }
+    public boolean isPaused() {
+        return this.loop.isPaused();
+    }
 
-    public void setIsPaused(boolean newValue) { this.isPaused = newValue; }
+    public void resume() {
+        this.loop.resume();
+    }
 
-    public void kill() { this.isKilled = true; }
+    public void pause() {
+        this.loop.pause();
+    }
+
+    public void kill() {
+        this.loop.exit();
+    }
 }
