@@ -27,6 +27,7 @@ public class WorldRenderer {
     public final ViewLayer overlayViewLayer;
 
     public final Reactive<Long> frameRenderTime;
+    public long frame = 0;
 
     public WorldRenderer(ImageMap imageMap, View<?> view) {
         this.imageSamplerMap = new ImageSamplerMap(imageMap);
@@ -47,6 +48,7 @@ public class WorldRenderer {
     }
 
     public synchronized void renderWorldViewLayer() {
+        this.frame++;
         Platform.runLater(() -> {
             long startNanoTime = System.nanoTime();
 
