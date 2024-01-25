@@ -1,27 +1,33 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.loop.FixedDelayLoop;
+import agh.ics.oop.loop.LoopController;
 import agh.ics.oop.util.ThreadManager;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class SimulationEngine implements ThreadManager {
-    private final ExecutorService executorService;
+//    private final ExecutorService executorService;
+    private final LoopController loopController;
+
     public SimulationEngine() {
-        this.executorService = Executors.newFixedThreadPool(8);
+//        this.executorService = Executors.newFixedThreadPool(8);
+        this.loopController = new LoopController(8);
     }
 
     public Simulation run(WorldMap map) {
-        return this.run(map, 250);
-    }
-
-    public Simulation run(WorldMap map, long updateDelay) {
-        Simulation simulation = new Simulation(map, updateDelay);
-        executorService.submit(simulation);
+        FixedDelayLoop loop = new FixedDelayLoop(time -> map.step(), loopController, 250_000L);
+        Simulation simulation = new Simulation(map, loop);
+        loop.start();
         return simulation;
     }
 
+//    public Simulation run(WorldMap map) {
+//        Simulation simulation = new Simulation(map);
+//        executorService.submit(simulation);
+//        return simulation;
+//    }
+
     public void kill() {
-        this.executorService.shutdown();
+//        this.executorService.shutdown();
+        this.loopController.kill();
     }
 }

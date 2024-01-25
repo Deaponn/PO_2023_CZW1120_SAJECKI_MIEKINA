@@ -102,7 +102,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         this.rendererEngine = this.getBundleItem("renderer_engine", RendererEngine.class)
                 .orElseThrow();
 
-        this.rendererLoop = this.rendererEngine.addRenderer(this.worldRenderer);
+        this.rendererLoop = this.rendererEngine.runRenderer(this.worldRenderer);
     }
 
     private void initWorldMap() {
@@ -147,8 +147,6 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
 
         this.window.setStageOnCloseRequest(event -> {
             this.simulation.kill();
-            this.rendererEngine.getLoopControl()
-                    .removeLoop(this.rendererLoop);
             exporter.saveToFile();
         });
     }
@@ -172,6 +170,6 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     // set the amount of milliseconds to wait before subsequent step() calls
     @FXML
     private void handleDelayUpdate(int newDelay) {
-        this.simulation.setUpdateDelay(newDelay);
+//        this.simulation.setUpdateDelay(newDelay);
     }
 }

@@ -1,47 +1,35 @@
 package agh.ics.oop.loop;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
-    private final Lock pauseLock;
-    private final Condition pauseCondition;
+public class FixedDelayLoop extends Loop implements PausedLoop {
     private boolean isPaused;
-    private boolean isStopped;
-    private long timeElapsed;
-    private long timeDelay;
+    private final long timeStarted;
+    private final long timeDelay;
 
     public FixedDelayLoop(Consumer<Long> action,
-                          long milliseconds) {
-        super(action, milliseconds);
-        this.pauseLock = new ReentrantLock();
-        this.pauseCondition = this.pauseLock.newCondition();
+                          LoopController loopController,
+                          long microseconds) {
+        super(action, loopController);
         this.isPaused = false;
-        this.isStopped = false;
-        this.timeElapsed = 0L;
+        this.timeDelay = microseconds;
+        this.timeStarted = System.nanoTime();
     }
 
     @Override
     public void resume() {
-        this.pauseLock.lock();
-        try {
-            this.isPaused = false;
-            this.pauseCondition.signalAll();
-        } finally {
-            this.pauseLock.unlock();
-        }
+        if (!this.isPaused) return;
+        this.future = this.attach();
+        this.isPaused = false;
     }
 
     @Override
     public void pause() {
-        this.pauseLock.lock();
-        try {
-            this.isPaused = true;
-        } finally {
-            this.pauseLock.unlock();
-        }
+        if (this.isPaused) return;
+        this.exit();
+        this.isPaused = true;
     }
 
     @Override
@@ -49,39 +37,19 @@ public class FixedDelayLoop extends TimeDelayLoop implements PausedLoop {
         return this.isPaused;
     }
 
-    @Override
-    public void run() {
-        while (!this.isStopped) {
-            this.pauseLock.lock();
-            try {
-                while (this.isPaused) {
-                    this.pauseCondition.await();
-                }
-                this.runAction(this.timeElapsed);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } finally {
-                this.pauseLock.unlock();
-            }
-
-            try {
-                synchronized (this) {
-                    this.wait(this.timeDelay);
-                }
-                this.timeElapsed += this.timeDelay;
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public long getElapsedTime() {
+        return System.nanoTime() - this.timeStarted;
     }
 
     @Override
-    public void stop() {
-        this.isStopped = true;
+    protected Future<?> attach() {
+        return this.loopController.getExecutorService()
+                .scheduleWithFixedDelay(this, 0, this.timeDelay, TimeUnit.MICROSECONDS);
     }
 
     @Override
-    public void setTimeDelay(Long milliseconds) {
-        this.timeDelay = milliseconds;
+    public void exit() {
+        if (this.future != null)
+            this.future.cancel(false);
     }
 }

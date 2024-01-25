@@ -3,19 +3,21 @@ package agh.ics.oop.model;
 import agh.ics.oop.loop.FixedDelayLoop;
 
 public class Simulation implements Runnable {
+    private final WorldMap map;
     private final FixedDelayLoop loop;
 
-    public Simulation(WorldMap map, long timeDelay) {
-        this.loop = new FixedDelayLoop(time -> map.step(), timeDelay);
+    public Simulation(WorldMap map, FixedDelayLoop loop) {
+        this.map = map;
+        this.loop = loop;
     }
 
     public void run() {
-        this.loop.run();
+        this.map.step();
     }
 
-    public void setUpdateDelay(long milliseconds) {
-        this.loop.setTimeDelay(milliseconds);
-    }
+//    public void setUpdateDelay(long milliseconds) {
+//        this.loop.setTimeDelay(milliseconds);
+//    }
 
     public boolean isPaused() {
         return this.loop.isPaused();
@@ -30,6 +32,6 @@ public class Simulation implements Runnable {
     }
 
     public void kill() {
-        this.loop.stop();
+        this.loop.exit();
     }
 }

@@ -1,22 +1,27 @@
 package agh.ics.oop.loop;
 
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public abstract class Loop implements Runnable {
-    private Consumer<Long> action;
+    private final Consumer<Long> action;
+    protected final LoopController loopController;
+    protected Future<?> future;
 
-    public Loop(Consumer<Long> action) {
-        this.setAction(action);
-    }
-
-    public void setAction(Consumer<Long> action) {
+    public Loop(Consumer<Long> action, LoopController loopController) {
         this.action = action;
+        this.loopController = loopController;
     }
 
-    public void runAction(Long time) {
+    public void run() {
+        long time = System.nanoTime();
         this.action.accept(time);
     }
 
-    public abstract void run();
-    public abstract void stop();
+    public void start() {
+        this.future = this.attach();
+    }
+
+    protected abstract Future<?> attach();
+    public abstract void exit();
 }

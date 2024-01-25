@@ -2,7 +2,7 @@ package agh.ics.oop.render;
 
 import agh.ics.oop.loop.FixedDelayLoop;
 import agh.ics.oop.loop.Loop;
-import agh.ics.oop.loop.LoopControl;
+import agh.ics.oop.loop.LoopController;
 import agh.ics.oop.util.ThreadManager;
 
 import java.util.concurrent.ExecutorService;
@@ -10,11 +10,11 @@ import java.util.concurrent.Executors;
 
 public class RendererEngine implements ThreadManager {
     private final ExecutorService executorService;
-    private final LoopControl loopControl;
+    private final LoopController loopController;
 
     public RendererEngine() {
         this.executorService = Executors.newCachedThreadPool();
-        this.loopControl = new LoopControl(RendererEngine.loopPoolSize);
+        this.loopController = new LoopController(RendererEngine.loopPoolSize);
     }
 
     public void renderOverlay(WorldRenderer worldRenderer) {
@@ -25,21 +25,18 @@ public class RendererEngine implements ThreadManager {
         this.executorService.submit(worldRenderer::renderWorldViewLayer);
     }
 
-    public Loop addRenderer(WorldRenderer worldRenderer) {
+    public Loop runRenderer(WorldRenderer worldRenderer) {
         Loop overlayLoop = new FixedDelayLoop(
                 time -> this.renderOverlay(worldRenderer),
-                50L);
-        this.loopControl.addLoop(overlayLoop);
+                this.loopController,
+                50_000L);
+        overlayLoop.start();
         return overlayLoop;
-    }
-
-    public LoopControl getLoopControl() {
-        return this.loopControl;
     }
 
     public void kill() {
         this.executorService.shutdown();
-        this.loopControl.kill();
+        this.loopController.kill();
     }
 
     private static final int loopPoolSize = 16;
