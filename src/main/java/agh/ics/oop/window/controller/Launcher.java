@@ -11,16 +11,21 @@ import agh.ics.oop.window.LayoutPath;
 import agh.ics.oop.window.Window;
 import agh.ics.oop.window.WindowController;
 import agh.ics.oop.windowx.Toast;
+import agh.ics.oop.windowx.input.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Launcher extends WindowController {
+public class Launcher extends WindowController implements InputChangeListener<InputEvent<InputField<?, String>>> {
     @FXML
     public TextField simulationTitle;
+    private Map<String, String> simulationParams;
     private Configuration configuration = new Configuration();
     private final SimulationEngine simulationEngine = new SimulationEngine();
     private final RendererEngine rendererEngine = new RendererEngine();
@@ -28,6 +33,15 @@ public class Launcher extends WindowController {
     @Override
     public void start() {
         super.start();
+
+        this.simulationParams = new HashMap<>();
+
+        DialogMediator<String> dialogMediator =
+                new StringDialogMediator(this.simulationParams);
+
+        dialogMediator.addStringField("title", this.simulationTitle, "");
+
+        dialogMediator.inputChangeSubscribe(this);
 
         this.loadConfiguration();
     }
@@ -47,19 +61,24 @@ public class Launcher extends WindowController {
 
     public void launchViewer() {
         Window<Viewer> viewerWindow = new Window<>(
-                !this.simulationTitle.getCharacters().isEmpty() ? this.simulationTitle.getCharacters().toString()
-                        : "No simulation name",
+                this.simulationParams.get("title"),
                 LayoutPath.VIEWER.path
         );
 
         try {
             WorldMap worldMap;
-            if (configuration.get(Configuration.Fields.MAP_TYPE) == MapType.STANDARD)
-                worldMap = new EquatorialWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
-            else
-                worldMap = new PoisonousPlantsWorldMap(this.simulationTitle.getCharacters().toString(), this.configuration);
-            ImageMap imageMap = new ImageMap(new String[]{"res/gfx", "res/gfx/frogs"}, "png");
-            Simulation simulation = this.simulationEngine.run(worldMap);
+
+            String mapTitle = this.simulationParams.get("title");
+            mapTitle = !mapTitle.isBlank() ? mapTitle : "no-name";
+
+            if (configuration.get(Configuration.Fields.MAP_TYPE) == MapType.STANDARD) {
+                worldMap = new EquatorialWorldMap(mapTitle, this.configuration);
+            } else {
+                worldMap = new PoisonousPlantsWorldMap(mapTitle, this.configuration);
+            }
+
+            ImageMap imageMap = new ImageMap(List.of("res/gfx", "res/gfx/frogs"), "png");
+            Simulation simulation = this.simulationEngine.runSimulation(worldMap);
 
             Bundle viewerBundle = new Bundle()
                     .send("configuration", this.configuration)
@@ -95,7 +114,6 @@ public class Launcher extends WindowController {
         Path folderPath = Path.of("res/save");
         if (!Files.exists(folderPath.toAbsolutePath()))
             new File("res/save").mkdirs();
-
         try {
             Resources.serializeToXML(
                     Configurator.configurationPath,
@@ -107,4 +125,7 @@ public class Launcher extends WindowController {
                     "Could not save XML " + e.getMessage()).setDoNothing();
         }
     }
+
+    @Override
+    public void inputChanged(InputEvent<InputField<?, String>> inputEvent) {}
 }

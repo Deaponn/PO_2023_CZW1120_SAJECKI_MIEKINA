@@ -85,27 +85,27 @@ public class Configurator
     }
 
     private void addIntegerField(Configuration.Fields key, TextField textField) {
-        new IntegerInputField<>(key, textField,
-                this.configuration.get(key), this.dialogMediator);
+        this.dialogMediator.addIntegerField(key, textField,
+                this.configuration.get(key));
     }
 
     private void addFloatField(Configuration.Fields key, TextField textField) {
-        new FloatInputField<>(key, textField,
-                this.configuration.get(key), this.dialogMediator);
+        this.dialogMediator.addFloatField(key, textField,
+                this.configuration.get(key));
     }
 
     private <T extends Enum<T>> void addEnumField(
             Configuration.Fields key,
             Class<T> enumClass,
             ChoiceBox<T> choiceBox) {
-        new EnumInputField<>(key, choiceBox, enumClass,
-                this.configuration.get(key), this.dialogMediator);
+        this.dialogMediator.addEnumField(key, choiceBox, enumClass,
+                this.configuration.get(key));
     }
 
     private void addBooleanField(
             Configuration.Fields key, CheckBox checkBox) {
-        new BooleanInputField<>(key, checkBox,
-                this.configuration.get(key), this.dialogMediator);
+        this.dialogMediator.addBooleanField(key, checkBox,
+                this.configuration.get(key));
     }
 
     public static final String configurationPath = "res/save/save0.xml";
