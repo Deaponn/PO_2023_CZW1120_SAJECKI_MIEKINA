@@ -117,7 +117,7 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
         Animal strongestAnimal = AnimalFactory.defaultAnimal();
         for (List<Animal> animalsList : this.animals.values()) {
             for (Animal animal : animalsList) {
-                if (Animal.compare(animal, strongestAnimal) > 0) strongestAnimal = animal;
+                if (Animal.compare(animal, strongestAnimal) < 0) strongestAnimal = animal;
             }
         }
         this.mostPopularGenome.setValue(strongestAnimal.getGenome());
