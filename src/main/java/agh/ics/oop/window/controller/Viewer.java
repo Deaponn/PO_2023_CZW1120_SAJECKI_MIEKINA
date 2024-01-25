@@ -7,6 +7,7 @@ import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
+import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.view.CanvasView;
@@ -74,10 +75,10 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     }
 
     private void initOverlays() {
-//        BouncingImageOverlay bouncyDVD =
-//                new BouncingImageOverlay(new Vector2D(50, 50), 4, "dvd0", 4f);
-//        bouncyDVD.setVelocity(new Vector2D(12, 8));
-//        this.worldRenderer.addOverlay("dvd", bouncyDVD);
+        BouncingImageOverlay bouncyDVD =
+                new BouncingImageOverlay(new Vector2D(50, 50), 0, "dvd0", 4f);
+        bouncyDVD.setVelocity(new Vector2D(12, 8));
+        this.worldRenderer.addOverlay("dvd", bouncyDVD);
 
         GridImageOverlay selectOverlay =
                 new GridImageOverlay(new Vector2D(), 2, "sel0");
