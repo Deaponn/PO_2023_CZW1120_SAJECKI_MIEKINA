@@ -15,9 +15,9 @@ public class Simulation implements Runnable {
         this.map.step();
     }
 
-//    public void setUpdateDelay(long milliseconds) {
-//        this.loop.setTimeDelay(milliseconds);
-//    }
+    public void setUpdateDelay(long milliseconds) {
+        this.loop.setDelay(milliseconds * 1000L);
+    }
 
     public boolean isPaused() {
         return this.loop.isPaused();

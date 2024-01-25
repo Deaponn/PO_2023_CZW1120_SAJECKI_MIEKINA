@@ -1,15 +1,15 @@
 package agh.ics.oop.window.controller;
 
 import agh.ics.oop.entities.Animal;
-import agh.ics.oop.loop.Loop;
+import agh.ics.oop.loop.DelayLoop;
 import agh.ics.oop.model.*;
+import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
-import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.util.ReactivePropagate;
 import agh.ics.oop.view.CanvasView;
 import agh.ics.oop.view.ViewInput;
@@ -31,7 +31,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     private WorldRenderer worldRenderer;
     private RendererEngine rendererEngine;
     private WorldMap worldMap;
-    private Loop rendererLoop;
+    private DelayLoop rendererLoop;
     private Simulation simulation;
 
     @Override
@@ -170,6 +170,6 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     // set the amount of milliseconds to wait before subsequent step() calls
     @FXML
     private void handleDelayUpdate(int newDelay) {
-//        this.simulation.setUpdateDelay(newDelay);
+        this.simulation.setUpdateDelay(newDelay);
     }
 }
