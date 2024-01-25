@@ -1,13 +1,12 @@
 package agh.ics.oop.window.controller;
 
 import agh.ics.oop.entities.Animal;
-import agh.ics.oop.loop.DelayLoop;
 import agh.ics.oop.model.*;
 import agh.ics.oop.render.RendererEngine;
 import agh.ics.oop.render.TextOverlay;
 import agh.ics.oop.render.WorldRenderer;
+import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
-import agh.ics.oop.render.overlay.BouncingImageOverlay;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
 import agh.ics.oop.util.ReactivePropagate;
@@ -31,7 +30,6 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
     private WorldRenderer worldRenderer;
     private RendererEngine rendererEngine;
     private WorldMap worldMap;
-    private DelayLoop rendererLoop;
     private Simulation simulation;
 
     @Override
@@ -68,6 +66,12 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 "font0",
                 "font0_atlas",
                 new Vector2D(10, 16));
+
+        this.worldRenderer.imageSamplerMap.addImageAtlasSampler(
+                "planta",
+                "plant_atlas",
+                (image) -> new ImageAtlasSampler(image, new Vector2D(16, 16))
+        );
     }
 
     private void initOverlays() {
@@ -102,7 +106,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
         this.rendererEngine = this.getBundleItem("renderer_engine", RendererEngine.class)
                 .orElseThrow();
 
-        this.rendererLoop = this.rendererEngine.runRenderer(this.worldRenderer);
+        this.rendererEngine.runRenderer(this.worldRenderer);
     }
 
     private void initWorldMap() {
