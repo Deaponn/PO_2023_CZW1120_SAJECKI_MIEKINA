@@ -7,7 +7,7 @@ import agh.ics.oop.render.image.ImageSampler;
 
 public class BouncingImageOverlay extends ImageOverlay {
     private Vector2D velocity;
-    private int framesToGo = 120;
+    private int framesToGo = 80;
 
     public BouncingImageOverlay(Vector2D screenPosition,
                                 int depthIndex,
@@ -29,7 +29,6 @@ public class BouncingImageOverlay extends ImageOverlay {
                 this.show();
             }
             this.framesToGo--;
-            System.out.println(this.framesToGo);
             return;
         }
 
