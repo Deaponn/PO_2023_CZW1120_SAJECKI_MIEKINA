@@ -18,15 +18,16 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
     private int deadAnimalsCount;
     private int deadAnimalsDaysLivedSum;
     private Animal focusedAnimal = null;
-    private final Reactive<Boolean> isAnimalFocused = new Reactive<>(false);
-    private final Reactive<Genome> focusedAnimalGenome = new Reactive<>(GenomeFactory.defaultGenome());
-    private final Reactive<Integer> focusedAnimalActiveGene = new Reactive<>(0);
-    private final Reactive<Integer> focusedAnimalEnergy = new Reactive<>(0);
-    private final Reactive<Integer> focusedAnimalPlantsEaten = new Reactive<>(0);
-    private final Reactive<Integer> focusedAnimalKidsCount = new Reactive<>(0);
-    private final Reactive<Integer> focusedAnimalAncestorsCount = new Reactive<>(0);
-    private final Reactive<Integer> focusedAnimalAge = new Reactive<>(0);
-    private final Reactive<Boolean> focusedAnimalIsAlive = new Reactive<>(false);
+    public final Reactive<Boolean> isAnimalFocused = new Reactive<>(false);
+    public final Reactive<Vector2D> focusedAnimalPosition = new Reactive<>(new Vector2D());
+    public final Reactive<Genome> focusedAnimalGenome = new Reactive<>(GenomeFactory.defaultGenome());
+    public final Reactive<Integer> focusedAnimalActiveGene = new Reactive<>(0);
+    public final Reactive<Integer> focusedAnimalEnergy = new Reactive<>(0);
+    public final Reactive<Integer> focusedAnimalPlantsEaten = new Reactive<>(0);
+    public final Reactive<Integer> focusedAnimalKidsCount = new Reactive<>(0);
+    public final Reactive<Integer> focusedAnimalAncestorsCount = new Reactive<>(0);
+    public final Reactive<Integer> focusedAnimalAge = new Reactive<>(0);
+    public final Reactive<Boolean> focusedAnimalIsAlive = new Reactive<>(false);
     private Map<Vector2D, List<Animal>> animals;
     private Map<Vector2D, Plant> plants;
     private int mapWidth;
@@ -49,6 +50,7 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
     public void setFocusedAnimal(Animal animal) {
         this.focusedAnimal = animal;
         this.isAnimalFocused.setValue(true);
+        this.collectAnimalStatistics();
         notifySubscribers("animal set");
     }
 
@@ -83,6 +85,7 @@ public class StatisticsCollector implements ObjectEventListener<WorldMap>, Objec
 
     private void collectAnimalStatistics() {
         if (this.focusedAnimal == null || !this.focusedAnimal.getAlive()) return;
+        this.focusedAnimalPosition.setValue(this.focusedAnimal.getPosition());
         this.focusedAnimalGenome.setValue(this.focusedAnimal.getGenome());
         this.focusedAnimalActiveGene.setValue(this.focusedAnimal.getGenome().getActiveGeneIndex());
         this.focusedAnimalEnergy.setValue(this.focusedAnimal.getEnergy());

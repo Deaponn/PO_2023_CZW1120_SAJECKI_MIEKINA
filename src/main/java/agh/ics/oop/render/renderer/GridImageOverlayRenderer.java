@@ -10,6 +10,7 @@ public class GridImageOverlayRenderer implements UnitRenderer<GridImageOverlay> 
 
     @Override
     public void render(WorldRenderer renderer, ViewLayer viewLayer, GridImageOverlay overlay) {
+        if (!overlay.isVisible.getValue()) return;
         renderer.putImageAtGrid(
                 overlay.gridPosition.getValue(),
                 overlay.samplerKey.getValue(),

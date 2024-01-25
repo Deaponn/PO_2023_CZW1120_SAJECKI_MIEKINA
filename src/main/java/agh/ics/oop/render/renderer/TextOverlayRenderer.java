@@ -10,6 +10,7 @@ public class TextOverlayRenderer implements UnitRenderer<TextOverlay> {
 
     @Override
     public void render(WorldRenderer renderer, ViewLayer viewLayer, TextOverlay overlay) {
+        if (!overlay.isVisible.getValue()) return;
         renderer.putTextAtScreenCoords(
                 overlay.screenPosition,
                 overlay.samplerKey.getValue(),

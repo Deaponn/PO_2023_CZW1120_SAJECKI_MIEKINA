@@ -10,6 +10,7 @@ public class ImageOverlayRenderer implements UnitRenderer<ImageOverlay> {
 
     @Override
     public void render(WorldRenderer renderer, ViewLayer viewLayer, ImageOverlay overlay) {
+        if (!overlay.isVisible.getValue()) return;
         renderer.putImageAtScreenCoords(
                 overlay.screenPosition,
                 overlay.samplerKey.getValue(),

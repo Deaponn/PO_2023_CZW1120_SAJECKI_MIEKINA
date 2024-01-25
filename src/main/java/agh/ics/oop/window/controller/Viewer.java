@@ -9,7 +9,6 @@ import agh.ics.oop.render.image.ImageAtlasSampler;
 import agh.ics.oop.render.image.ImageMap;
 import agh.ics.oop.render.overlay.GridImageOverlay;
 import agh.ics.oop.render.overlay.StaticTextOverlay;
-import agh.ics.oop.util.ReactivePropagate;
 import agh.ics.oop.view.CanvasView;
 import agh.ics.oop.view.ViewInput;
 import agh.ics.oop.window.WindowController;
@@ -86,8 +85,13 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
 
         selectOverlay.gridPosition.bindTo(
                 this.viewInput.mousePosition,
-                this.canvasView::getGridIndex,
-                ReactivePropagate.LISTENER_ONLY);
+                this.canvasView::getGridIndex);
+
+        GridImageOverlay targetOverlay =
+                new GridImageOverlay(new Vector2D(), 3, "tgt0");
+        this.worldRenderer.addOverlay("target", targetOverlay);
+
+        targetOverlay.hide();
 
         TextOverlay frameTimeOverlay =
                 new StaticTextOverlay(new Vector2D(0, 0), 1, "font0_atlas", 1f, "");
@@ -131,6 +135,7 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 mapStatisticsOverlay.text.setValue(statistics.toString()));
 
         GridImageOverlay selectOverlay = (GridImageOverlay) this.worldRenderer.getOverlay("selector");
+        GridImageOverlay targetOverlay = (GridImageOverlay) this.worldRenderer.getOverlay("target");
 
         this.viewInput.isLeftMousePressed.addOnChange(isPressed -> {
             if (isPressed) {
@@ -148,6 +153,9 @@ public class Viewer extends WindowController implements ObjectEventListener<Worl
                 }
             }
         });
+
+        targetOverlay.isVisible.bindTo(collector.isAnimalFocused);
+        targetOverlay.gridPosition.bindTo(collector.focusedAnimalPosition);
 
         this.window.setStageOnCloseRequest(event -> {
             this.simulation.kill();
