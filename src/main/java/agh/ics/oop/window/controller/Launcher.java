@@ -60,8 +60,8 @@ public class Launcher extends WindowController implements InputChangeListener<In
     }
 
     public void launchViewer() {
-        String mapTitle = this.simulationParams.get("title");
-        mapTitle = !(mapTitle == null || mapTitle.isBlank()) ? mapTitle : "no-name";
+        String mapTitle = this.getSimulationParam("title");
+        mapTitle = !mapTitle.isBlank() ? mapTitle : "no-name";
 
         Window<Viewer> viewerWindow = new Window<>(
                 mapTitle,
@@ -103,6 +103,13 @@ public class Launcher extends WindowController implements InputChangeListener<In
         } catch (ResourceNotFoundException e) {
             this.window.showToast("Running with new configuration", Toast.Duration.MEDIUM);
         }
+    }
+
+    private String getSimulationParam(String key) {
+        String paramOrNull = this.simulationParams.get(key);
+        if (paramOrNull != null)
+            return paramOrNull;
+        return "";
     }
 
     public void cleanupOnClose() {
