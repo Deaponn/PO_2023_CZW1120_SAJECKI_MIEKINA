@@ -9,17 +9,18 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="agh.ics.oop.window.controller.Viewer"
-            minHeight="400.0" minWidth="600.0">
+            minHeight="400.0" minWidth="600.0"
+            style="-fx-background-color: #202020">
     <Canvas fx:id="canvas" width="600.0" height="400.0"/>
     <bottom>
-        <GridPane hgap="5.0" vgap="5.0" style="-fx-padding: 10">
+        <GridPane hgap="5.0" vgap="5.0" style="-fx-padding: 10; -fx-background-color: #e0e0e0">
             <Button
                     GridPane.columnIndex="0"
                     onAction="#handlePauseButtonClick"
             >PAUSE/PLAY</Button>
             <Label
                     GridPane.columnIndex="1"
-            >Predkosc animacji:</Label>
+            >animation speed:</Label>
             <Slider
                     GridPane.columnIndex="2"
                     min="100"
